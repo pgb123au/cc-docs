@@ -1,0 +1,132 @@
+{
+  "tool-lookup-caller-by-phone": {
+    "endpoint": "/lookup-caller-phone",
+    "webhook_path": "reignite-retell/lookup-caller-phone",
+    "category": "Identity & CRM"
+  },
+  "tool-lookup-caller-by-name-village": {
+    "endpoint": "/lookup-caller-name-village",
+    "webhook_path": "reignite-retell/lookup-caller-name-village",
+    "category": "Identity & CRM"
+  },
+  "tool-lookup-caller-by-dob": {
+    "endpoint": "/lookup-caller-dob",
+    "webhook_path": "reignite-retell/lookup-caller-dob",
+    "category": "Identity & CRM"
+  },
+  "tool-create-new-client": {
+    "endpoint": "/create-new-client",
+    "webhook_path": "reignite-retell/create-new-client",
+    "category": "Identity & CRM"
+  },
+  "tool-get-availability": {
+    "endpoint": "/get-availability",
+    "webhook_path": "reignite-retell/get-availability",
+    "category": "Appointments"
+  },
+  "tool-get-booking-rules": {
+    "endpoint": "/get-booking-rules",
+    "webhook_path": "reignite-retell/get-booking-rules",
+    "category": "Appointments"
+  },
+  "tool-check-funding": {
+    "endpoint": "/check-funding",
+    "webhook_path": "reignite-retell/check-funding",
+    "category": "Appointments"
+  },
+  "tool-check-protected-slot": {
+    "endpoint": "/check-protected-slot",
+    "webhook_path": "check-protected-slot",
+    "category": "Appointments"
+  },
+  "tool-create-appointment": {
+    "endpoint": "/create-appointment",
+    "webhook_path": "reignite-retell/create-appointment",
+    "category": "Appointments"
+  },
+  "tool-list-appointments": {
+    "endpoint": "/list-appointments",
+    "webhook_path": "reignite-retell/list-appointments",
+    "category": "Appointments"
+  },
+  "tool-reschedule-appointment": {
+    "endpoint": "/reschedule-appointment",
+    "webhook_path": "reignite-retell/reschedule-appointment",
+    "category": "Appointments"
+  },
+  "tool-cancel-appointment": {
+    "endpoint": "/cancel-appointment",
+    "webhook_path": "reignite-retell/cancel-appointment",
+    "category": "Appointments"
+  },
+  "tool-get-reschedule-availability": {
+    "endpoint": "/get-reschedule-availability",
+    "webhook_path": "reignite-retell/get-reschedule-availability",
+    "category": "Appointments"
+  },
+  "tool-check-recurring-conflict": {
+    "endpoint": "/check-recurring-conflict",
+    "webhook_path": "reignite-retell/check-recurring-conflict",
+    "category": "Appointments"
+  },
+  "tool-check-ep-assessment": {
+    "endpoint": "/check-ep-assessment",
+    "webhook_path": "reignite-retell/check-ep-assessment",
+    "category": "Appointments"
+  },
+  "tool-get-class-schedule": {
+    "endpoint": "/get-class-schedule",
+    "webhook_path": "reignite-retell/get-class-schedule",
+    "category": "Classes"
+  },
+  "tool-check-class-capacity": {
+    "endpoint": "/check-class-capacity",
+    "webhook_path": "reignite-retell/check-class-capacity",
+    "category": "Classes"
+  },
+  "tool-enroll-class": {
+    "endpoint": "/enroll-class",
+    "webhook_path": "reignite-retell/enroll-class",
+    "category": "Classes"
+  },
+  "tool-add-waitlist": {
+    "endpoint": "/add-waitlist",
+    "webhook_path": "reignite-retell/add-waitlist",
+    "category": "Classes"
+  },
+  "tool-capture-transfer-details": {
+    "endpoint": "/capture-booking-details",
+    "webhook_path": "reignite-retell/capture-booking-details",
+    "category": "Admin & Handoffs"
+  },
+  "tool-email-sara-with-caller-details": {
+    "endpoint": "/email-sara-transfer",
+    "webhook_path": "reignite-retell/email-sara-transfer",
+    "category": "Admin & Handoffs"
+  },
+  "tool-check-holiday": {
+    "endpoint": "/check-holiday",
+    "webhook_path": "reignite-retell/check-holiday",
+    "category": "Admin & Handoffs"
+  },
+  "tool-send-sms": {
+    "endpoint": "/send-sms",
+    "webhook_path": "reignite-retell/send-sms",
+    "category": "Admin & Handoffs"
+  },
+  "tool-add-to-followup": {
+    "endpoint": "/add-to-followup",
+    "webhook_path": "reignite-retell/add-to-followup",
+    "category": "Admin & Handoffs"
+  },
+  "tool-add-to-sara-approval": {
+    "endpoint": "/add-to-sara-approval",
+    "webhook_path": "reignite-retell/add-to-sara-approval",
+    "category": "Admin & Handoffs"
+  },
+  "tool-email-instructor": {
+    "endpoint": "/email-instructor",
+    "webhook_path": "reignite-retell/email-instructor",
+    "category": "Classes"
+  }
+}
