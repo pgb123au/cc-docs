@@ -1,5 +1,19 @@
 # AI Voice Agent & Automation Knowledge Base
 
+## ⚠️ MANDATORY COMPLETION FORMAT - ALWAYS DO THIS LAST
+
+**After EVERY completed task**, end your response with:
+```
+DONE DONE DONE
+
+Files created/modified:
+• [Full absolute path as clickable link, e.g., C:\Users\peter\Downloads\CC\filename.ext]
+```
+
+This is NON-NEGOTIABLE. Every task must end with "DONE DONE DONE" and full file paths.
+
+---
+
 ## CRITICAL SAFETY RULES
 
 ### RetellAI Simulation Tests - MANDATORY
@@ -211,4 +225,4 @@ Production AI receptionist system using RetellAI voice agents + n8n automation w
 
 ---
 
-**Last Updated:** 2025-11-28
+**Last Updated:** 2025-11-29
