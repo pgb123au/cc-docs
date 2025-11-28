@@ -25,6 +25,8 @@ Tests with `"tool_mocks": []` execute REAL webhooks and modify REAL Cliniko data
 
 ### GitHub Auto-Commit (REQUIRED for all file changes)
 
+**IMPORTANT:** After creating or modifying any agent, workflow, or documentation file, **commit and push immediately without asking**. Do not ask "Would you like me to commit?" - just do it.
+
 **Repositories:**
 | Repo | Local Path | GitHub |
 |------|------------|--------|
