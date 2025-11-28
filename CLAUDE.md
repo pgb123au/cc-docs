@@ -114,7 +114,14 @@ Common: `add-to-followup`, `book-appointment-compound`, `list-appointments`, `se
 ## CLAUDE CODE BEHAVIOR
 
 ### Before Working on RetellAI Agents
-**MANDATORY:** Read `retell/AGENT_DEVELOPMENT_GUIDE.md` FIRST before creating or modifying any agent JSON file. It contains critical file safety rules, version increment procedures, and Python templates.
+**MANDATORY:** Read these files FIRST before creating or modifying any agent JSON file:
+1. `retell/AGENT_DEVELOPMENT_GUIDE.md` - File safety rules, version procedures
+2. `retell/RETELL_VARIABLE_BINDING_RULES.md` - ⚠️ **CRITICAL** - Variable binding rules
+
+**CRITICAL VARIABLE BINDING RULE:**
+> DO NOT hard-bind function node parameters to `{{variables}}` for values collected in conversation.
+> Only bind system values (call_id) or values from previous tool `response_variables`.
+> Let the LLM extract conversation-collected values (names, dates, etc.) via tool descriptions.
 
 ### Before Working on n8n Workflows
 **MANDATORY:** Read `n8n/Webhooks Docs/RETELLAI_WEBHOOKS_CURRENT.md` for current webhook reference.
@@ -162,6 +169,7 @@ Production AI receptionist system using RetellAI voice agents + n8n automation w
 | `RETELLAI_MASTER_GUIDE_FOR_CLAUDE.md` | Complete agent building guide |
 | `RETELLAI_DEBUGGING_AND_VALIDATION_GUIDE.md` | Troubleshooting |
 | `AGENT_DEVELOPMENT_GUIDE.md` | Naming, versioning, file safety rules |
+| `RETELL_VARIABLE_BINDING_RULES.md` | ⚠️ **CRITICAL** - When to bind vs not bind parameters |
 | `Testing/` | Active agent development folder |
 
 ### n8n Workflows (`/n8n/`)
