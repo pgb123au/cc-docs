@@ -1,0 +1,15 @@
+# Subdirectories with their own git repos
+retell/
+n8n/
+
+# Claude Code local settings
+.claude/
+
+# Windows files
+Thumbs.db
+Desktop.ini
+
+# Temp files
+*.tmp
+*_temp*
+*_backup*
