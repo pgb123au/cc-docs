@@ -129,10 +129,25 @@ Common: `add-to-followup`, `book-appointment-compound`, `list-appointments`, `se
 
 ### Before Working on RetellAI Agents
 **MANDATORY:** Read these files FIRST before creating or modifying any agent JSON file:
-1. `retell/RETELL_ARCHITECTURAL_PATTERNS.md` - ⚠️ **START HERE** - 5 critical rules
-2. `retell/RETELL_VARIABLE_BINDING_RULES.md` - Variable binding details
-3. `retell/AGENT_DEVELOPMENT_GUIDE.md` - Naming, versioning, file safety
-4. `retell/Medical_Center_Receptionist_OFFICIAL_TEMPLATE.json` - Reference implementation
+
+**CRITICAL STANDARDS (Nov 2025):**
+1. `retell/RETELLAI_REFERENCE.md` - ⚠️ **API, Events, Variables, Models**
+2. `retell/RETELLAI_JSON_SCHEMAS.md` - ⚠️ **Valid JSON structures & patterns**
+
+**Architecture & Development:**
+3. `retell/RETELL_ARCHITECTURAL_PATTERNS.md` - 5 critical rules from official template
+4. `retell/RETELL_VARIABLE_BINDING_RULES.md` - Variable binding details
+5. `retell/AGENT_DEVELOPMENT_GUIDE.md` - Naming, versioning, file safety
+
+**CRITICAL JSON VALIDATION RULES:**
+| Rule | Requirement |
+|------|-------------|
+| 1. Tool Parameters | MUST have `"type": "object"` at top level |
+| 2. Dynamic Variables | ALL values MUST be strings (not int/bool) |
+| 3. Response Engine | Use `response_engine` NOT deprecated `llm_websocket_url` |
+| 4. start_speaker | REQUIRED field - "agent" or "user" |
+| 5. Node/Edge IDs | Must be unique within scope |
+| 6. destination_node_id | Must reference existing nodes |
 
 **THE 5 CRITICAL RETELL RULES:**
 | Rule | Requirement |
@@ -186,7 +201,9 @@ Production AI receptionist system using RetellAI voice agents + n8n automation w
 ### RetellAI Agents (`/retell/`)
 | Document | Purpose |
 |----------|---------|
-| `RETELL_ARCHITECTURAL_PATTERNS.md` | ⚠️ **START HERE** - 5 critical rules from official template |
+| `RETELLAI_REFERENCE.md` | ⚠️ **CRITICAL** - API, Events, Variables, Models (Nov 2025) |
+| `RETELLAI_JSON_SCHEMAS.md` | ⚠️ **CRITICAL** - Valid JSON structures & validation rules |
+| `RETELL_ARCHITECTURAL_PATTERNS.md` | 5 critical rules from official template |
 | `RETELL_VARIABLE_BINDING_RULES.md` | When to bind vs not bind parameters |
 | `Medical_Center_Receptionist_OFFICIAL_TEMPLATE.json` | Official Retell reference implementation |
 | `AGENT_DEVELOPMENT_GUIDE.md` | Naming, versioning, file safety rules |
