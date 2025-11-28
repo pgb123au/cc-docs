@@ -2,6 +2,9 @@
 retell/
 n8n/
 
+# Separate projects
+websites/
+
 # Claude Code local settings
 .claude/
 
