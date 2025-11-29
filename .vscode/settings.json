@@ -1,0 +1,36 @@
+{
+  "editor.formatOnSave": true,
+  "files.associations": {
+    "*.json": "json"
+  },
+  "json.schemas": [
+    {
+      "fileMatch": ["**/Reignite_AI_Mega_Receptionist_*.json"],
+      "url": "./retell/RETELLAI_JSON_SCHEMAS.md"
+    }
+  ],
+  "files.exclude": {
+    "**/archive/**": true,
+    "**/__pycache__/**": true,
+    "**/*.pyc": true,
+    "**/desktop.ini": true
+  },
+  "search.exclude": {
+    "**/archive/**": true,
+    "**/node_modules/**": true
+  },
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+  "files.autoSave": "onFocusChange",
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features",
+    "editor.tabSize": 2
+  },
+  "[markdown]": {
+    "editor.wordWrap": "on"
+  },
+  "[python]": {
+    "editor.tabSize": 4
+  }
+}
