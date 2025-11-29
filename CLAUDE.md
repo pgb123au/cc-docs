@@ -33,6 +33,33 @@ Tests with `"tool_mocks": []` execute REAL webhooks and modify REAL Cliniko data
 
 ---
 
+## FILE LOCATIONS (WHERE TO SAVE)
+
+### RetellAI Agents
+| Purpose | Location | Notes |
+|---------|----------|-------|
+| **Active Development** | `retell/Testing/[current-date]/` | e.g., `25-11-29a/` |
+| **Production/Stable** | `retell/agents/` | Only latest stable version |
+| **Official Templates** | `retell/templates/` | Reference templates |
+| **Old Versions** | `retell/archive/agent-history/` | Auto-ignored by git |
+
+**Naming:** `Reignite_AI_Mega_Receptionist_vX.XX_CC.json`
+
+### n8n Workflows
+| Purpose | Location |
+|---------|----------|
+| **Current Production** | `n8n/JSON/active_workflows/` |
+| **Old Backups** | `n8n/JSON/archive/` |
+
+### Documentation
+| Purpose | Location |
+|---------|----------|
+| **Webhook Reference** | `n8n/Webhooks Docs/RETELLAI_WEBHOOKS_CURRENT.md` |
+| **Dated Webhook Refs** | `n8n/Webhooks Docs/RETELLAI_WEBHOOKS_AGENT_REFERENCE_YYYY_MM_DD.md` |
+| **Old Webhook Docs** | `n8n/Webhooks Docs/archive/` |
+
+---
+
 ## GIT AUTO-COMMIT (REQUIRED)
 
 **Commit and push immediately after creating/modifying files. Do not ask.**
@@ -60,10 +87,6 @@ cd /c/Users/peter/Downloads/CC/n8n && git add . && git commit -m "Workflow - [de
 
 ### Test Patient
 - **Name:** Peter Ball | **ID:** `1805465202989210063` | **Phone:** `0412111000`
-
-### Agent Naming
-- **File:** `Reignite_AI_Mega_Receptionist_vX.XX_CC.json`
-- **Location:** `retell/Testing/`
 
 ### n8n API Scripts
 ```bash
@@ -122,30 +145,43 @@ CC/
 ├── Reignite Health AI - Master Environment Reference.md
 │
 ├── retell/                   ← RetellAI agents repo
-│   ├── RETELLAI_REFERENCE.md       ← CRITICAL: API reference
-│   ├── RETELLAI_JSON_SCHEMAS.md    ← CRITICAL: JSON validation
-│   ├── AGENT_DEVELOPMENT_GUIDE.md
-│   ├── RETELL_ARCHITECTURAL_PATTERNS.md
-│   ├── RETELL_VARIABLE_BINDING_RULES.md
-│   ├── guides/               ← Learning docs & guides
+│   ├── agents/               ← PRODUCTION: Latest stable only
+│   ├── Testing/              ← DEVELOPMENT: Current work
+│   │   └── [date-folder]/    ← Active session (e.g., 25-11-29a/)
 │   ├── templates/            ← Official RetellAI templates
-│   ├── Testing/              ← Active development
-│   └── archive/              ← Old versions
+│   ├── guides/               ← Learning docs & guides
+│   ├── archive/              ← Old versions (git-ignored)
+│   │   └── agent-history/    ← All historical versions
+│   ├── RETELLAI_REFERENCE.md
+│   ├── RETELLAI_JSON_SCHEMAS.md
+│   └── AGENT_DEVELOPMENT_GUIDE.md
 │
 ├── n8n/                      ← n8n workflows repo
 │   ├── Webhooks Docs/
 │   │   ├── RETELLAI_WEBHOOKS_CURRENT.md  ← PRIMARY reference
-│   │   └── archive/          ← Old webhook docs
-│   ├── Guides Docs/          ← Operational guides
-│   ├── AWS Docs/             ← Infrastructure docs
-│   ├── JSON/                 ← Workflow exports
+│   │   └── archive/
+│   ├── Guides Docs/
+│   ├── AWS Docs/
+│   ├── JSON/
 │   │   ├── active_workflows/ ← Current production
-│   │   └── archive/          ← Old backups
+│   │   └── archive/
 │   └── Python/               ← API scripts
 │
-├── agents/reignite-receptionist/  ← Project-specific rules
-└── shared/                        ← Global principles
+├── agents/reignite-receptionist/
+└── shared/
 ```
+
+---
+
+## WORKFLOW: Creating New Agent Version
+
+1. **Read mandatory docs** (RETELLAI_REFERENCE.md, JSON_SCHEMAS.md)
+2. **Copy from** `retell/agents/` (latest stable) or current Testing folder
+3. **Increment version** in filename AND `agent_name` field
+4. **Save to** `retell/Testing/[current-date]/`
+5. **Validate** with `/validate-agent` command
+6. **When stable** → Copy to `retell/agents/` (replaces old)
+7. **Git commit** both locations
 
 ---
 
@@ -156,13 +192,15 @@ CC/
 3. Read files before editing
 4. Commit and push after file changes
 5. Create CHANGELOG.md with new agent versions
+6. Save development work to Testing/, stable to agents/
 
 ## NEVER DO
 
+- Save agents directly to agents/ without testing
+- Keep multiple versions in agents/ (only latest stable)
+- Commit call transcripts or audit files
 - Overwrite source files (input ≠ output)
 - Use `tool-log-error` (doesn't exist)
-- Commit files with `_temp` or `_backup`
-- Skip git commit after creating files
 
 ---
 
