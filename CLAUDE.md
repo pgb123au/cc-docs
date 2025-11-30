@@ -111,7 +111,7 @@ python CC-Made-n8n_api_check_webhooks.py                # Check issues
 ### Before n8n Work
 | File | Content |
 |------|---------|
-| `n8n/Webhooks Docs/RETELLAI_WEBHOOKS_CURRENT.md` | Current webhook reference |
+| `n8n/Webhooks Docs/RETELLAI_WEBHOOKS_CURRENT.md` | Webhook specs + Agent variable mappings (Single Source of Truth) |
 
 ---
 
@@ -208,8 +208,8 @@ CC/
 
 **System:** AI receptionist using RetellAI + n8n automation
 **Stack:** RetellAI, n8n, AWS EC2, Docker, PostgreSQL, Cliniko
-**Version:** Reignite AI Mega Receptionist v10+
+**Version:** Reignite AI Mega Receptionist v11.54+
 
 ---
 
-**Last Updated:** 2025-11-29
+**Last Updated:** 2025-12-01
