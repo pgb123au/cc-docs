@@ -105,8 +105,7 @@ python CC-Made-n8n_api_check_webhooks.py                # Check issues
 |----------|------|---------|
 | 1 | `retell/RETELLAI_REFERENCE.md` | API, Events, Variables, Models |
 | 2 | `retell/RETELLAI_JSON_SCHEMAS.md` | Valid JSON structures |
-| 3 | `retell/RETELL_ARCHITECTURAL_PATTERNS.md` | 5 critical rules |
-| 4 | `retell/AGENT_DEVELOPMENT_GUIDE.md` | Naming, versioning |
+| 3 | `retell/AGENT_DEVELOPMENT_GUIDE.md` | 5 critical rules, variable binding, naming, versioning |
 
 ### Before n8n Work
 | File | Content |
@@ -152,9 +151,9 @@ CC/
 │   ├── guides/               ← Learning docs & guides
 │   ├── archive/              ← Old versions (git-ignored)
 │   │   └── agent-history/    ← All historical versions
-│   ├── RETELLAI_REFERENCE.md
-│   ├── RETELLAI_JSON_SCHEMAS.md
-│   └── AGENT_DEVELOPMENT_GUIDE.md
+│   ├── RETELLAI_REFERENCE.md     ← API reference
+│   ├── RETELLAI_JSON_SCHEMAS.md  ← JSON structures
+│   └── AGENT_DEVELOPMENT_GUIDE.md ← Development guide (includes patterns)
 │
 ├── n8n/                      ← n8n workflows repo
 │   ├── Webhooks Docs/
