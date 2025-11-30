@@ -124,6 +124,27 @@ python CC-Made-n8n_api_check_webhooks.py                # Check issues
 | 4 | Call Termination | Use `type: "end"` nodes for proper SIP termination |
 | 5 | Global Prompt | Keep under 1000 chars |
 
+## ANTI-PATTERNS (NEVER DO)
+
+| # | Anti-Pattern | Fix |
+|---|--------------|-----|
+| 1 | Mixed edge types (`skip_response_edge` + `edges`) | Use only one; set `edges: []` if using skip |
+| 2 | Function node without `response_variables` | Always add with at least `"success": "success"` |
+| 3 | Entry node without timeout edge | Add edge: `"No response for 15 seconds"` |
+| 4 | Function node without error edge | Add edge to `node-human-transfer-prep` |
+| 5 | Variable collision (`village` = `class_village`) | Use distinct names: `class_village` |
+| 6 | Instructions over 1000 chars | Split node or move to tool description |
+| 7 | Duplicate nodes diverging | Update BOTH when changing one |
+
+## PARAMETER BINDING RULES
+
+| Source | How to Bind | Example |
+|--------|-------------|---------|
+| System-provided | `"{{var}}"` | `"call_id": "{{call_id}}"` |
+| Tool response | `"{{var}}"` | `"patient_id": "{{patient_id}}"` |
+| User spoke it | `""` (empty) | `"first_name": ""` |
+| Not needed | Omit key | Don't include it |
+
 ## JSON VALIDATION RULES
 
 | Rule | Requirement |
@@ -133,6 +154,9 @@ python CC-Made-n8n_api_check_webhooks.py                # Check issues
 | Response Engine | Use `response_engine` NOT `llm_websocket_url` |
 | start_speaker | REQUIRED - "agent" or "user" |
 | Node/Edge IDs | Must be unique |
+| Function nodes | MUST have `response_variables` block |
+| Entry node | MUST have timeout edge |
+| End node | MUST have `type: "end"` with NO edges |
 
 ---
 
@@ -207,7 +231,7 @@ CC/
 
 **System:** AI receptionist using RetellAI + n8n automation
 **Stack:** RetellAI, n8n, AWS EC2, Docker, PostgreSQL, Cliniko
-**Version:** Reignite AI Mega Receptionist v11.54+
+**Version:** Reignite AI Mega Receptionist v11.59+
 
 ---
 
