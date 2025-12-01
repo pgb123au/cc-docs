@@ -88,6 +88,24 @@ cd /c/Users/peter/Downloads/CC/n8n && git add . && git commit -m "Workflow - [de
 ### Test Patient
 - **Name:** Peter Ball | **ID:** `1805465202989210063` | **Phone:** `0412111000`
 
+### RetellAI Python Tools
+```bash
+cd C:\Users\peter\Downloads\CC\retell\scripts
+
+# Comprehensive agent auditor (finds all issues)
+python retell_audit.py agent.json              # Audit specific file
+python retell_audit.py                         # Audit most recent agent
+python retell_audit.py agent.json -o report.md # Generate markdown report
+python retell_audit.py agent.json --json       # JSON for automation
+
+# Agent utilities (for fix scripts)
+from agent_utils import AgentEditor
+editor = AgentEditor("agent_v11.64.json")
+editor.set_version("11.65")
+editor.change_edge_destination("edge-id", "new-node")
+editor.save("agent_v11.65.json")
+```
+
 ### n8n API Scripts
 ```bash
 cd C:\Users\peter\Downloads\CC\n8n\Python
@@ -173,6 +191,10 @@ CC/
 │   │   └── [date-folder]/    ← Active session (e.g., 25-11-29a/)
 │   ├── templates/            ← Official RetellAI templates
 │   ├── guides/               ← Learning docs & guides
+│   ├── scripts/              ← Reusable Python tools
+│   │   ├── agent_utils.py    ← AgentEditor class for modifications
+│   │   ├── retell_audit.py   ← Comprehensive auditor
+│   │   └── validate_agent_edges.py ← Edge-specific validator
 │   ├── archive/              ← Old versions (git-ignored)
 │   │   └── agent-history/    ← All historical versions
 │   ├── RETELLAI_REFERENCE.md     ← API reference
@@ -202,9 +224,26 @@ CC/
 2. **Copy from** `retell/agents/` (latest stable) or current Testing folder
 3. **Increment version** in filename AND `agent_name` field
 4. **Save to** `retell/Testing/[current-date]/`
-5. **Validate** with `/validate-agent` command
-6. **When stable** → Copy to `retell/agents/` (replaces old)
-7. **Git commit** both locations
+5. **Audit** with `python retell/scripts/retell_audit.py <file>` - fix any CRITICAL issues
+6. **Validate** with `/validate-agent` command
+7. **When stable** → Copy to `retell/agents/` (replaces old)
+8. **Git commit** both locations
+
+## WORKFLOW: Fixing Agent Issues
+
+1. **Audit** with `python retell/scripts/retell_audit.py agent.json -o report.md`
+2. **Review** the markdown report - prioritize CRITICAL, then WARNING
+3. **Write fix script** using `AgentEditor` class from `agent_utils.py`:
+   ```python
+   from agent_utils import AgentEditor
+   editor = AgentEditor("v11.64.json")
+   editor.change_edge_destination("edge-id", "correct-node")
+   editor.remove_node_parameter("node-id", "bad_param")
+   editor.increment_version()
+   editor.save("v11.65.json")
+   ```
+4. **Re-audit** the fixed version to verify all CRITICAL issues resolved
+5. **Git commit** both the fix script and new agent version
 
 ---
 
