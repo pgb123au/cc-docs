@@ -92,11 +92,14 @@ cd /c/Users/peter/Downloads/CC/n8n && git add . && git commit -m "Workflow - [de
 ```bash
 cd C:\Users\peter\Downloads\CC\retell\scripts
 
-# Comprehensive agent auditor (finds all issues)
+# Basic auditor (fast, catches common issues)
 python retell_audit.py agent.json              # Audit specific file
 python retell_audit.py                         # Audit most recent agent
 python retell_audit.py agent.json -o report.md # Generate markdown report
-python retell_audit.py agent.json --json       # JSON for automation
+
+# Deep auditor (comprehensive, catches ALL bug patterns from v11.40-v11.64)
+python retell_deep_audit.py agent.json         # Full deep audit
+python retell_deep_audit.py agent.json -o report.md  # Detailed report
 
 # Agent utilities (for fix scripts)
 from agent_utils import AgentEditor
@@ -193,7 +196,8 @@ CC/
 │   ├── guides/               ← Learning docs & guides
 │   ├── scripts/              ← Reusable Python tools
 │   │   ├── agent_utils.py    ← AgentEditor class for modifications
-│   │   ├── retell_audit.py   ← Comprehensive auditor
+│   │   ├── retell_audit.py   ← Basic auditor (fast)
+│   │   ├── retell_deep_audit.py ← Deep auditor (catches all bug patterns)
 │   │   └── validate_agent_edges.py ← Edge-specific validator
 │   ├── archive/              ← Old versions (git-ignored)
 │   │   └── agent-history/    ← All historical versions
