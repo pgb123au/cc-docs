@@ -37,6 +37,7 @@ def get_script_categories() -> Dict[str, List[Tuple[str, str, str]]]:
         "Launcher Scripts": [],
         "n8n - Core Scripts": [],
         "n8n - Diagnostics": [],
+        "RetellAI - API Scripts": [],
         "RetellAI - Testing & Fixes": [],
         "RetellAI - Audit": [],
         "Other": []
@@ -68,6 +69,21 @@ def get_script_categories() -> Dict[str, List[Tuple[str, str, str]]]:
     if n8n_diag.exists():
         for script in sorted(n8n_diag.glob("*.py")):
             scripts["n8n - Diagnostics"].append((script.name, str(script), get_rel_path(script)))
+
+    # RetellAI API Scripts - key upload/download scripts
+    retell_api_scripts = base_dir / "retell" / "archive" / "agent-history" / "testing-root-old"
+    if retell_api_scripts.exists():
+        # Add specific key API scripts
+        upload_script = retell_api_scripts / "upload_retellai_v1-03.py"
+        calls_script = retell_api_scripts / "download_retellai_calls_v1-00.py"
+        agents_script = retell_api_scripts / "download_retellai_agents_v1-00.py"
+
+        if upload_script.exists():
+            scripts["RetellAI - API Scripts"].append((upload_script.name, str(upload_script), get_rel_path(upload_script)))
+        if calls_script.exists():
+            scripts["RetellAI - API Scripts"].append((calls_script.name, str(calls_script), get_rel_path(calls_script)))
+        if agents_script.exists():
+            scripts["RetellAI - API Scripts"].append((agents_script.name, str(agents_script), get_rel_path(agents_script)))
 
     # RetellAI Testing - main folder (exclude CC-Made subfolder)
     retell_testing = base_dir / "retell" / "Testing"
