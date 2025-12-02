@@ -1372,6 +1372,77 @@ def search_transcripts(conn, creds: Dict[str, str]):
         show_call_details(conn, selected_call_ids, creds)
 
 
+def show_full_transcripts(all_call_data: List[dict]):
+    """Display full transcripts for selected calls with pagination"""
+    call_index = 0
+
+    while True:
+        os.system('cls' if os.name == 'nt' else 'clear')
+
+        data = all_call_data[call_index]
+        call_info = data.get("call_info", {})
+        call_id = data.get("call_id", "Unknown")
+
+        total_calls = len(all_call_data)
+        print_header(f"FULL TRANSCRIPT - Call {call_index + 1} of {total_calls}")
+
+        # Call summary
+        print(f"\n  {Colors.BOLD}Call ID:{Colors.RESET} {call_id}")
+        print(f"  {Colors.BOLD}Time:{Colors.RESET} {call_info.get('started_at', '-')}")
+        print(f"  {Colors.BOLD}From:{Colors.RESET} {call_info.get('from_number', '-')} → {call_info.get('to_number', '-')}")
+        print(f"  {Colors.BOLD}Agent:{Colors.RESET} {call_info.get('retell_agent_name', '-')}")
+        print(f"  {Colors.BOLD}Duration:{Colors.RESET} {call_info.get('duration_seconds', '-')} seconds")
+
+        transcript = call_info.get('full_transcript') or call_info.get('transcript') or ''
+
+        if transcript:
+            word_count = len(transcript.split())
+            print(f"  {Colors.BOLD}Words:{Colors.RESET} {word_count}")
+            print(f"\n  {Colors.BOLD}{'='*70}{Colors.RESET}")
+            print(f"\n{Colors.CYAN}TRANSCRIPT:{Colors.RESET}\n")
+
+            # Format transcript for readability - wrap long lines
+            lines = transcript.split('\n')
+            for line in lines:
+                # Wrap lines longer than 100 chars
+                while len(line) > 100:
+                    # Find a space to break at
+                    break_point = line.rfind(' ', 0, 100)
+                    if break_point == -1:
+                        break_point = 100
+                    print(f"  {line[:break_point]}")
+                    line = line[break_point:].lstrip()
+                print(f"  {line}")
+
+            print(f"\n  {Colors.BOLD}{'='*70}{Colors.RESET}")
+        else:
+            print(f"\n  {Colors.YELLOW}No transcript available for this call{Colors.RESET}")
+
+        # Navigation
+        print(f"\n  {Colors.BOLD}Navigation:{Colors.RESET}")
+        if call_index > 0:
+            print(f"    {Colors.CYAN}P{Colors.RESET} - Previous call")
+        if call_index < total_calls - 1:
+            print(f"    {Colors.CYAN}N{Colors.RESET} - Next call")
+        if total_calls > 1:
+            print(f"    {Colors.CYAN}1-{total_calls}{Colors.RESET} - Jump to specific call")
+        print(f"    {Colors.CYAN}Q{Colors.RESET} - Back to call details")
+        print()
+
+        choice = input(f"  {Colors.BOLD}Select: {Colors.RESET}").strip().upper()
+
+        if choice == 'Q' or choice == '':
+            break
+        elif choice == 'P' and call_index > 0:
+            call_index -= 1
+        elif choice == 'N' and call_index < total_calls - 1:
+            call_index += 1
+        elif choice.isdigit():
+            idx = int(choice) - 1
+            if 0 <= idx < total_calls:
+                call_index = idx
+
+
 def show_call_details(conn, call_ids: List[str], creds: Dict[str, str]):
     """Show comprehensive details for selected calls with export option"""
     import json
@@ -1519,15 +1590,19 @@ def show_call_details(conn, call_ids: List[str], creds: Dict[str, str]):
             if call_info.get('raw_data'):
                 print(f"\n  {Colors.DIM}Raw API data available in export{Colors.RESET}")
 
-        # Export options
+        # Options
         print(f"\n  {Colors.BOLD}{'='*70}{Colors.RESET}")
-        print(f"\n  {Colors.BOLD}EXPORT OPTIONS:{Colors.RESET}")
+        print(f"\n  {Colors.BOLD}OPTIONS:{Colors.RESET}")
+        print(f"    {Colors.CYAN}T{Colors.RESET} - {Colors.BOLD}View full transcript(s){Colors.RESET}")
+        print(f"    {Colors.CYAN}P{Colors.RESET} - Play recording(s) in browser")
+        print()
+        print(f"  {Colors.BOLD}EXPORT:{Colors.RESET}")
         print(f"    {Colors.CYAN}1{Colors.RESET} - Export to current folder (default)")
         print(f"    {Colors.CYAN}2{Colors.RESET} - Export to Downloads folder")
         print(f"    {Colors.CYAN}3{Colors.RESET} - Export to Desktop")
         print(f"    {Colors.CYAN}4{Colors.RESET} - Export to CC folder")
         print(f"    {Colors.CYAN}5{Colors.RESET} - Custom path")
-        print(f"    {Colors.CYAN}P{Colors.RESET} - Play recording(s) in browser")
+        print()
         print(f"    {Colors.CYAN}Q{Colors.RESET} - Back to call list")
         print()
 
@@ -1535,6 +1610,10 @@ def show_call_details(conn, call_ids: List[str], creds: Dict[str, str]):
 
         if choice == 'Q' or choice == '':
             break
+
+        elif choice == 'T':
+            # Show full transcripts
+            show_full_transcripts(all_call_data)
 
         elif choice == 'P':
             # Play recordings

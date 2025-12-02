@@ -788,8 +788,9 @@ def sync_retell(conn):
     print(f"  [OK] {len(numbers)} numbers synced")
 
     # Recent calls with full transcripts (NEW - items 17, 18)
+    # Increased limit to get more historical calls for searching
     print("\n[Calls + Analysis + Transcripts]")
-    calls = api.get_calls(limit=50)
+    calls = api.get_calls(limit=500)
     for c in calls:
         agent_name = agent_map.get(c.get('agent_id'), c.get('agent_id', ''))
         duration_sec = (c.get('duration_ms') or 0) // 1000
