@@ -240,20 +240,36 @@ def print_subheader(text: str):
     print(f"\n{Colors.YELLOW}{Colors.BOLD}[{text}]{Colors.RESET}")
 
 
+def strip_ansi(s: str) -> str:
+    """Remove ANSI color codes from string for length calculation"""
+    import re
+    return re.sub(r'\033\[[0-9;]*m', '', str(s))
+
+
 def print_table(headers: List[str], rows: List[List[str]], col_widths: List[int] = None):
-    """Print a formatted table"""
+    """Print a formatted table with proper alignment (handles ANSI colors)"""
     if not col_widths:
-        col_widths = [max(len(str(row[i])) for row in [headers] + rows) + 2 for i in range(len(headers))]
+        col_widths = [max(len(strip_ansi(str(row[i]))) for row in [headers] + rows) + 2 for i in range(len(headers))]
+
+    gap = "  "  # Gap between columns
+    total_width = sum(col_widths) + len(gap) * (len(col_widths) - 1)
 
     # Header
-    header_line = "  ".join(f"{Colors.BOLD}{h:<{col_widths[i]}}{Colors.RESET}" for i, h in enumerate(headers))
-    print(f"  {header_line}")
-    print(f"  {'-' * sum(col_widths)}")
+    header_parts = []
+    for i, h in enumerate(headers):
+        header_parts.append(f"{Colors.BOLD}{h:<{col_widths[i]}}{Colors.RESET}")
+    print(f"  {gap.join(header_parts)}")
+    print(f"  {'-' * total_width}")
 
-    # Rows
+    # Rows - handle ANSI color codes for proper alignment
     for row in rows:
-        row_line = "  ".join(f"{str(row[i]):<{col_widths[i]}}" for i in range(len(row)))
-        print(f"  {row_line}")
+        row_parts = []
+        for i in range(len(row)):
+            cell = str(row[i])
+            visible_len = len(strip_ansi(cell))
+            padding_needed = col_widths[i] - visible_len
+            row_parts.append(cell + ' ' * max(0, padding_needed))
+        print(f"  {gap.join(row_parts)}")
 
 
 def format_phone(number: str) -> str:
@@ -545,8 +561,96 @@ def get_db_connection(creds: Dict[str, str]):
         return None
 
 
+def open_url(url: str):
+    """Open a URL in the default browser"""
+    import subprocess
+    if os.name == 'nt':
+        subprocess.run(['start', '', url], shell=True)
+    else:
+        subprocess.run(['xdg-open', url])
+
+
+def show_section_detail(conn, section: dict, creds: Dict[str, str]):
+    """Show a single section in detail with pagination"""
+    offset = 0
+    page_size = 20
+
+    while True:
+        os.system('cls' if os.name == 'nt' else 'clear')
+        print_header(f"TELCO DATA WAREHOUSE - {section['name']}")
+
+        cur = conn.cursor()
+
+        # Get total count
+        try:
+            count_query = f"SELECT COUNT(*) FROM ({section['query']}) sub"
+            cur.execute(count_query)
+            total_count = cur.fetchone()[0]
+        except:
+            total_count = 0
+
+        if total_count > 0:
+            print(f"\n  {Colors.DIM}Showing {offset + 1}-{min(offset + page_size, total_count)} of {total_count} records{Colors.RESET}\n")
+        else:
+            print(f"\n  {Colors.DIM}No records{Colors.RESET}\n")
+
+        # Get data with offset
+        cur.execute(f"{section['query']} LIMIT {page_size} OFFSET {offset}")
+        rows = []
+        raw_rows = cur.fetchall()  # Keep raw for clickable URLs
+        for idx, row in enumerate(raw_rows):
+            try:
+                formatted = section["format"](row)
+                # Add row number for sections with URLs (like recordings)
+                if section.get("url_column") is not None and len(formatted) > 0 and formatted[0] == "":
+                    formatted[0] = str(idx + 1)
+                rows.append(formatted)
+            except Exception as e:
+                rows.append([str(e)] + ["-"] * (len(section["headers"]) - 1))
+
+        if rows:
+            print_table(section["headers"], rows, section["widths"])
+        else:
+            print(f"  {Colors.DIM}No data{Colors.RESET}")
+
+        # Check if this section has clickable URLs (recordings)
+        has_urls = section.get("url_column") is not None
+
+        print(f"\n  {Colors.BOLD}Options:{Colors.RESET}")
+        if offset > 0:
+            print(f"    {Colors.CYAN}P{Colors.RESET} - Previous page")
+        if offset + page_size < total_count:
+            print(f"    {Colors.CYAN}M{Colors.RESET} - More (next page)")
+        if has_urls and raw_rows:
+            print(f"    {Colors.CYAN}1-{len(raw_rows)}{Colors.RESET} - Play recording in browser")
+        print(f"    {Colors.CYAN}Q{Colors.RESET} - Back to overview")
+        print()
+
+        choice = input(f"  {Colors.BOLD}Select: {Colors.RESET}").strip().upper()
+
+        if choice == 'Q' or choice == '':
+            break
+        elif choice == 'M' and offset + page_size < total_count:
+            offset += page_size
+        elif choice == 'P' and offset > 0:
+            offset -= page_size
+        elif has_urls and choice.isdigit():
+            idx = int(choice) - 1
+            if 0 <= idx < len(raw_rows):
+                url_col = section["url_column"]
+                url = raw_rows[idx][url_col]
+                if url:
+                    print(f"\n  {Colors.GREEN}Opening recording in browser...{Colors.RESET}")
+                    print(f"  {Colors.DIM}{url}{Colors.RESET}")
+                    open_url(url)
+                    input(f"\n  {Colors.DIM}Press Enter to continue...{Colors.RESET}")
+                else:
+                    print(f"\n  {Colors.RED}No recording URL available for this entry{Colors.RESET}")
+                    input(f"  {Colors.DIM}Press Enter to continue...{Colors.RESET}")
+
+
 def show_warehouse_summary(creds: Dict[str, str]):
-    """Show data warehouse with expandable sections - 5 rows default, click for 50"""
+    """Show data warehouse with expandable sections - press key to view section detail"""
     print_header("TELCO DATA WAREHOUSE")
 
     if not POSTGRES_AVAILABLE:
@@ -556,9 +660,6 @@ def show_warehouse_summary(creds: Dict[str, str]):
     conn = get_db_connection(creds)
     if not conn:
         return
-
-    # Track which sections to expand
-    expanded_sections = set()
 
     while True:
         os.system('cls' if os.name == 'nt' else 'clear')
@@ -584,15 +685,15 @@ def show_warehouse_summary(creds: Dict[str, str]):
                         JOIN telco.providers p ON pn.provider_id = p.provider_id
                         ORDER BY pn.last_synced DESC NULLS LAST, pn.id DESC
                     """,
-                    "headers": ["Number", "Provider", "Status", "Location", "Agent", "Synced"],
-                    "widths": [18, 10, 8, 14, 20, 12],
+                    "headers": ["Number", "Provider", "Status", "Location", "Agent Name", "Synced"],
+                    "widths": [20, 12, 10, 20, 55, 16],
                     "format": lambda r: [
                         format_phone(r[0] or ""),
                         f"{Colors.CYAN if r[1]=='telnyx' else Colors.MAGENTA if r[1]=='zadarma' else Colors.BLUE}{r[1]}{Colors.RESET}",
                         f"{Colors.GREEN if r[2] in ['on','active'] else Colors.YELLOW}{r[2] or '?'}{Colors.RESET}",
-                        truncate(r[3] or r[4] or "-", 12),
-                        truncate(r[5], 18) if r[5] else "-",
-                        r[6].strftime("%m-%d %H:%M") if r[6] else "-"
+                        truncate(r[3] or r[4] or "-", 18),
+                        r[5] or "-",  # Full agent name
+                        r[6].strftime("%Y-%m-%d %H:%M") if r[6] else "-"
                     ]
                 },
                 {
@@ -605,16 +706,16 @@ def show_warehouse_summary(creds: Dict[str, str]):
                         JOIN telco.providers p ON c.provider_id = p.provider_id
                         ORDER BY c.started_at DESC NULLS LAST
                     """,
-                    "headers": ["Time", "Provider", "From", "To", "Dur", "Status", "Agent", "Cost"],
-                    "widths": [12, 10, 16, 16, 6, 10, 18, 8],
+                    "headers": ["Time", "Provider", "From", "To", "Dur", "Status", "Agent Name", "Cost"],
+                    "widths": [18, 12, 20, 20, 8, 10, 55, 10],
                     "format": lambda r: [
-                        r[0].strftime("%m-%d %H:%M") if r[0] else "?",
+                        r[0].strftime("%Y-%m-%d %H:%M") if r[0] else "?",
                         f"{Colors.CYAN if r[1]=='telnyx' else Colors.MAGENTA if r[1]=='zadarma' else Colors.BLUE}{r[1]}{Colors.RESET}",
                         format_phone(r[2] or ""),
                         format_phone(r[3] or ""),
                         f"{r[4]}s" if r[4] else "-",
                         f"{Colors.GREEN if r[5]=='ended' else Colors.YELLOW}{r[5] or '?'}{Colors.RESET}",
-                        truncate(r[6], 16) if r[6] else "-",
+                        r[6] or "-",  # Full agent name
                         f"${r[7]:.2f}" if r[7] else "-"
                     ]
                 },
@@ -627,16 +728,16 @@ def show_warehouse_summary(creds: Dict[str, str]):
                         FROM telco.call_analysis ca
                         ORDER BY ca.synced_at DESC
                     """,
-                    "headers": ["Time", "Agent", "Call Sent.", "User Sent.", "Success", "VM", "Summary"],
-                    "widths": [12, 20, 10, 10, 8, 4, 30],
+                    "headers": ["Time", "Agent Name", "Call Sent.", "User Sent.", "Success", "VM", "Summary"],
+                    "widths": [18, 50, 12, 12, 8, 4, 55],
                     "format": lambda r: [
-                        r[0].strftime("%m-%d %H:%M") if r[0] else "-",
-                        truncate(r[1] or "-", 18),
+                        r[0].strftime("%Y-%m-%d %H:%M") if r[0] else "-",
+                        r[1] or "-",  # Full agent name
                         f"{Colors.GREEN if r[2]=='positive' else Colors.RED if r[2]=='negative' else Colors.YELLOW}{r[2] or '-'}{Colors.RESET}",
                         f"{Colors.GREEN if r[3]=='positive' else Colors.RED if r[3]=='negative' else Colors.YELLOW}{r[3] or '-'}{Colors.RESET}",
                         f"{Colors.GREEN}Yes{Colors.RESET}" if r[4] else f"{Colors.RED}No{Colors.RESET}" if r[4] is False else "-",
                         "Y" if r[5] else "-",
-                        truncate(r[6] or "-", 28)
+                        truncate((r[6] or "-").replace('\n', ' ').replace('\r', ''), 53)
                     ]
                 },
                 {
@@ -650,15 +751,15 @@ def show_warehouse_summary(creds: Dict[str, str]):
                         WHERE p.name = 'retell' AND c.full_transcript IS NOT NULL
                         ORDER BY c.started_at DESC
                     """,
-                    "headers": ["Time", "Agent", "Caller", "Dur", "Words", "Transcript Preview"],
-                    "widths": [12, 18, 16, 6, 6, 35],
+                    "headers": ["Time", "Agent Name", "Caller", "Dur", "Words", "Transcript Preview"],
+                    "widths": [18, 50, 20, 8, 8, 60],
                     "format": lambda r: [
-                        r[0].strftime("%m-%d %H:%M") if r[0] else "-",
-                        truncate(r[1] or "-", 16),
+                        r[0].strftime("%Y-%m-%d %H:%M") if r[0] else "-",
+                        r[1] or "-",  # Full agent name
                         format_phone(r[2] or ""),
                         f"{r[3]}s" if r[3] else "-",
                         str(r[4] or 0),
-                        truncate(r[5] or "-", 33) if r[5] else "-"
+                        truncate((r[5] or "-").replace('\n', ' ').replace('\r', ''), 58) if r[5] else "-"
                     ]
                 },
                 {
@@ -672,34 +773,46 @@ def show_warehouse_summary(creds: Dict[str, str]):
                         ORDER BY s.last_synced DESC NULLS LAST
                     """,
                     "headers": ["SIP ID", "Name", "Caller ID", "Status", "Lines", "Synced"],
-                    "widths": [12, 20, 16, 10, 6, 12],
+                    "widths": [16, 35, 20, 12, 8, 18],
                     "format": lambda r: [
                         r[0] or "-",
-                        truncate(r[1] or "-", 18),
+                        truncate(r[1] or "-", 33),
                         r[2] or "-",
                         f"{Colors.GREEN}{r[3]}{Colors.RESET}" if r[3] == 'active' else r[3] or "-",
                         str(r[4] or 1),
-                        r[5].strftime("%m-%d %H:%M") if r[5] else "-"
+                        r[5].strftime("%Y-%m-%d %H:%M") if r[5] else "-"
                     ]
                 },
                 {
                     "key": "6",
-                    "name": "Recordings",
+                    "name": "Recordings (All Providers)",
                     "query": """
-                        SELECT r.created_at, p.name, r.duration_seconds, r.format,
-                               r.recording_url, r.synced_at
-                        FROM telco.recordings r
-                        JOIN telco.providers p ON r.provider_id = p.provider_id
-                        ORDER BY r.created_at DESC NULLS LAST
+                        SELECT created_at, provider, duration_seconds, format, recording_url, agent_name, caller
+                        FROM (
+                            SELECT r.created_at, p.name as provider, r.duration_seconds, r.format,
+                                   r.recording_url, NULL as agent_name, NULL as caller
+                            FROM telco.recordings r
+                            JOIN telco.providers p ON r.provider_id = p.provider_id
+                            UNION ALL
+                            SELECT c.started_at as created_at, 'retell' as provider, c.duration_seconds,
+                                   'mp3' as format, c.recording_url, c.retell_agent_name as agent_name,
+                                   c.from_number as caller
+                            FROM telco.calls c
+                            JOIN telco.providers p ON c.provider_id = p.provider_id
+                            WHERE p.name = 'retell' AND c.recording_url IS NOT NULL
+                        ) combined
+                        ORDER BY created_at DESC NULLS LAST
                     """,
-                    "headers": ["Created", "Provider", "Duration", "Format", "URL"],
-                    "widths": [12, 10, 10, 8, 50],
+                    "headers": ["#", "Time", "Provider", "Dur", "Agent/Caller", "Recording URL"],
+                    "widths": [4, 18, 12, 8, 50, 70],
+                    "url_column": 4,  # Index in raw row for recording_url (0-based in SELECT)
                     "format": lambda r: [
-                        r[0].strftime("%m-%d %H:%M") if r[0] else "-",
-                        f"{Colors.MAGENTA}{r[1]}{Colors.RESET}",
+                        "",  # Row number filled by display
+                        r[0].strftime("%Y-%m-%d %H:%M") if r[0] else "-",
+                        f"{Colors.BLUE if r[1]=='retell' else Colors.MAGENTA}{r[1]}{Colors.RESET}",
                         f"{r[2]}s" if r[2] else "-",
-                        r[3] or "-",
-                        truncate(r[4] or "-", 48)
+                        truncate(r[5] or r[6] or "-", 48),  # agent_name or caller
+                        truncate(r[4] or "-", 68)
                     ]
                 },
                 {
@@ -713,7 +826,7 @@ def show_warehouse_summary(creds: Dict[str, str]):
                         ORDER BY m.sent_at DESC NULLS LAST
                     """,
                     "headers": ["Sent", "Provider", "From", "To", "Dir", "Status", "Body", "Cost"],
-                    "widths": [12, 10, 16, 16, 6, 10, 25, 8],
+                    "widths": [14, 10, 18, 18, 6, 10, 40, 8],
                     "format": lambda r: [
                         r[0].strftime("%m-%d %H:%M") if r[0] else "-",
                         f"{Colors.CYAN}{r[1]}{Colors.RESET}",
@@ -721,7 +834,7 @@ def show_warehouse_summary(creds: Dict[str, str]):
                         format_phone(r[3] or ""),
                         r[4] or "-",
                         r[5] or "-",
-                        truncate(r[6] or "-", 23),
+                        truncate((r[6] or "-").replace('\n', ' ').replace('\r', ''), 38),
                         f"${r[7]:.3f}" if r[7] else "-"
                     ]
                 },
@@ -735,10 +848,10 @@ def show_warehouse_summary(creds: Dict[str, str]):
                         ORDER BY f.last_synced DESC NULLS LAST
                     """,
                     "headers": ["Connection", "FQDN", "Active", "Transport", "Region", "Synced"],
-                    "widths": [25, 30, 8, 12, 15, 12],
+                    "widths": [35, 40, 8, 12, 18, 14],
                     "format": lambda r: [
-                        truncate(r[0] or "-", 23),
-                        truncate(r[1] or "-", 28),
+                        truncate(r[0] or "-", 33),
+                        truncate(r[1] or "-", 38),
                         f"{Colors.GREEN}Yes{Colors.RESET}" if r[2] else f"{Colors.RED}No{Colors.RESET}",
                         r[3] or "-",
                         r[4] or "-",
@@ -755,9 +868,9 @@ def show_warehouse_summary(creds: Dict[str, str]):
                         ORDER BY o.last_synced DESC NULLS LAST
                     """,
                     "headers": ["Profile Name", "Enabled", "Traffic Type", "Plan", "Spend Limit", "Synced"],
-                    "widths": [25, 8, 16, 15, 12, 12],
+                    "widths": [40, 8, 18, 20, 14, 14],
                     "format": lambda r: [
-                        truncate(r[0] or "-", 23),
+                        truncate(r[0] or "-", 38),
                         f"{Colors.GREEN}Yes{Colors.RESET}" if r[1] else f"{Colors.RED}No{Colors.RESET}",
                         r[2] or "-",
                         r[3] or "-",
@@ -774,12 +887,12 @@ def show_warehouse_summary(creds: Dict[str, str]):
                         ORDER BY m.last_synced DESC NULLS LAST
                     """,
                     "headers": ["Profile Name", "Enabled", "Pool", "Webhook URL", "Synced"],
-                    "widths": [25, 8, 6, 35, 12],
+                    "widths": [40, 8, 6, 55, 14],
                     "format": lambda r: [
-                        truncate(r[0] or "-", 23),
+                        truncate(r[0] or "-", 38),
                         f"{Colors.GREEN}Yes{Colors.RESET}" if r[1] else f"{Colors.RED}No{Colors.RESET}",
                         "Y" if r[2] else "N",
-                        truncate(r[3] or "-", 33),
+                        truncate(r[3] or "-", 53),
                         r[4].strftime("%m-%d %H:%M") if r[4] else "-"
                     ]
                 },
@@ -792,10 +905,10 @@ def show_warehouse_summary(creds: Dict[str, str]):
                         ORDER BY s.last_synced DESC NULLS LAST
                     """,
                     "headers": ["SIP Username", "Connection", "Active", "Created", "Synced"],
-                    "widths": [20, 25, 8, 12, 12],
+                    "widths": [30, 40, 8, 14, 14],
                     "format": lambda r: [
-                        r[0] or "-",
-                        truncate(r[1] or "-", 23),
+                        truncate(r[0] or "-", 28),
+                        truncate(r[1] or "-", 38),
                         f"{Colors.GREEN}Yes{Colors.RESET}" if r[2] else f"{Colors.RED}No{Colors.RESET}",
                         r[3].strftime("%m-%d %H:%M") if r[3] else "-",
                         r[4].strftime("%m-%d %H:%M") if r[4] else "-"
@@ -811,12 +924,12 @@ def show_warehouse_summary(creds: Dict[str, str]):
                         ORDER BY n.ordered_at DESC NULLS LAST
                     """,
                     "headers": ["Order ID", "Type", "Status", "Reference", "Reqs Met", "Ordered"],
-                    "widths": [25, 15, 12, 20, 8, 12],
+                    "widths": [40, 18, 14, 30, 10, 14],
                     "format": lambda r: [
-                        truncate(r[0] or "-", 23),
+                        truncate(r[0] or "-", 38),
                         r[1] or "-",
                         f"{Colors.GREEN if r[2]=='success' else Colors.YELLOW}{r[2] or '-'}{Colors.RESET}",
-                        truncate(r[3] or "-", 18),
+                        truncate(r[3] or "-", 28),
                         f"{Colors.GREEN}Yes{Colors.RESET}" if r[4] else f"{Colors.RED}No{Colors.RESET}" if r[4] is False else "-",
                         r[5].strftime("%m-%d %H:%M") if r[5] else "-"
                     ]
@@ -830,11 +943,11 @@ def show_warehouse_summary(creds: Dict[str, str]):
                         ORDER BY k.last_synced DESC NULLS LAST
                     """,
                     "headers": ["KB ID", "Name", "Description", "Sources", "Synced"],
-                    "widths": [25, 25, 30, 8, 12],
+                    "widths": [35, 35, 45, 10, 14],
                     "format": lambda r: [
-                        truncate(r[0] or "-", 23),
-                        truncate(r[1] or "-", 23),
-                        truncate(r[2] or "-", 28),
+                        truncate(r[0] or "-", 33),
+                        truncate(r[1] or "-", 33),
+                        truncate(r[2] or "-", 43),
                         str(r[3] or 0),
                         r[4].strftime("%m-%d %H:%M") if r[4] else "-"
                     ]
@@ -848,10 +961,10 @@ def show_warehouse_summary(creds: Dict[str, str]):
                         ORDER BY l.last_synced DESC NULLS LAST
                     """,
                     "headers": ["LLM ID", "Name", "Model", "Temp", "Synced"],
-                    "widths": [28, 25, 20, 6, 12],
+                    "widths": [40, 40, 25, 6, 14],
                     "format": lambda r: [
-                        truncate(r[0] or "-", 26),
-                        truncate(r[1] or "-", 23),
+                        truncate(r[0] or "-", 38),
+                        truncate(r[1] or "-", 38),
                         r[2] or "-",
                         f"{r[3]:.1f}" if r[3] else "-",
                         r[4].strftime("%m-%d %H:%M") if r[4] else "-"
@@ -866,14 +979,14 @@ def show_warehouse_summary(creds: Dict[str, str]):
                         ORDER BY v.last_synced DESC NULLS LAST
                     """,
                     "headers": ["Voice ID", "Name", "Provider", "Language", "Gender", "Accent"],
-                    "widths": [20, 22, 15, 10, 8, 15],
+                    "widths": [35, 30, 18, 12, 10, 20],
                     "format": lambda r: [
-                        truncate(r[0] or "-", 18),
-                        truncate(r[1] or "-", 20),
+                        truncate(r[0] or "-", 33),
+                        truncate(r[1] or "-", 28),
                         r[2] or "-",
                         r[3] or "-",
                         r[4] or "-",
-                        truncate(r[5] or "-", 13)
+                        truncate(r[5] or "-", 18)
                     ]
                 },
                 {
@@ -884,14 +997,14 @@ def show_warehouse_summary(creds: Dict[str, str]):
                         FROM telco.retell_agents
                         ORDER BY last_synced DESC NULLS LAST
                     """,
-                    "headers": ["Agent ID", "Name", "Voice", "Lang", "Webhook", "Synced"],
-                    "widths": [25, 30, 15, 6, 20, 12],
+                    "headers": ["Agent ID", "Agent Name", "Voice ID", "Lang", "Webhook", "Synced"],
+                    "widths": [30, 45, 25, 6, 25, 14],
                     "format": lambda r: [
-                        truncate(r[0] or "-", 23),
-                        truncate(r[1] or "-", 28),
-                        truncate(r[2] or "-", 13),
+                        truncate(r[0] or "-", 28),
+                        r[1] or "-",  # Full agent name - no truncation
+                        truncate(r[2] or "-", 23),
                         r[3] or "-",
-                        truncate(r[4] or "-", 18) if r[4] else "-",
+                        truncate(r[4] or "-", 23) if r[4] else "-",
                         r[5].strftime("%m-%d %H:%M") if r[5] else "-"
                     ]
                 },
@@ -904,8 +1017,8 @@ def show_warehouse_summary(creds: Dict[str, str]):
                         JOIN telco.providers p ON b.provider_id = p.provider_id
                         ORDER BY b.snapshot_at DESC
                     """,
-                    "headers": ["Snapshot", "Provider", "Balance", "Currency", "Credit"],
-                    "widths": [18, 12, 12, 10, 12],
+                    "headers": ["Snapshot", "Provider", "Balance", "Currency", "Credit Limit"],
+                    "widths": [20, 14, 14, 10, 14],
                     "format": lambda r: [
                         r[0].strftime("%Y-%m-%d %H:%M") if r[0] else "-",
                         f"{Colors.CYAN if r[1]=='telnyx' else Colors.MAGENTA if r[1]=='zadarma' else Colors.BLUE}{r[1]}{Colors.RESET}",
@@ -922,8 +1035,8 @@ def show_warehouse_summary(creds: Dict[str, str]):
                         FROM telco.concurrency_stats c
                         ORDER BY c.snapshot_at DESC
                     """,
-                    "headers": ["Snapshot", "Current", "Max", "In Progress"],
-                    "widths": [20, 10, 10, 12],
+                    "headers": ["Snapshot", "Current Concurrent", "Max Concurrent", "Calls In Progress"],
+                    "widths": [22, 20, 16, 18],
                     "format": lambda r: [
                         r[0].strftime("%Y-%m-%d %H:%M") if r[0] else "-",
                         str(r[1] or 0),
@@ -933,15 +1046,13 @@ def show_warehouse_summary(creds: Dict[str, str]):
                 },
             ]
 
-            # Display all sections
-            print_subheader("Data Sections (Press key to expand/collapse)")
+            # Display all sections with preview (5 rows each)
+            print_subheader("Data Sections (Press key to view full section)")
             print()
 
             for section in sections:
                 key = section["key"]
                 name = section["name"]
-                is_expanded = key in expanded_sections
-                limit = 50 if is_expanded else 5
 
                 # Get count
                 try:
@@ -952,33 +1063,33 @@ def show_warehouse_summary(creds: Dict[str, str]):
                     total_count = 0
 
                 # Section header
-                expand_indicator = f"{Colors.GREEN}[-]{Colors.RESET}" if is_expanded else f"{Colors.YELLOW}[+]{Colors.RESET}"
                 count_display = f"({total_count})" if total_count > 0 else f"{Colors.DIM}(0){Colors.RESET}"
-                print(f"  {Colors.CYAN}{key}.{Colors.RESET} {expand_indicator} {name} {count_display}")
+                print(f"  {Colors.CYAN}{key}.{Colors.RESET} {Colors.YELLOW}[+]{Colors.RESET} {name} {count_display}")
 
                 if total_count > 0:
-                    # Get data
-                    cur.execute(f"{section['query']} LIMIT {limit}")
+                    # Get preview data (5 rows)
+                    cur.execute(f"{section['query']} LIMIT 5")
                     rows = []
-                    for row in cur.fetchall():
+                    raw_rows = cur.fetchall()
+                    for idx, row in enumerate(raw_rows):
                         try:
                             formatted = section["format"](row)
+                            # Add row number for recordings section
+                            if section.get("url_column") is not None and formatted[0] == "":
+                                formatted[0] = str(idx + 1)
                             rows.append(formatted)
                         except Exception as e:
                             rows.append([str(e)] + ["-"] * (len(section["headers"]) - 1))
 
                     if rows:
                         print_table(section["headers"], rows, section["widths"])
-                        if total_count > limit:
-                            more = total_count - limit
-                            print(f"       {Colors.DIM}... {more} more (press {key} to show all 50){Colors.RESET}")
-                        elif is_expanded and total_count > 5:
-                            print(f"       {Colors.DIM}(press {key} to collapse){Colors.RESET}")
+                        if total_count > 5:
+                            print(f"       {Colors.DIM}... {total_count - 5} more (press {key} to view all){Colors.RESET}")
                     print()
 
             # Menu
             print(f"\n  {Colors.BOLD}Options:{Colors.RESET}")
-            print(f"    Press 1-9, A-I to expand/collapse a section")
+            print(f"    Press {Colors.CYAN}1-9, A-I{Colors.RESET} to view a section in detail")
             print(f"    Press {Colors.CYAN}Q{Colors.RESET} to return to main menu")
             print()
 
@@ -987,10 +1098,11 @@ def show_warehouse_summary(creds: Dict[str, str]):
             if choice == 'Q' or choice == '':
                 break
             elif choice in [s["key"] for s in sections]:
-                if choice in expanded_sections:
-                    expanded_sections.remove(choice)
-                else:
-                    expanded_sections.add(choice)
+                # Find the section and show detail view
+                for section in sections:
+                    if section["key"] == choice:
+                        show_section_detail(conn, section, creds)
+                        break
 
         except Exception as e:
             print(f"{Colors.RED}Error querying database: {e}{Colors.RESET}")
@@ -1000,6 +1112,383 @@ def show_warehouse_summary(creds: Dict[str, str]):
             break
 
     conn.close()
+
+
+# ============================================================================
+# RETELL CALLS EXPLORER
+# ============================================================================
+
+def show_retell_calls_explorer(creds: Dict[str, str]):
+    """Comprehensive Retell Calls Explorer - view all data for calls and export"""
+    if not POSTGRES_AVAILABLE:
+        print(f"  {Colors.RED}psycopg2 not installed. Run: pip install psycopg2-binary{Colors.RESET}")
+        return
+
+    conn = get_db_connection(creds)
+    if not conn:
+        return
+
+    while True:
+        os.system('cls' if os.name == 'nt' else 'clear')
+        print_header("RETELL CALLS EXPLORER")
+        print(f"\n  {Colors.DIM}View comprehensive call data with all related information{Colors.RESET}\n")
+
+        cur = conn.cursor()
+
+        # Get 10 most recent Retell calls
+        cur.execute("""
+            SELECT c.call_id, c.started_at, c.from_number, c.to_number,
+                   c.duration_seconds, c.status, c.retell_agent_name,
+                   c.direction, c.recording_url
+            FROM telco.calls c
+            JOIN telco.providers p ON c.provider_id = p.provider_id
+            WHERE p.name = 'retell'
+            ORDER BY c.started_at DESC NULLS LAST
+            LIMIT 10
+        """)
+        calls = cur.fetchall()
+
+        if not calls:
+            print(f"  {Colors.YELLOW}No Retell calls found in database{Colors.RESET}")
+            print(f"\n  {Colors.DIM}Try syncing data first (option S from main menu){Colors.RESET}")
+            input(f"\n{Colors.DIM}Press Enter to go back...{Colors.RESET}")
+            conn.close()
+            return
+
+        # Display calls with selection numbers
+        print(f"  {Colors.BOLD}10 Most Recent Retell Calls:{Colors.RESET}\n")
+
+        headers = ["#", "Time", "From", "To", "Dur", "Status", "Agent", "Dir"]
+        col_widths = [4, 18, 18, 18, 8, 12, 40, 6]
+
+        rows = []
+        for idx, call in enumerate(calls, 1):
+            call_id, started_at, from_num, to_num, duration, status, agent_name, direction, rec_url = call
+            time_str = started_at.strftime("%Y-%m-%d %H:%M") if started_at else "-"
+            dur_str = f"{duration}s" if duration else "-"
+            agent_short = (agent_name[:38] + "..") if agent_name and len(agent_name) > 40 else (agent_name or "-")
+            dir_str = direction[:3].upper() if direction else "-"
+            has_rec = f"{Colors.GREEN}●{Colors.RESET}" if rec_url else ""
+
+            rows.append([
+                f"{Colors.CYAN}{idx}{Colors.RESET}",
+                time_str,
+                from_num or "-",
+                to_num or "-",
+                dur_str,
+                status or "-",
+                agent_short,
+                dir_str + has_rec
+            ])
+
+        print_table(headers, rows, col_widths)
+
+        print(f"\n  {Colors.BOLD}Select calls:{Colors.RESET}")
+        print(f"    - Enter number (e.g., {Colors.CYAN}1{Colors.RESET}) for single call")
+        print(f"    - Enter range (e.g., {Colors.CYAN}1-3{Colors.RESET}) for multiple")
+        print(f"    - Enter comma-separated (e.g., {Colors.CYAN}1,3,5{Colors.RESET})")
+        print(f"    - Enter {Colors.CYAN}A{Colors.RESET} for all 10 calls")
+        print(f"    - Enter {Colors.CYAN}Q{Colors.RESET} to go back")
+        print()
+
+        choice = input(f"  {Colors.BOLD}Selection: {Colors.RESET}").strip()
+
+        if not choice or choice.upper() == 'Q':
+            break
+
+        # Parse selection
+        selected_indices = []
+        if choice.upper() == 'A':
+            selected_indices = list(range(10))
+        else:
+            try:
+                parts = choice.replace(' ', '').split(',')
+                for part in parts:
+                    if '-' in part:
+                        start, end = part.split('-')
+                        selected_indices.extend(range(int(start) - 1, int(end)))
+                    else:
+                        selected_indices.append(int(part) - 1)
+            except:
+                print(f"\n  {Colors.RED}Invalid selection format{Colors.RESET}")
+                input(f"  {Colors.DIM}Press Enter to try again...{Colors.RESET}")
+                continue
+
+        # Validate indices
+        selected_indices = [i for i in selected_indices if 0 <= i < len(calls)]
+        if not selected_indices:
+            print(f"\n  {Colors.RED}No valid calls selected{Colors.RESET}")
+            input(f"  {Colors.DIM}Press Enter to try again...{Colors.RESET}")
+            continue
+
+        # Get selected call IDs
+        selected_calls = [calls[i] for i in selected_indices]
+        selected_call_ids = [call[0] for call in selected_calls]
+
+        # Show detailed view for selected calls
+        show_call_details(conn, selected_call_ids, creds)
+
+    conn.close()
+
+
+def show_call_details(conn, call_ids: List[str], creds: Dict[str, str]):
+    """Show comprehensive details for selected calls with export option"""
+    import json
+
+    cur = conn.cursor()
+    all_call_data = []
+
+    for call_id in call_ids:
+        call_data = {"call_id": call_id}
+
+        # Get main call data
+        cur.execute("""
+            SELECT c.*, p.name as provider_name
+            FROM telco.calls c
+            JOIN telco.providers p ON c.provider_id = p.provider_id
+            WHERE c.call_id = %s
+        """, (call_id,))
+
+        call_row = cur.fetchone()
+        if call_row:
+            col_names = [desc[0] for desc in cur.description]
+            call_data["call_info"] = dict(zip(col_names, call_row))
+
+            # Convert datetime objects to strings for JSON
+            for key, val in call_data["call_info"].items():
+                if isinstance(val, datetime):
+                    call_data["call_info"][key] = val.isoformat()
+
+        # Get call analysis if available
+        cur.execute("""
+            SELECT * FROM telco.call_analysis WHERE call_id = %s
+        """, (call_id,))
+
+        analysis_row = cur.fetchone()
+        if analysis_row:
+            col_names = [desc[0] for desc in cur.description]
+            call_data["call_analysis"] = dict(zip(col_names, analysis_row))
+            for key, val in call_data["call_analysis"].items():
+                if isinstance(val, datetime):
+                    call_data["call_analysis"][key] = val.isoformat()
+
+        # Get agent info if we have agent_id
+        agent_id = call_data.get("call_info", {}).get("agent_id") or call_data.get("call_info", {}).get("retell_agent_id")
+        if agent_id:
+            cur.execute("""
+                SELECT * FROM telco.retell_agents WHERE agent_id = %s
+            """, (agent_id,))
+
+            agent_row = cur.fetchone()
+            if agent_row:
+                col_names = [desc[0] for desc in cur.description]
+                call_data["agent_info"] = dict(zip(col_names, agent_row))
+                for key, val in call_data["agent_info"].items():
+                    if isinstance(val, datetime):
+                        call_data["agent_info"][key] = val.isoformat()
+
+                # Get voice config if we have voice_id
+                voice_id = call_data["agent_info"].get("voice_id")
+                if voice_id:
+                    cur.execute("""
+                        SELECT * FROM telco.voice_configs WHERE voice_id = %s
+                    """, (voice_id,))
+                    voice_row = cur.fetchone()
+                    if voice_row:
+                        col_names = [desc[0] for desc in cur.description]
+                        call_data["voice_config"] = dict(zip(col_names, voice_row))
+                        for key, val in call_data["voice_config"].items():
+                            if isinstance(val, datetime):
+                                call_data["voice_config"][key] = val.isoformat()
+
+        all_call_data.append(call_data)
+
+    # Display the data
+    while True:
+        os.system('cls' if os.name == 'nt' else 'clear')
+        print_header(f"CALL DETAILS - {len(call_ids)} Call(s) Selected")
+
+        for idx, data in enumerate(all_call_data, 1):
+            call_info = data.get("call_info", {})
+            analysis = data.get("call_analysis", {})
+            agent = data.get("agent_info", {})
+            voice = data.get("voice_config", {})
+
+            print(f"\n  {Colors.BOLD}{'='*70}{Colors.RESET}")
+            print(f"  {Colors.CYAN}CALL {idx}: {data['call_id']}{Colors.RESET}")
+            print(f"  {Colors.BOLD}{'='*70}{Colors.RESET}")
+
+            # Basic call info
+            print(f"\n  {Colors.BOLD}CALL INFORMATION:{Colors.RESET}")
+            print(f"    Started:     {call_info.get('started_at', '-')}")
+            print(f"    Ended:       {call_info.get('ended_at', '-')}")
+            print(f"    From:        {call_info.get('from_number', '-')}")
+            print(f"    To:          {call_info.get('to_number', '-')}")
+            print(f"    Direction:   {call_info.get('direction', '-')}")
+            print(f"    Duration:    {call_info.get('duration_seconds', '-')} seconds")
+            print(f"    Status:      {call_info.get('status', '-')}")
+            print(f"    Cost:        ${call_info.get('cost', 0) or 0:.4f}")
+
+            if call_info.get('recording_url'):
+                print(f"    Recording:   {Colors.GREEN}Available{Colors.RESET}")
+
+            # Agent info
+            if agent:
+                print(f"\n  {Colors.BOLD}AGENT INFORMATION:{Colors.RESET}")
+                print(f"    Agent Name:  {agent.get('agent_name', '-')}")
+                print(f"    Agent ID:    {agent.get('agent_id', '-')}")
+                print(f"    Voice ID:    {agent.get('voice_id', '-')}")
+                print(f"    Language:    {agent.get('language', '-')}")
+                if agent.get('webhook_url'):
+                    print(f"    Webhook:     {agent.get('webhook_url', '-')}")
+            else:
+                print(f"\n  {Colors.BOLD}AGENT INFORMATION:{Colors.RESET}")
+                print(f"    Agent Name:  {call_info.get('retell_agent_name', '-')}")
+
+            # Voice config
+            if voice:
+                print(f"\n  {Colors.BOLD}VOICE CONFIGURATION:{Colors.RESET}")
+                print(f"    Voice Name:  {voice.get('voice_name', '-')}")
+                print(f"    Provider:    {voice.get('provider_voice', '-')}")
+                print(f"    Language:    {voice.get('language', '-')}")
+                print(f"    Gender:      {voice.get('gender', '-')}")
+                print(f"    Accent:      {voice.get('accent', '-')}")
+
+            # Call analysis
+            if analysis:
+                print(f"\n  {Colors.BOLD}CALL ANALYSIS:{Colors.RESET}")
+                print(f"    Summary:     {analysis.get('call_summary', '-')}")
+                print(f"    Sentiment:   Call: {analysis.get('call_sentiment', '-')} | User: {analysis.get('user_sentiment', '-')}")
+                print(f"    Successful:  {analysis.get('call_successful', '-')}")
+                print(f"    Voicemail:   {analysis.get('in_voicemail', '-')}")
+                if analysis.get('latency_stats'):
+                    print(f"    Latency:     {analysis.get('latency_stats', '-')}")
+
+            # Transcript preview
+            transcript = call_info.get('full_transcript', '')
+            if transcript:
+                print(f"\n  {Colors.BOLD}TRANSCRIPT PREVIEW:{Colors.RESET}")
+                preview = transcript[:500].replace('\n', ' ').replace('\r', '')
+                if len(transcript) > 500:
+                    preview += "..."
+                print(f"    {Colors.DIM}{preview}{Colors.RESET}")
+                print(f"    {Colors.DIM}(Total: {call_info.get('transcript_words', 0)} words){Colors.RESET}")
+
+            # Raw data available
+            if call_info.get('raw_data'):
+                print(f"\n  {Colors.DIM}Raw API data available in export{Colors.RESET}")
+
+        # Export options
+        print(f"\n  {Colors.BOLD}{'='*70}{Colors.RESET}")
+        print(f"\n  {Colors.BOLD}EXPORT OPTIONS:{Colors.RESET}")
+        print(f"    {Colors.CYAN}1{Colors.RESET} - Export to current folder (default)")
+        print(f"    {Colors.CYAN}2{Colors.RESET} - Export to Downloads folder")
+        print(f"    {Colors.CYAN}3{Colors.RESET} - Export to Desktop")
+        print(f"    {Colors.CYAN}4{Colors.RESET} - Export to CC folder")
+        print(f"    {Colors.CYAN}5{Colors.RESET} - Custom path")
+        print(f"    {Colors.CYAN}P{Colors.RESET} - Play recording(s) in browser")
+        print(f"    {Colors.CYAN}Q{Colors.RESET} - Back to call list")
+        print()
+
+        choice = input(f"  {Colors.BOLD}Select: {Colors.RESET}").strip().upper()
+
+        if choice == 'Q' or choice == '':
+            break
+
+        elif choice == 'P':
+            # Play recordings
+            for data in all_call_data:
+                rec_url = data.get("call_info", {}).get("recording_url")
+                if rec_url:
+                    print(f"\n  {Colors.GREEN}Opening recording: {data['call_id']}{Colors.RESET}")
+                    open_url(rec_url)
+            input(f"\n  {Colors.DIM}Press Enter to continue...{Colors.RESET}")
+
+        elif choice in ['1', '2', '3', '4', '5']:
+            # Determine export path
+            if choice == '1':
+                export_dir = Path.cwd()
+            elif choice == '2':
+                export_dir = Path.home() / "Downloads"
+            elif choice == '3':
+                export_dir = Path.home() / "Desktop"
+            elif choice == '4':
+                export_dir = Path.home() / "Downloads" / "CC"
+            elif choice == '5':
+                custom_path = input(f"  Enter path: ").strip()
+                if not custom_path:
+                    print(f"  {Colors.RED}No path entered{Colors.RESET}")
+                    input(f"  {Colors.DIM}Press Enter to continue...{Colors.RESET}")
+                    continue
+                export_dir = Path(custom_path)
+
+            # Create directory if needed
+            export_dir.mkdir(parents=True, exist_ok=True)
+
+            # Generate filename
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            if len(call_ids) == 1:
+                filename = f"retell_call_{call_ids[0][:8]}_{timestamp}.json"
+            else:
+                filename = f"retell_calls_{len(call_ids)}calls_{timestamp}.json"
+
+            export_path = export_dir / filename
+
+            # Prepare export data
+            export_data = {
+                "exported_at": datetime.now().isoformat(),
+                "call_count": len(all_call_data),
+                "calls": all_call_data
+            }
+
+            # Write JSON file
+            try:
+                with open(export_path, 'w', encoding='utf-8') as f:
+                    json.dump(export_data, f, indent=2, default=str)
+
+                print(f"\n  {Colors.GREEN}Exported successfully!{Colors.RESET}")
+                print(f"  {Colors.DIM}{export_path}{Colors.RESET}")
+
+                # Also create a readable text version
+                txt_path = export_path.with_suffix('.txt')
+                with open(txt_path, 'w', encoding='utf-8') as f:
+                    f.write(f"RETELL CALLS EXPORT\n")
+                    f.write(f"Exported: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+                    f.write(f"Calls: {len(all_call_data)}\n")
+                    f.write("="*70 + "\n\n")
+
+                    for data in all_call_data:
+                        call_info = data.get("call_info", {})
+                        analysis = data.get("call_analysis", {})
+
+                        f.write(f"CALL ID: {data['call_id']}\n")
+                        f.write("-"*50 + "\n")
+                        f.write(f"Time: {call_info.get('started_at', '-')}\n")
+                        f.write(f"From: {call_info.get('from_number', '-')}\n")
+                        f.write(f"To: {call_info.get('to_number', '-')}\n")
+                        f.write(f"Duration: {call_info.get('duration_seconds', '-')} seconds\n")
+                        f.write(f"Agent: {call_info.get('retell_agent_name', '-')}\n")
+                        f.write(f"Status: {call_info.get('status', '-')}\n")
+                        if call_info.get('recording_url'):
+                            f.write(f"Recording: {call_info.get('recording_url')}\n")
+
+                        if analysis:
+                            f.write(f"\nAnalysis:\n")
+                            f.write(f"  Summary: {analysis.get('call_summary', '-')}\n")
+                            f.write(f"  Sentiment: {analysis.get('call_sentiment', '-')}\n")
+                            f.write(f"  Successful: {analysis.get('call_successful', '-')}\n")
+
+                        if call_info.get('full_transcript'):
+                            f.write(f"\nTranscript:\n{call_info.get('full_transcript')}\n")
+
+                        f.write("\n" + "="*70 + "\n\n")
+
+                print(f"  {Colors.DIM}Text version: {txt_path}{Colors.RESET}")
+
+            except Exception as e:
+                print(f"\n  {Colors.RED}Export failed: {e}{Colors.RESET}")
+
+            input(f"\n  {Colors.DIM}Press Enter to continue...{Colors.RESET}")
 
 
 def show_menu():
@@ -1013,6 +1502,7 @@ def show_menu():
     print(f"  {Colors.CYAN}3.{Colors.RESET} Retell AI Overview")
     print(f"  {Colors.CYAN}4.{Colors.RESET} Unified Number View (All Providers)")
     print(f"  {Colors.CYAN}5.{Colors.RESET} Data Warehouse (PostgreSQL)")
+    print(f"  {Colors.CYAN}6.{Colors.RESET} {Colors.BOLD}Retell Calls Explorer{Colors.RESET} {Colors.GREEN}NEW{Colors.RESET}")
     print()
     print(f"  {Colors.CYAN}A.{Colors.RESET} Show All")
     print(f"  {Colors.CYAN}S.{Colors.RESET} Sync Data (Pull from APIs)")
@@ -1086,6 +1576,9 @@ def main():
 
         elif choice == '5':
             show_warehouse_summary(creds)
+
+        elif choice == '6':
+            show_retell_calls_explorer(creds)
 
         elif choice == 'a':
             if zadarma:
