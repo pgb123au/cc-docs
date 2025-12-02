@@ -1137,7 +1137,7 @@ def show_retell_calls_explorer(creds: Dict[str, str]):
 
         # Get 10 most recent Retell calls
         cur.execute("""
-            SELECT c.call_id, c.started_at, c.from_number, c.to_number,
+            SELECT c.external_call_id, c.started_at, c.from_number, c.to_number,
                    c.duration_seconds, c.status, c.retell_agent_name,
                    c.direction, c.recording_url
             FROM telco.calls c
@@ -1183,11 +1183,12 @@ def show_retell_calls_explorer(creds: Dict[str, str]):
 
         print_table(headers, rows, col_widths)
 
-        print(f"\n  {Colors.BOLD}Select calls:{Colors.RESET}")
+        print(f"\n  {Colors.BOLD}Options:{Colors.RESET}")
         print(f"    - Enter number (e.g., {Colors.CYAN}1{Colors.RESET}) for single call")
         print(f"    - Enter range (e.g., {Colors.CYAN}1-3{Colors.RESET}) for multiple")
         print(f"    - Enter comma-separated (e.g., {Colors.CYAN}1,3,5{Colors.RESET})")
         print(f"    - Enter {Colors.CYAN}A{Colors.RESET} for all 10 calls")
+        print(f"    - Enter {Colors.CYAN}S{Colors.RESET} to {Colors.BOLD}Search transcripts{Colors.RESET}")
         print(f"    - Enter {Colors.CYAN}Q{Colors.RESET} to go back")
         print()
 
@@ -1195,6 +1196,11 @@ def show_retell_calls_explorer(creds: Dict[str, str]):
 
         if not choice or choice.upper() == 'Q':
             break
+
+        # Handle search option
+        if choice.upper() == 'S':
+            search_transcripts(conn, creds)
+            continue
 
         # Parse selection
         selected_indices = []
@@ -1231,6 +1237,141 @@ def show_retell_calls_explorer(creds: Dict[str, str]):
     conn.close()
 
 
+def search_transcripts(conn, creds: Dict[str, str]):
+    """Search all transcripts for a string and list matching calls"""
+    os.system('cls' if os.name == 'nt' else 'clear')
+    print_header("TRANSCRIPT SEARCH")
+
+    print(f"\n  {Colors.DIM}Search for text within call transcripts{Colors.RESET}\n")
+
+    search_term = input(f"  {Colors.BOLD}Enter search term: {Colors.RESET}").strip()
+
+    if not search_term:
+        print(f"\n  {Colors.RED}No search term entered{Colors.RESET}")
+        input(f"  {Colors.DIM}Press Enter to go back...{Colors.RESET}")
+        return
+
+    cur = conn.cursor()
+
+    # Search transcripts (case-insensitive)
+    cur.execute("""
+        SELECT c.external_call_id, c.started_at, c.from_number, c.to_number,
+               c.duration_seconds, c.status, c.retell_agent_name,
+               c.direction, c.recording_url, c.transcript, c.full_transcript
+        FROM telco.calls c
+        JOIN telco.providers p ON c.provider_id = p.provider_id
+        WHERE p.name = 'retell'
+          AND (c.transcript ILIKE %s OR c.full_transcript ILIKE %s)
+        ORDER BY c.started_at DESC NULLS LAST
+        LIMIT 50
+    """, (f'%{search_term}%', f'%{search_term}%'))
+
+    results = cur.fetchall()
+
+    if not results:
+        print(f"\n  {Colors.YELLOW}No calls found containing '{search_term}'{Colors.RESET}")
+        input(f"\n  {Colors.DIM}Press Enter to go back...{Colors.RESET}")
+        return
+
+    while True:
+        os.system('cls' if os.name == 'nt' else 'clear')
+        print_header(f"TRANSCRIPT SEARCH: '{search_term}'")
+        print(f"\n  {Colors.GREEN}Found {len(results)} call(s) matching '{search_term}'{Colors.RESET}\n")
+
+        headers = ["#", "Time", "From", "To", "Dur", "Agent", "Transcript Preview"]
+        col_widths = [4, 18, 16, 16, 8, 30, 50]
+
+        rows = []
+        for idx, result in enumerate(results, 1):
+            call_id, started_at, from_num, to_num, duration, status, agent_name, direction, rec_url, transcript, full_transcript = result
+
+            time_str = started_at.strftime("%Y-%m-%d %H:%M") if started_at else "-"
+            dur_str = f"{duration}s" if duration else "-"
+            agent_short = (agent_name[:28] + "..") if agent_name and len(agent_name) > 30 else (agent_name or "-")
+
+            # Get transcript preview with search term highlighted
+            text = full_transcript or transcript or ""
+            text = text.replace('\n', ' ').replace('\r', '')
+
+            # Find the search term and show context around it
+            lower_text = text.lower()
+            lower_term = search_term.lower()
+            pos = lower_text.find(lower_term)
+            if pos != -1:
+                start = max(0, pos - 20)
+                end = min(len(text), pos + len(search_term) + 30)
+                preview = ("..." if start > 0 else "") + text[start:end] + ("..." if end < len(text) else "")
+                # Highlight the search term
+                preview_lower = preview.lower()
+                term_pos = preview_lower.find(lower_term)
+                if term_pos != -1:
+                    preview = preview[:term_pos] + f"{Colors.YELLOW}{preview[term_pos:term_pos+len(search_term)]}{Colors.RESET}" + preview[term_pos+len(search_term):]
+            else:
+                preview = text[:50] + "..." if len(text) > 50 else text
+
+            rows.append([
+                f"{Colors.CYAN}{idx}{Colors.RESET}",
+                time_str,
+                from_num or "-",
+                to_num or "-",
+                dur_str,
+                agent_short,
+                preview
+            ])
+
+        print_table(headers, rows, col_widths)
+
+        print(f"\n  {Colors.BOLD}Options:{Colors.RESET}")
+        print(f"    - Enter number (e.g., {Colors.CYAN}1{Colors.RESET}) for single call")
+        print(f"    - Enter range (e.g., {Colors.CYAN}1-3{Colors.RESET}) for multiple")
+        print(f"    - Enter comma-separated (e.g., {Colors.CYAN}1,3,5{Colors.RESET})")
+        print(f"    - Enter {Colors.CYAN}A{Colors.RESET} for all matching calls")
+        print(f"    - Enter {Colors.CYAN}N{Colors.RESET} for new search")
+        print(f"    - Enter {Colors.CYAN}Q{Colors.RESET} to go back")
+        print()
+
+        choice = input(f"  {Colors.BOLD}Selection: {Colors.RESET}").strip()
+
+        if not choice or choice.upper() == 'Q':
+            break
+
+        if choice.upper() == 'N':
+            # Recursive call for new search
+            search_transcripts(conn, creds)
+            break
+
+        # Parse selection
+        selected_indices = []
+        if choice.upper() == 'A':
+            selected_indices = list(range(len(results)))
+        else:
+            try:
+                parts = choice.replace(' ', '').split(',')
+                for part in parts:
+                    if '-' in part:
+                        start, end = part.split('-')
+                        selected_indices.extend(range(int(start) - 1, int(end)))
+                    else:
+                        selected_indices.append(int(part) - 1)
+            except:
+                print(f"\n  {Colors.RED}Invalid selection format{Colors.RESET}")
+                input(f"  {Colors.DIM}Press Enter to try again...{Colors.RESET}")
+                continue
+
+        # Validate indices
+        selected_indices = [i for i in selected_indices if 0 <= i < len(results)]
+        if not selected_indices:
+            print(f"\n  {Colors.RED}No valid calls selected{Colors.RESET}")
+            input(f"  {Colors.DIM}Press Enter to try again...{Colors.RESET}")
+            continue
+
+        # Get selected call IDs
+        selected_call_ids = [results[i][0] for i in selected_indices]
+
+        # Show detailed view for selected calls
+        show_call_details(conn, selected_call_ids, creds)
+
+
 def show_call_details(conn, call_ids: List[str], creds: Dict[str, str]):
     """Show comprehensive details for selected calls with export option"""
     import json
@@ -1246,7 +1387,7 @@ def show_call_details(conn, call_ids: List[str], creds: Dict[str, str]):
             SELECT c.*, p.name as provider_name
             FROM telco.calls c
             JOIN telco.providers p ON c.provider_id = p.provider_id
-            WHERE c.call_id = %s
+            WHERE c.external_call_id = %s
         """, (call_id,))
 
         call_row = cur.fetchone()
