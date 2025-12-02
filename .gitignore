@@ -14,7 +14,8 @@ websites/
 # Environment files
 .env
 
-# Telco credentials (API keys)
+# Credentials files (API keys, passwords)
+.credentials_master
 Telcos/.credentials
 
 # Windows files
