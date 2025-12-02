@@ -100,6 +100,10 @@ cd /c/Users/peter/Downloads/CC/n8n && git add . && git commit -m "Workflow - [de
 ```bash
 cd C:\Users\peter\Downloads\CC\retell\scripts
 
+# DEPLOY AGENT TO PRODUCTION (validates, shows phone numbers, uploads)
+python deploy_agent.py agent.json              # Deploy specific file
+python deploy_agent.py                         # Interactive file selection
+
 # PRE-IMPORT VALIDATOR (run before uploading to RetellAI!)
 python retell_agent_validator.py agent.json           # Validate agent
 python retell_agent_validator.py agent.json --fix     # Auto-fix issues
@@ -120,6 +124,14 @@ editor = AgentEditor("agent_v11.64.json")
 editor.set_version("11.65")
 editor.change_edge_destination("edge-id", "new-node")
 editor.save("agent_v11.65.json")
+```
+
+### Telco Manager (Phone Numbers)
+```bash
+cd C:\Users\peter\Downloads\CC\Telcos
+python telco.py                                # Interactive menu
+# Option 3: Retell AI Overview - shows phone numbers and agent assignments
+# Option 4: Unified Number View - all providers (Zadarma, Telnyx, Retell)
 ```
 
 ### n8n API Scripts
@@ -212,6 +224,8 @@ CC/
 │   ├── templates/            ← Official RetellAI templates
 │   ├── guides/               ← Learning docs & guides
 │   ├── scripts/              ← Reusable Python tools
+│   │   ├── deploy_agent.py   ← Full deployment (validate + upload + show numbers)
+│   │   ├── retell_agent_validator.py ← Pre-import validator
 │   │   ├── agent_utils.py    ← AgentEditor class for modifications
 │   │   ├── retell_audit.py   ← Basic auditor (fast)
 │   │   ├── retell_deep_audit.py ← Deep auditor (catches all bug patterns)
@@ -233,6 +247,12 @@ CC/
 │   │   └── archive/
 │   └── Python/               ← API scripts
 │
+├── Telcos/                   ← Telephony provider management
+│   ├── telco.py             ← Unified view of all providers
+│   ├── .credentials         ← API keys (git-ignored)
+│   ├── Telnyx/              ← Telnyx documentation
+│   └── Zadarma/             ← Zadarma documentation
+│
 ├── agents/reignite-receptionist/
 └── shared/
 ```
@@ -248,8 +268,39 @@ CC/
 5. **Audit** with `python retell/scripts/retell_audit.py <file>` - fix any CRITICAL issues
 6. **PRE-IMPORT VALIDATE** with `python retell/scripts/retell_agent_validator.py <file>` - catches null-type errors
 7. **Validate** with `/validate-agent` command
-8. **When stable** → Copy to `retell/agents/` (replaces old)
-9. **Git commit** both locations
+8. **Deploy to production** with `python retell/scripts/deploy_agent.py <file>`
+   - Shows current phone numbers and connected agents
+   - Updates the production conversation flow
+   - Updates the agent name
+9. **When stable** → Copy to `retell/agents/` (replaces old)
+10. **Git commit** both locations
+
+## WORKFLOW: Full Agent Deployment
+
+The `deploy_agent.py` script handles the complete deployment:
+
+```bash
+cd C:\Users\peter\Downloads\CC\retell\Testing\[date]
+python ../../scripts/deploy_agent.py agent.json
+```
+
+**What it does:**
+1. Validates the agent JSON (runs retell_agent_validator.py)
+2. Shows all phone numbers and their current agent assignments
+3. Identifies the production agent (the one connected to phone numbers)
+4. Updates the production conversation flow with new nodes/edges
+5. Updates the agent name to the new version
+6. Shows deployment summary with connected phone numbers
+
+**Phone Numbers (Production):**
+- `+61288800226` - Main Sydney number
+- `+61240620999` - Secondary number
+
+**View phone numbers anytime:**
+```bash
+cd C:\Users\peter\Downloads\CC\Telcos
+python telco.py  # Option 3 for Retell numbers
+```
 
 ## WORKFLOW: Fixing Agent Issues
 
@@ -292,8 +343,8 @@ CC/
 
 **System:** AI receptionist using RetellAI + n8n automation
 **Stack:** RetellAI, n8n, AWS EC2, Docker, PostgreSQL, Cliniko
-**Version:** Reignite AI Mega Receptionist v11.59+
+**Version:** Reignite AI Mega Receptionist v11.109
 
 ---
 
-**Last Updated:** 2025-12-01
+**Last Updated:** 2025-12-03
