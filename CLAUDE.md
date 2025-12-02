@@ -54,9 +54,8 @@ Tests with `"tool_mocks": []` execute REAL webhooks and modify REAL Cliniko data
 ### Documentation
 | Purpose | Location |
 |---------|----------|
-| **Webhook Reference** | `n8n/Webhooks Docs/RETELLAI_WEBHOOKS_CURRENT.md` |
-| **Dated Webhook Refs** | `n8n/Webhooks Docs/RETELLAI_WEBHOOKS_AGENT_REFERENCE_YYYY_MM_DD.md` |
-| **Old Webhook Docs** | `n8n/Webhooks Docs/archive/` |
+| **Webhook Reference** | `n8n/Webhooks Docs/RETELLAI_WEBHOOKS_CURRENT.md` **(ONLY SOURCE OF TRUTH)** |
+| **Archived Webhook Docs** | `n8n/Webhooks Docs/archive/` **(OUTDATED - DO NOT USE)** |
 
 ---
 
@@ -91,6 +90,11 @@ cd /c/Users/peter/Downloads/CC/n8n && git add . && git commit -m "Workflow - [de
 ### RetellAI Python Tools
 ```bash
 cd C:\Users\peter\Downloads\CC\retell\scripts
+
+# PRE-IMPORT VALIDATOR (run before uploading to RetellAI!)
+python retell_agent_validator.py agent.json           # Validate agent
+python retell_agent_validator.py agent.json --fix     # Auto-fix issues
+python retell_agent_validator.py agent.json -o report.md  # Save report
 
 # Basic auditor (fast, catches common issues)
 python retell_audit.py agent.json              # Audit specific file
@@ -230,9 +234,10 @@ CC/
 3. **Increment version** in filename AND `agent_name` field
 4. **Save to** `retell/Testing/[current-date]/`
 5. **Audit** with `python retell/scripts/retell_audit.py <file>` - fix any CRITICAL issues
-6. **Validate** with `/validate-agent` command
-7. **When stable** → Copy to `retell/agents/` (replaces old)
-8. **Git commit** both locations
+6. **PRE-IMPORT VALIDATE** with `python retell/scripts/retell_agent_validator.py <file>` - catches null-type errors
+7. **Validate** with `/validate-agent` command
+8. **When stable** → Copy to `retell/agents/` (replaces old)
+9. **Git commit** both locations
 
 ## WORKFLOW: Fixing Agent Issues
 
