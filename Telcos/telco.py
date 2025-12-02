@@ -585,79 +585,233 @@ def show_warehouse_summary(creds: Dict[str, str]):
             except:
                 print(f"  {name}: {Colors.RED}Error{Colors.RESET}")
 
-        # Phone Numbers by provider
-        print_subheader("Phone Numbers by Provider")
+        # =====================================================================
+        # PHONE NUMBERS - Last 10
+        # =====================================================================
+        print_subheader("Phone Numbers (Last 10 Synced)")
         cur.execute("""
-            SELECT p.name, COUNT(*) as cnt
+            SELECT pn.phone_number, p.name, pn.status, pn.city, pn.nickname,
+                   pn.retell_agent_name, pn.last_synced
             FROM telco.phone_numbers pn
             JOIN telco.providers p ON pn.provider_id = p.provider_id
-            GROUP BY p.name ORDER BY cnt DESC
-        """)
-        for row in cur.fetchall():
-            print(f"  {row[0]}: {Colors.GREEN}{row[1]}{Colors.RESET}")
-
-        # Recent Calls
-        print_subheader("Recent Calls (Last 10)")
-        cur.execute("""
-            SELECT c.started_at, p.name, c.from_number, c.to_number,
-                   c.duration_seconds, c.status, c.retell_agent_name
-            FROM telco.calls c
-            JOIN telco.providers p ON c.provider_id = p.provider_id
-            ORDER BY c.started_at DESC
+            ORDER BY pn.last_synced DESC NULLS LAST, pn.id DESC
             LIMIT 10
         """)
         rows = []
         for row in cur.fetchall():
-            started = row[0].strftime("%Y-%m-%d %H:%M") if row[0] else "?"
-            duration = f"{row[4]}s" if row[4] else "-"
-            agent = truncate(row[6], 20) if row[6] else "-"
-            status_color = Colors.GREEN if row[5] == 'ended' else Colors.YELLOW
+            synced = row[6].strftime("%m-%d %H:%M") if row[6] else "-"
+            status_color = Colors.GREEN if row[2] in ['on', 'active'] else Colors.YELLOW
+            provider_color = Colors.CYAN if row[1] == 'telnyx' else (Colors.MAGENTA if row[1] == 'zadarma' else Colors.BLUE)
+            location = row[3] or row[4] or "-"  # city or nickname
+            agent = truncate(row[5], 18) if row[5] else "-"
             rows.append([
-                started,
-                row[1],  # provider
-                format_phone(row[2] or ""),  # from
-                format_phone(row[3] or ""),  # to
-                duration,
-                f"{status_color}{row[5] or '?'}{Colors.RESET}",
-                agent
+                format_phone(row[0] or ""),
+                f"{provider_color}{row[1]}{Colors.RESET}",
+                f"{status_color}{row[2] or '?'}{Colors.RESET}",
+                truncate(location, 12),
+                agent,
+                synced
             ])
         if rows:
-            print_table(["Time", "Provider", "From", "To", "Dur", "Status", "Agent"],
-                       rows, [17, 8, 16, 16, 6, 10, 22])
+            print_table(["Number", "Provider", "Status", "Location", "Retell Agent", "Synced"],
+                       rows, [18, 10, 8, 14, 20, 12])
+        else:
+            print(f"  {Colors.DIM}No phone numbers{Colors.RESET}")
+
+        # =====================================================================
+        # CALLS/CDRs - Last 10
+        # =====================================================================
+        print_subheader("Calls/CDRs (Last 10)")
+        cur.execute("""
+            SELECT c.started_at, p.name, c.from_number, c.to_number,
+                   c.duration_seconds, c.status, c.retell_agent_name, c.cost
+            FROM telco.calls c
+            JOIN telco.providers p ON c.provider_id = p.provider_id
+            ORDER BY c.started_at DESC NULLS LAST
+            LIMIT 10
+        """)
+        rows = []
+        for row in cur.fetchall():
+            started = row[0].strftime("%m-%d %H:%M") if row[0] else "?"
+            duration = f"{row[4]}s" if row[4] else "-"
+            agent = truncate(row[6], 18) if row[6] else "-"
+            cost = f"${row[7]:.2f}" if row[7] else "-"
+            status_color = Colors.GREEN if row[5] == 'ended' else Colors.YELLOW
+            provider_color = Colors.CYAN if row[1] == 'telnyx' else (Colors.MAGENTA if row[1] == 'zadarma' else Colors.BLUE)
+            rows.append([
+                started,
+                f"{provider_color}{row[1]}{Colors.RESET}",
+                format_phone(row[2] or ""),
+                format_phone(row[3] or ""),
+                duration,
+                f"{status_color}{row[5] or '?'}{Colors.RESET}",
+                agent,
+                cost
+            ])
+        if rows:
+            print_table(["Time", "Provider", "From", "To", "Dur", "Status", "Agent", "Cost"],
+                       rows, [12, 10, 16, 16, 6, 8, 20, 8])
         else:
             print(f"  {Colors.DIM}No calls recorded{Colors.RESET}")
 
-        # Latest Balance Snapshots
-        print_subheader("Latest Balances")
+        # =====================================================================
+        # BALANCE SNAPSHOTS - Last 10
+        # =====================================================================
+        print_subheader("Balance Snapshots (Last 10)")
+        cur.execute("""
+            SELECT b.snapshot_at, p.name, b.balance, b.currency, b.credit_limit
+            FROM telco.balance_snapshots b
+            JOIN telco.providers p ON b.provider_id = p.provider_id
+            ORDER BY b.snapshot_at DESC
+            LIMIT 10
+        """)
+        rows = []
+        for row in cur.fetchall():
+            snapshot = row[0].strftime("%Y-%m-%d %H:%M") if row[0] else "?"
+            provider_color = Colors.CYAN if row[1] == 'telnyx' else (Colors.MAGENTA if row[1] == 'zadarma' else Colors.BLUE)
+            credit = f"${row[4]:.2f}" if row[4] else "-"
+            rows.append([
+                snapshot,
+                f"{provider_color}{row[1]}{Colors.RESET}",
+                f"{Colors.GREEN}${row[2]:.2f}{Colors.RESET}",
+                row[3] or "USD",
+                credit
+            ])
+        if rows:
+            print_table(["Snapshot Time", "Provider", "Balance", "Currency", "Credit Limit"],
+                       rows, [18, 10, 12, 10, 12])
+        else:
+            print(f"  {Colors.DIM}No balance snapshots{Colors.RESET}")
+
+        # =====================================================================
+        # RETELL AGENTS - Last 10
+        # =====================================================================
+        print_subheader("Retell Agents (Last 10 Synced)")
+        cur.execute("""
+            SELECT agent_id, agent_name, voice_id, language, last_synced
+            FROM telco.retell_agents
+            ORDER BY last_synced DESC NULLS LAST, id DESC
+            LIMIT 10
+        """)
+        rows = []
+        for row in cur.fetchall():
+            synced = row[4].strftime("%m-%d %H:%M") if row[4] else "-"
+            rows.append([
+                truncate(row[1] or "", 35),
+                row[0][:20] + "..." if row[0] and len(row[0]) > 20 else (row[0] or "-"),
+                truncate(row[2] or "-", 15),
+                row[3] or "-",
+                synced
+            ])
+        if rows:
+            print_table(["Agent Name", "Agent ID", "Voice", "Lang", "Synced"],
+                       rows, [37, 24, 17, 6, 12])
+        else:
+            print(f"  {Colors.DIM}No agents{Colors.RESET}")
+
+        # =====================================================================
+        # RECORDINGS - Last 10
+        # =====================================================================
+        print_subheader("Recordings (Last 10)")
+        cur.execute("""
+            SELECT r.created_at, p.name, r.duration_seconds, r.format,
+                   r.recording_url, r.synced_at
+            FROM telco.recordings r
+            JOIN telco.providers p ON r.provider_id = p.provider_id
+            ORDER BY r.created_at DESC NULLS LAST, r.id DESC
+            LIMIT 10
+        """)
+        rows = []
+        for row in cur.fetchall():
+            created = row[0].strftime("%m-%d %H:%M") if row[0] else "-"
+            duration = f"{row[2]}s" if row[2] else "-"
+            url = truncate(row[4] or "-", 40)
+            provider_color = Colors.CYAN if row[1] == 'telnyx' else (Colors.MAGENTA if row[1] == 'zadarma' else Colors.BLUE)
+            rows.append([
+                created,
+                f"{provider_color}{row[1]}{Colors.RESET}",
+                duration,
+                row[3] or "-",
+                url
+            ])
+        if rows:
+            print_table(["Created", "Provider", "Duration", "Format", "URL"],
+                       rows, [12, 10, 10, 8, 42])
+        else:
+            print(f"  {Colors.DIM}No recordings{Colors.RESET}")
+
+        # =====================================================================
+        # MESSAGES - Last 10
+        # =====================================================================
+        print_subheader("Messages/SMS (Last 10)")
+        cur.execute("""
+            SELECT m.sent_at, p.name, m.from_number, m.to_number,
+                   m.direction, m.status, m.body, m.cost
+            FROM telco.messages m
+            JOIN telco.providers p ON m.provider_id = p.provider_id
+            ORDER BY m.sent_at DESC NULLS LAST, m.id DESC
+            LIMIT 10
+        """)
+        rows = []
+        for row in cur.fetchall():
+            sent = row[0].strftime("%m-%d %H:%M") if row[0] else "-"
+            provider_color = Colors.CYAN if row[1] == 'telnyx' else (Colors.MAGENTA if row[1] == 'zadarma' else Colors.BLUE)
+            direction = row[4] or "-"
+            body = truncate(row[6] or "", 30)
+            cost = f"${row[7]:.3f}" if row[7] else "-"
+            rows.append([
+                sent,
+                f"{provider_color}{row[1]}{Colors.RESET}",
+                format_phone(row[2] or ""),
+                format_phone(row[3] or ""),
+                direction,
+                row[5] or "-",
+                body,
+                cost
+            ])
+        if rows:
+            print_table(["Sent", "Provider", "From", "To", "Dir", "Status", "Body", "Cost"],
+                       rows, [12, 10, 16, 16, 8, 10, 32, 8])
+        else:
+            print(f"  {Colors.DIM}No messages{Colors.RESET}")
+
+        # =====================================================================
+        # OVERALL STATISTICS
+        # =====================================================================
+        print_subheader("Overall Statistics")
+
+        # Call stats by provider
+        cur.execute("""
+            SELECT p.name,
+                   COUNT(*) as total_calls,
+                   SUM(c.duration_seconds) as total_duration,
+                   SUM(c.cost) as total_cost
+            FROM telco.calls c
+            JOIN telco.providers p ON c.provider_id = p.provider_id
+            GROUP BY p.name
+            ORDER BY total_calls DESC
+        """)
+        call_stats = cur.fetchall()
+        if call_stats:
+            print(f"  {Colors.BOLD}Calls by Provider:{Colors.RESET}")
+            for row in call_stats:
+                mins = (row[2] or 0) // 60
+                cost = f"${row[3]:.2f}" if row[3] else "$0.00"
+                print(f"    {row[0]}: {Colors.GREEN}{row[1]} calls{Colors.RESET}, {mins} mins, {cost}")
+
+        # Current balances
         cur.execute("""
             SELECT DISTINCT ON (p.name)
-                p.name, b.balance, b.currency, b.snapshot_at
+                p.name, b.balance, b.currency
             FROM telco.balance_snapshots b
             JOIN telco.providers p ON b.provider_id = p.provider_id
             ORDER BY p.name, b.snapshot_at DESC
         """)
-        for row in cur.fetchall():
-            snapshot_time = row[3].strftime("%Y-%m-%d %H:%M") if row[3] else "?"
-            print(f"  {row[0]}: {Colors.GREEN}${row[1]} {row[2]}{Colors.RESET} (as of {snapshot_time})")
-
-        # Call stats
-        print_subheader("Call Statistics (All Time)")
-        cur.execute("""
-            SELECT
-                COUNT(*) as total_calls,
-                SUM(duration_seconds) as total_duration,
-                AVG(duration_seconds) as avg_duration,
-                COUNT(CASE WHEN status = 'ended' THEN 1 END) as completed
-            FROM telco.calls
-        """)
-        row = cur.fetchone()
-        if row and row[0]:
-            total_mins = (row[1] or 0) // 60
-            avg_secs = int(row[2] or 0)
-            print(f"  Total Calls: {Colors.GREEN}{row[0]}{Colors.RESET}")
-            print(f"  Completed: {Colors.GREEN}{row[3]}{Colors.RESET}")
-            print(f"  Total Duration: {Colors.CYAN}{total_mins} minutes{Colors.RESET}")
-            print(f"  Avg Duration: {Colors.CYAN}{avg_secs} seconds{Colors.RESET}")
+        balances = cur.fetchall()
+        if balances:
+            print(f"\n  {Colors.BOLD}Current Balances:{Colors.RESET}")
+            for row in balances:
+                print(f"    {row[0]}: {Colors.GREEN}${row[1]:.2f} {row[2]}{Colors.RESET}")
 
     except Exception as e:
         print(f"{Colors.RED}Error querying database: {e}{Colors.RESET}")
