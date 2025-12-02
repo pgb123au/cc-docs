@@ -52,10 +52,13 @@ Tests with `"tool_mocks": []` execute REAL webhooks and modify REAL Cliniko data
 | **Old Backups** | `n8n/JSON/archive/` |
 
 ### Documentation
-| Purpose | Location |
-|---------|----------|
-| **Webhook Reference** | `n8n/Webhooks Docs/RETELLAI_WEBHOOKS_CURRENT.md` **(ONLY SOURCE OF TRUTH)** |
-| **Archived Webhook Docs** | `n8n/Webhooks Docs/archive/` **(OUTDATED - DO NOT USE)** |
+| Purpose | Location | Status |
+|---------|----------|--------|
+| **Webhook Specs** | `n8n/Webhooks Docs/RETELLAI_WEBHOOKS_CURRENT.md` | **ONLY SOURCE OF TRUTH** |
+| **Webhook Troubleshooting** | `n8n/Webhooks Docs/N8N_WEBHOOK_TROUBLESHOOTING.md` | **MAINTAINED** |
+| **Archived Webhook Docs** | `n8n/Webhooks Docs/archive/` | **OUTDATED - DO NOT USE FOR SPECS** |
+
+**CRITICAL:** Only `RETELLAI_WEBHOOKS_CURRENT.md` is maintained for webhook specs. Archive docs contain outdated parameters, endpoints, and mappings that WILL cause bugs.
 
 ---
 
@@ -134,9 +137,12 @@ python CC-Made-n8n_api_check_webhooks.py                # Check issues
 | 4 | `retell/WHITELISTED_PATTERNS.md` | **Intentional design choices - DO NOT "fix" these** |
 
 ### Before n8n Work
-| File | Content |
-|------|---------|
-| `n8n/Webhooks Docs/RETELLAI_WEBHOOKS_CURRENT.md` | Webhook specs + Agent variable mappings (Single Source of Truth) |
+| File | Content | Status |
+|------|---------|--------|
+| `n8n/Webhooks Docs/RETELLAI_WEBHOOKS_CURRENT.md` | Webhook specs, endpoints, parameters, response mappings | **ONLY SOURCE OF TRUTH** |
+| `n8n/Webhooks Docs/N8N_WEBHOOK_TROUBLESHOOTING.md` | Debugging, common errors, fixes, testing commands | **MAINTAINED** |
+
+**WARNING:** Do NOT use any docs from `n8n/Webhooks Docs/archive/` for webhook specs - they are outdated and will cause bugs.
 
 ---
 
