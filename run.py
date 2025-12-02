@@ -168,6 +168,11 @@ def display_menu(scripts: Dict[str, List[Tuple[str, str, str]]], config: dict):
     print(f"  {Colors.CYAN}ccn.{Colors.ENDC} Run Claude in C:\\Users\\peter\\Downloads\\CC\\n8n\\")
     print()
 
+    # Telco Manager
+    print(f"{Colors.BOLD}{Colors.BLUE}Telco:{Colors.ENDC}")
+    print(f"  {Colors.CYAN}t.{Colors.ENDC}   Telco Manager (Zadarma, Telnyx, Retell)")
+    print()
+
     return script_map
 
 def change_working_directory(config: dict):
@@ -331,6 +336,13 @@ def main():
             claude_dir = r"C:\Users\peter\Downloads\CC\n8n"
             print(f"\n{Colors.GREEN}Opening Claude in {claude_dir}...{Colors.ENDC}\n")
             subprocess.run(["claude"], cwd=claude_dir, check=False)
+            input(f"{Colors.YELLOW}Press Enter to continue...{Colors.ENDC}")
+            continue
+        elif choice == 't':
+            telco_dir = r"C:\Users\peter\Downloads\CC\Telcos"
+            telco_script = os.path.join(telco_dir, "telco.py")
+            print(f"\n{Colors.GREEN}Opening Telco Manager...{Colors.ENDC}\n")
+            subprocess.run([sys.executable, telco_script], cwd=telco_dir, check=False)
             input(f"{Colors.YELLOW}Press Enter to continue...{Colors.ENDC}")
             continue
         elif choice == 'e':
