@@ -8,6 +8,15 @@ websites/
 # Claude Code local settings
 .claude/
 
+# MCP config (contains API keys)
+.mcp.json
+
+# Environment files
+.env
+
+# Telco credentials (API keys)
+Telcos/.credentials
+
 # Windows files
 Thumbs.db
 Desktop.ini

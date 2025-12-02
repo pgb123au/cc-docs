@@ -60,6 +60,12 @@ Tests with `"tool_mocks": []` execute REAL webhooks and modify REAL Cliniko data
 
 **CRITICAL:** Only `RETELLAI_WEBHOOKS_CURRENT.md` is maintained for webhook specs. Archive docs contain outdated parameters, endpoints, and mappings that WILL cause bugs.
 
+### Telcos (Telephony Providers)
+| Provider | Location | Content |
+|----------|----------|---------|
+| **Telnyx** | `Telcos/Telnyx/TELNYX_REFERENCE.md` | API keys, SIP connections, phone numbers, Retell integration |
+| **Zadarma** | `Telcos/Zadarma/` | (To be documented) |
+
 ---
 
 ## GIT AUTO-COMMIT (REQUIRED)
