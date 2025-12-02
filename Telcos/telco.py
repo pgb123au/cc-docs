@@ -546,7 +546,7 @@ def get_db_connection(creds: Dict[str, str]):
 
 
 def show_warehouse_summary(creds: Dict[str, str]):
-    """Show data warehouse summary from PostgreSQL"""
+    """Show data warehouse with expandable sections - 5 rows default, click for 50"""
     print_header("TELCO DATA WAREHOUSE")
 
     if not POSTGRES_AVAILABLE:
@@ -557,266 +557,449 @@ def show_warehouse_summary(creds: Dict[str, str]):
     if not conn:
         return
 
-    try:
-        cur = conn.cursor()
+    # Track which sections to expand
+    expanded_sections = set()
 
-        # Database info
-        print_subheader("Database Connection")
-        print(f"  Host: {Colors.CYAN}{creds.get('POSTGRES_HOST', '96.47.238.189')}{Colors.RESET}")
-        print(f"  Database: {Colors.CYAN}telco_warehouse{Colors.RESET}")
-        print(f"  Schema: {Colors.CYAN}telco{Colors.RESET}")
+    while True:
+        os.system('cls' if os.name == 'nt' else 'clear')
+        print_header("TELCO DATA WAREHOUSE")
 
-        # Table counts
-        print_subheader("Data Summary")
-        tables = [
-            ("Phone Numbers", "SELECT COUNT(*) FROM telco.phone_numbers"),
-            ("Calls/CDRs", "SELECT COUNT(*) FROM telco.calls"),
-            ("Balance Snapshots", "SELECT COUNT(*) FROM telco.balance_snapshots"),
-            ("Retell Agents", "SELECT COUNT(*) FROM telco.retell_agents"),
-            ("Recordings", "SELECT COUNT(*) FROM telco.recordings"),
-            ("Messages", "SELECT COUNT(*) FROM telco.messages"),
-        ]
-        for name, query in tables:
-            try:
-                cur.execute(query)
-                count = cur.fetchone()[0]
-                color = Colors.GREEN if count > 0 else Colors.DIM
-                print(f"  {name}: {color}{count}{Colors.RESET}")
-            except:
-                print(f"  {name}: {Colors.RED}Error{Colors.RESET}")
+        try:
+            cur = conn.cursor()
 
-        # =====================================================================
-        # PHONE NUMBERS - Last 10
-        # =====================================================================
-        print_subheader("Phone Numbers (Last 10 Synced)")
-        cur.execute("""
-            SELECT pn.phone_number, p.name, pn.status, pn.city, pn.nickname,
-                   pn.retell_agent_name, pn.last_synced
-            FROM telco.phone_numbers pn
-            JOIN telco.providers p ON pn.provider_id = p.provider_id
-            ORDER BY pn.last_synced DESC NULLS LAST, pn.id DESC
-            LIMIT 10
-        """)
-        rows = []
-        for row in cur.fetchall():
-            synced = row[6].strftime("%m-%d %H:%M") if row[6] else "-"
-            status_color = Colors.GREEN if row[2] in ['on', 'active'] else Colors.YELLOW
-            provider_color = Colors.CYAN if row[1] == 'telnyx' else (Colors.MAGENTA if row[1] == 'zadarma' else Colors.BLUE)
-            location = row[3] or row[4] or "-"  # city or nickname
-            agent = truncate(row[5], 18) if row[5] else "-"
-            rows.append([
-                format_phone(row[0] or ""),
-                f"{provider_color}{row[1]}{Colors.RESET}",
-                f"{status_color}{row[2] or '?'}{Colors.RESET}",
-                truncate(location, 12),
-                agent,
-                synced
-            ])
-        if rows:
-            print_table(["Number", "Provider", "Status", "Location", "Retell Agent", "Synced"],
-                       rows, [18, 10, 8, 14, 20, 12])
-        else:
-            print(f"  {Colors.DIM}No phone numbers{Colors.RESET}")
+            # Database info
+            print_subheader("Database Connection")
+            print(f"  Host: {Colors.CYAN}{creds.get('POSTGRES_HOST', '96.47.238.189')}{Colors.RESET}")
+            print(f"  Database: {Colors.CYAN}telco_warehouse{Colors.RESET}")
 
-        # =====================================================================
-        # CALLS/CDRs - Last 10
-        # =====================================================================
-        print_subheader("Calls/CDRs (Last 10)")
-        cur.execute("""
-            SELECT c.started_at, p.name, c.from_number, c.to_number,
-                   c.duration_seconds, c.status, c.retell_agent_name, c.cost
-            FROM telco.calls c
-            JOIN telco.providers p ON c.provider_id = p.provider_id
-            ORDER BY c.started_at DESC NULLS LAST
-            LIMIT 10
-        """)
-        rows = []
-        for row in cur.fetchall():
-            started = row[0].strftime("%m-%d %H:%M") if row[0] else "?"
-            duration = f"{row[4]}s" if row[4] else "-"
-            agent = truncate(row[6], 18) if row[6] else "-"
-            cost = f"${row[7]:.2f}" if row[7] else "-"
-            status_color = Colors.GREEN if row[5] == 'ended' else Colors.YELLOW
-            provider_color = Colors.CYAN if row[1] == 'telnyx' else (Colors.MAGENTA if row[1] == 'zadarma' else Colors.BLUE)
-            rows.append([
-                started,
-                f"{provider_color}{row[1]}{Colors.RESET}",
-                format_phone(row[2] or ""),
-                format_phone(row[3] or ""),
-                duration,
-                f"{status_color}{row[5] or '?'}{Colors.RESET}",
-                agent,
-                cost
-            ])
-        if rows:
-            print_table(["Time", "Provider", "From", "To", "Dur", "Status", "Agent", "Cost"],
-                       rows, [12, 10, 16, 16, 6, 8, 20, 8])
-        else:
-            print(f"  {Colors.DIM}No calls recorded{Colors.RESET}")
+            # Section definitions with queries
+            sections = [
+                {
+                    "key": "1",
+                    "name": "Phone Numbers",
+                    "query": """
+                        SELECT pn.phone_number, p.name, pn.status, pn.city, pn.nickname,
+                               pn.retell_agent_name, pn.last_synced
+                        FROM telco.phone_numbers pn
+                        JOIN telco.providers p ON pn.provider_id = p.provider_id
+                        ORDER BY pn.last_synced DESC NULLS LAST, pn.id DESC
+                    """,
+                    "headers": ["Number", "Provider", "Status", "Location", "Agent", "Synced"],
+                    "widths": [18, 10, 8, 14, 20, 12],
+                    "format": lambda r: [
+                        format_phone(r[0] or ""),
+                        f"{Colors.CYAN if r[1]=='telnyx' else Colors.MAGENTA if r[1]=='zadarma' else Colors.BLUE}{r[1]}{Colors.RESET}",
+                        f"{Colors.GREEN if r[2] in ['on','active'] else Colors.YELLOW}{r[2] or '?'}{Colors.RESET}",
+                        truncate(r[3] or r[4] or "-", 12),
+                        truncate(r[5], 18) if r[5] else "-",
+                        r[6].strftime("%m-%d %H:%M") if r[6] else "-"
+                    ]
+                },
+                {
+                    "key": "2",
+                    "name": "Calls/CDRs",
+                    "query": """
+                        SELECT c.started_at, p.name, c.from_number, c.to_number,
+                               c.duration_seconds, c.status, c.retell_agent_name, c.cost
+                        FROM telco.calls c
+                        JOIN telco.providers p ON c.provider_id = p.provider_id
+                        ORDER BY c.started_at DESC NULLS LAST
+                    """,
+                    "headers": ["Time", "Provider", "From", "To", "Dur", "Status", "Agent", "Cost"],
+                    "widths": [12, 10, 16, 16, 6, 10, 18, 8],
+                    "format": lambda r: [
+                        r[0].strftime("%m-%d %H:%M") if r[0] else "?",
+                        f"{Colors.CYAN if r[1]=='telnyx' else Colors.MAGENTA if r[1]=='zadarma' else Colors.BLUE}{r[1]}{Colors.RESET}",
+                        format_phone(r[2] or ""),
+                        format_phone(r[3] or ""),
+                        f"{r[4]}s" if r[4] else "-",
+                        f"{Colors.GREEN if r[5]=='ended' else Colors.YELLOW}{r[5] or '?'}{Colors.RESET}",
+                        truncate(r[6], 16) if r[6] else "-",
+                        f"${r[7]:.2f}" if r[7] else "-"
+                    ]
+                },
+                {
+                    "key": "3",
+                    "name": "Call Analysis (Retell)",
+                    "query": """
+                        SELECT ca.synced_at, ca.agent_name, ca.call_sentiment, ca.user_sentiment,
+                               ca.call_successful, ca.in_voicemail, ca.call_summary
+                        FROM telco.call_analysis ca
+                        ORDER BY ca.synced_at DESC
+                    """,
+                    "headers": ["Time", "Agent", "Call Sent.", "User Sent.", "Success", "VM", "Summary"],
+                    "widths": [12, 20, 10, 10, 8, 4, 30],
+                    "format": lambda r: [
+                        r[0].strftime("%m-%d %H:%M") if r[0] else "-",
+                        truncate(r[1] or "-", 18),
+                        f"{Colors.GREEN if r[2]=='positive' else Colors.RED if r[2]=='negative' else Colors.YELLOW}{r[2] or '-'}{Colors.RESET}",
+                        f"{Colors.GREEN if r[3]=='positive' else Colors.RED if r[3]=='negative' else Colors.YELLOW}{r[3] or '-'}{Colors.RESET}",
+                        f"{Colors.GREEN}Yes{Colors.RESET}" if r[4] else f"{Colors.RED}No{Colors.RESET}" if r[4] is False else "-",
+                        "Y" if r[5] else "-",
+                        truncate(r[6] or "-", 28)
+                    ]
+                },
+                {
+                    "key": "4",
+                    "name": "Full Transcripts (Retell)",
+                    "query": """
+                        SELECT c.started_at, c.retell_agent_name, c.from_number, c.duration_seconds,
+                               c.transcript_words, c.full_transcript
+                        FROM telco.calls c
+                        JOIN telco.providers p ON c.provider_id = p.provider_id
+                        WHERE p.name = 'retell' AND c.full_transcript IS NOT NULL
+                        ORDER BY c.started_at DESC
+                    """,
+                    "headers": ["Time", "Agent", "Caller", "Dur", "Words", "Transcript Preview"],
+                    "widths": [12, 18, 16, 6, 6, 35],
+                    "format": lambda r: [
+                        r[0].strftime("%m-%d %H:%M") if r[0] else "-",
+                        truncate(r[1] or "-", 16),
+                        format_phone(r[2] or ""),
+                        f"{r[3]}s" if r[3] else "-",
+                        str(r[4] or 0),
+                        truncate(r[5] or "-", 33) if r[5] else "-"
+                    ]
+                },
+                {
+                    "key": "5",
+                    "name": "SIP Accounts (Zadarma)",
+                    "query": """
+                        SELECT s.sip_id, s.sip_name, s.caller_id, s.status, s.lines, s.last_synced
+                        FROM telco.sip_accounts s
+                        JOIN telco.providers p ON s.provider_id = p.provider_id
+                        WHERE p.name = 'zadarma'
+                        ORDER BY s.last_synced DESC NULLS LAST
+                    """,
+                    "headers": ["SIP ID", "Name", "Caller ID", "Status", "Lines", "Synced"],
+                    "widths": [12, 20, 16, 10, 6, 12],
+                    "format": lambda r: [
+                        r[0] or "-",
+                        truncate(r[1] or "-", 18),
+                        r[2] or "-",
+                        f"{Colors.GREEN}{r[3]}{Colors.RESET}" if r[3] == 'active' else r[3] or "-",
+                        str(r[4] or 1),
+                        r[5].strftime("%m-%d %H:%M") if r[5] else "-"
+                    ]
+                },
+                {
+                    "key": "6",
+                    "name": "Recordings",
+                    "query": """
+                        SELECT r.created_at, p.name, r.duration_seconds, r.format,
+                               r.recording_url, r.synced_at
+                        FROM telco.recordings r
+                        JOIN telco.providers p ON r.provider_id = p.provider_id
+                        ORDER BY r.created_at DESC NULLS LAST
+                    """,
+                    "headers": ["Created", "Provider", "Duration", "Format", "URL"],
+                    "widths": [12, 10, 10, 8, 50],
+                    "format": lambda r: [
+                        r[0].strftime("%m-%d %H:%M") if r[0] else "-",
+                        f"{Colors.MAGENTA}{r[1]}{Colors.RESET}",
+                        f"{r[2]}s" if r[2] else "-",
+                        r[3] or "-",
+                        truncate(r[4] or "-", 48)
+                    ]
+                },
+                {
+                    "key": "7",
+                    "name": "SMS Messages",
+                    "query": """
+                        SELECT m.sent_at, p.name, m.from_number, m.to_number,
+                               m.direction, m.status, m.body, m.cost
+                        FROM telco.messages m
+                        JOIN telco.providers p ON m.provider_id = p.provider_id
+                        ORDER BY m.sent_at DESC NULLS LAST
+                    """,
+                    "headers": ["Sent", "Provider", "From", "To", "Dir", "Status", "Body", "Cost"],
+                    "widths": [12, 10, 16, 16, 6, 10, 25, 8],
+                    "format": lambda r: [
+                        r[0].strftime("%m-%d %H:%M") if r[0] else "-",
+                        f"{Colors.CYAN}{r[1]}{Colors.RESET}",
+                        format_phone(r[2] or ""),
+                        format_phone(r[3] or ""),
+                        r[4] or "-",
+                        r[5] or "-",
+                        truncate(r[6] or "-", 23),
+                        f"${r[7]:.3f}" if r[7] else "-"
+                    ]
+                },
+                {
+                    "key": "8",
+                    "name": "FQDN Connections (Telnyx SIP)",
+                    "query": """
+                        SELECT f.connection_name, f.fqdn, f.is_active, f.transport_protocol,
+                               f.sip_region, f.last_synced
+                        FROM telco.fqdn_connections f
+                        ORDER BY f.last_synced DESC NULLS LAST
+                    """,
+                    "headers": ["Connection", "FQDN", "Active", "Transport", "Region", "Synced"],
+                    "widths": [25, 30, 8, 12, 15, 12],
+                    "format": lambda r: [
+                        truncate(r[0] or "-", 23),
+                        truncate(r[1] or "-", 28),
+                        f"{Colors.GREEN}Yes{Colors.RESET}" if r[2] else f"{Colors.RED}No{Colors.RESET}",
+                        r[3] or "-",
+                        r[4] or "-",
+                        r[5].strftime("%m-%d %H:%M") if r[5] else "-"
+                    ]
+                },
+                {
+                    "key": "9",
+                    "name": "Outbound Voice Profiles (Telnyx)",
+                    "query": """
+                        SELECT o.profile_name, o.is_enabled, o.traffic_type, o.service_plan,
+                               o.daily_spend_limit, o.last_synced
+                        FROM telco.outbound_profiles o
+                        ORDER BY o.last_synced DESC NULLS LAST
+                    """,
+                    "headers": ["Profile Name", "Enabled", "Traffic Type", "Plan", "Spend Limit", "Synced"],
+                    "widths": [25, 8, 16, 15, 12, 12],
+                    "format": lambda r: [
+                        truncate(r[0] or "-", 23),
+                        f"{Colors.GREEN}Yes{Colors.RESET}" if r[1] else f"{Colors.RED}No{Colors.RESET}",
+                        r[2] or "-",
+                        r[3] or "-",
+                        f"${r[4]:.2f}" if r[4] else "None",
+                        r[5].strftime("%m-%d %H:%M") if r[5] else "-"
+                    ]
+                },
+                {
+                    "key": "A",
+                    "name": "Messaging Profiles (Telnyx)",
+                    "query": """
+                        SELECT m.profile_name, m.is_enabled, m.number_pool_enabled, m.webhook_url, m.last_synced
+                        FROM telco.messaging_profiles m
+                        ORDER BY m.last_synced DESC NULLS LAST
+                    """,
+                    "headers": ["Profile Name", "Enabled", "Pool", "Webhook URL", "Synced"],
+                    "widths": [25, 8, 6, 35, 12],
+                    "format": lambda r: [
+                        truncate(r[0] or "-", 23),
+                        f"{Colors.GREEN}Yes{Colors.RESET}" if r[1] else f"{Colors.RED}No{Colors.RESET}",
+                        "Y" if r[2] else "N",
+                        truncate(r[3] or "-", 33),
+                        r[4].strftime("%m-%d %H:%M") if r[4] else "-"
+                    ]
+                },
+                {
+                    "key": "B",
+                    "name": "SIP Credentials (Telnyx)",
+                    "query": """
+                        SELECT s.sip_username, s.connection_name, s.is_active, s.created_at_provider, s.last_synced
+                        FROM telco.sip_credentials s
+                        ORDER BY s.last_synced DESC NULLS LAST
+                    """,
+                    "headers": ["SIP Username", "Connection", "Active", "Created", "Synced"],
+                    "widths": [20, 25, 8, 12, 12],
+                    "format": lambda r: [
+                        r[0] or "-",
+                        truncate(r[1] or "-", 23),
+                        f"{Colors.GREEN}Yes{Colors.RESET}" if r[2] else f"{Colors.RED}No{Colors.RESET}",
+                        r[3].strftime("%m-%d %H:%M") if r[3] else "-",
+                        r[4].strftime("%m-%d %H:%M") if r[4] else "-"
+                    ]
+                },
+                {
+                    "key": "C",
+                    "name": "Number Orders (Telnyx)",
+                    "query": """
+                        SELECT n.order_id, n.order_type, n.status, n.customer_reference,
+                               n.requirements_met, n.ordered_at
+                        FROM telco.number_orders n
+                        ORDER BY n.ordered_at DESC NULLS LAST
+                    """,
+                    "headers": ["Order ID", "Type", "Status", "Reference", "Reqs Met", "Ordered"],
+                    "widths": [25, 15, 12, 20, 8, 12],
+                    "format": lambda r: [
+                        truncate(r[0] or "-", 23),
+                        r[1] or "-",
+                        f"{Colors.GREEN if r[2]=='success' else Colors.YELLOW}{r[2] or '-'}{Colors.RESET}",
+                        truncate(r[3] or "-", 18),
+                        f"{Colors.GREEN}Yes{Colors.RESET}" if r[4] else f"{Colors.RED}No{Colors.RESET}" if r[4] is False else "-",
+                        r[5].strftime("%m-%d %H:%M") if r[5] else "-"
+                    ]
+                },
+                {
+                    "key": "D",
+                    "name": "Knowledge Bases (Retell)",
+                    "query": """
+                        SELECT k.kb_id, k.kb_name, k.description, k.source_count, k.last_synced
+                        FROM telco.knowledge_bases k
+                        ORDER BY k.last_synced DESC NULLS LAST
+                    """,
+                    "headers": ["KB ID", "Name", "Description", "Sources", "Synced"],
+                    "widths": [25, 25, 30, 8, 12],
+                    "format": lambda r: [
+                        truncate(r[0] or "-", 23),
+                        truncate(r[1] or "-", 23),
+                        truncate(r[2] or "-", 28),
+                        str(r[3] or 0),
+                        r[4].strftime("%m-%d %H:%M") if r[4] else "-"
+                    ]
+                },
+                {
+                    "key": "E",
+                    "name": "LLM Configurations (Retell)",
+                    "query": """
+                        SELECT l.llm_id, l.llm_name, l.model, l.temperature, l.last_synced
+                        FROM telco.llm_configs l
+                        ORDER BY l.last_synced DESC NULLS LAST
+                    """,
+                    "headers": ["LLM ID", "Name", "Model", "Temp", "Synced"],
+                    "widths": [28, 25, 20, 6, 12],
+                    "format": lambda r: [
+                        truncate(r[0] or "-", 26),
+                        truncate(r[1] or "-", 23),
+                        r[2] or "-",
+                        f"{r[3]:.1f}" if r[3] else "-",
+                        r[4].strftime("%m-%d %H:%M") if r[4] else "-"
+                    ]
+                },
+                {
+                    "key": "F",
+                    "name": "Voice Configs (Retell)",
+                    "query": """
+                        SELECT v.voice_id, v.voice_name, v.provider_voice, v.language, v.gender, v.accent
+                        FROM telco.voice_configs v
+                        ORDER BY v.last_synced DESC NULLS LAST
+                    """,
+                    "headers": ["Voice ID", "Name", "Provider", "Language", "Gender", "Accent"],
+                    "widths": [20, 22, 15, 10, 8, 15],
+                    "format": lambda r: [
+                        truncate(r[0] or "-", 18),
+                        truncate(r[1] or "-", 20),
+                        r[2] or "-",
+                        r[3] or "-",
+                        r[4] or "-",
+                        truncate(r[5] or "-", 13)
+                    ]
+                },
+                {
+                    "key": "G",
+                    "name": "Retell Agents",
+                    "query": """
+                        SELECT agent_id, agent_name, voice_id, language, webhook_url, last_synced
+                        FROM telco.retell_agents
+                        ORDER BY last_synced DESC NULLS LAST
+                    """,
+                    "headers": ["Agent ID", "Name", "Voice", "Lang", "Webhook", "Synced"],
+                    "widths": [25, 30, 15, 6, 20, 12],
+                    "format": lambda r: [
+                        truncate(r[0] or "-", 23),
+                        truncate(r[1] or "-", 28),
+                        truncate(r[2] or "-", 13),
+                        r[3] or "-",
+                        truncate(r[4] or "-", 18) if r[4] else "-",
+                        r[5].strftime("%m-%d %H:%M") if r[5] else "-"
+                    ]
+                },
+                {
+                    "key": "H",
+                    "name": "Balance Snapshots",
+                    "query": """
+                        SELECT b.snapshot_at, p.name, b.balance, b.currency, b.credit_limit
+                        FROM telco.balance_snapshots b
+                        JOIN telco.providers p ON b.provider_id = p.provider_id
+                        ORDER BY b.snapshot_at DESC
+                    """,
+                    "headers": ["Snapshot", "Provider", "Balance", "Currency", "Credit"],
+                    "widths": [18, 12, 12, 10, 12],
+                    "format": lambda r: [
+                        r[0].strftime("%Y-%m-%d %H:%M") if r[0] else "-",
+                        f"{Colors.CYAN if r[1]=='telnyx' else Colors.MAGENTA if r[1]=='zadarma' else Colors.BLUE}{r[1]}{Colors.RESET}",
+                        f"{Colors.GREEN}${r[2]:.2f}{Colors.RESET}",
+                        r[3] or "USD",
+                        f"${r[4]:.2f}" if r[4] else "-"
+                    ]
+                },
+                {
+                    "key": "I",
+                    "name": "Concurrency Stats (Retell)",
+                    "query": """
+                        SELECT c.snapshot_at, c.current_concurrent, c.max_concurrent, c.calls_in_progress
+                        FROM telco.concurrency_stats c
+                        ORDER BY c.snapshot_at DESC
+                    """,
+                    "headers": ["Snapshot", "Current", "Max", "In Progress"],
+                    "widths": [20, 10, 10, 12],
+                    "format": lambda r: [
+                        r[0].strftime("%Y-%m-%d %H:%M") if r[0] else "-",
+                        str(r[1] or 0),
+                        str(r[2] or 0),
+                        str(r[3] or 0)
+                    ]
+                },
+            ]
 
-        # =====================================================================
-        # BALANCE SNAPSHOTS - Last 10
-        # =====================================================================
-        print_subheader("Balance Snapshots (Last 10)")
-        cur.execute("""
-            SELECT b.snapshot_at, p.name, b.balance, b.currency, b.credit_limit
-            FROM telco.balance_snapshots b
-            JOIN telco.providers p ON b.provider_id = p.provider_id
-            ORDER BY b.snapshot_at DESC
-            LIMIT 10
-        """)
-        rows = []
-        for row in cur.fetchall():
-            snapshot = row[0].strftime("%Y-%m-%d %H:%M") if row[0] else "?"
-            provider_color = Colors.CYAN if row[1] == 'telnyx' else (Colors.MAGENTA if row[1] == 'zadarma' else Colors.BLUE)
-            credit = f"${row[4]:.2f}" if row[4] else "-"
-            rows.append([
-                snapshot,
-                f"{provider_color}{row[1]}{Colors.RESET}",
-                f"{Colors.GREEN}${row[2]:.2f}{Colors.RESET}",
-                row[3] or "USD",
-                credit
-            ])
-        if rows:
-            print_table(["Snapshot Time", "Provider", "Balance", "Currency", "Credit Limit"],
-                       rows, [18, 10, 12, 10, 12])
-        else:
-            print(f"  {Colors.DIM}No balance snapshots{Colors.RESET}")
+            # Display all sections
+            print_subheader("Data Sections (Press key to expand/collapse)")
+            print()
 
-        # =====================================================================
-        # RETELL AGENTS - Last 10
-        # =====================================================================
-        print_subheader("Retell Agents (Last 10 Synced)")
-        cur.execute("""
-            SELECT agent_id, agent_name, voice_id, language, last_synced
-            FROM telco.retell_agents
-            ORDER BY last_synced DESC NULLS LAST, id DESC
-            LIMIT 10
-        """)
-        rows = []
-        for row in cur.fetchall():
-            synced = row[4].strftime("%m-%d %H:%M") if row[4] else "-"
-            rows.append([
-                truncate(row[1] or "", 35),
-                row[0][:20] + "..." if row[0] and len(row[0]) > 20 else (row[0] or "-"),
-                truncate(row[2] or "-", 15),
-                row[3] or "-",
-                synced
-            ])
-        if rows:
-            print_table(["Agent Name", "Agent ID", "Voice", "Lang", "Synced"],
-                       rows, [37, 24, 17, 6, 12])
-        else:
-            print(f"  {Colors.DIM}No agents{Colors.RESET}")
+            for section in sections:
+                key = section["key"]
+                name = section["name"]
+                is_expanded = key in expanded_sections
+                limit = 50 if is_expanded else 5
 
-        # =====================================================================
-        # RECORDINGS - Last 10
-        # =====================================================================
-        print_subheader("Recordings (Last 10)")
-        cur.execute("""
-            SELECT r.created_at, p.name, r.duration_seconds, r.format,
-                   r.recording_url, r.synced_at
-            FROM telco.recordings r
-            JOIN telco.providers p ON r.provider_id = p.provider_id
-            ORDER BY r.created_at DESC NULLS LAST, r.id DESC
-            LIMIT 10
-        """)
-        rows = []
-        for row in cur.fetchall():
-            created = row[0].strftime("%m-%d %H:%M") if row[0] else "-"
-            duration = f"{row[2]}s" if row[2] else "-"
-            url = truncate(row[4] or "-", 40)
-            provider_color = Colors.CYAN if row[1] == 'telnyx' else (Colors.MAGENTA if row[1] == 'zadarma' else Colors.BLUE)
-            rows.append([
-                created,
-                f"{provider_color}{row[1]}{Colors.RESET}",
-                duration,
-                row[3] or "-",
-                url
-            ])
-        if rows:
-            print_table(["Created", "Provider", "Duration", "Format", "URL"],
-                       rows, [12, 10, 10, 8, 42])
-        else:
-            print(f"  {Colors.DIM}No recordings{Colors.RESET}")
+                # Get count
+                try:
+                    count_query = f"SELECT COUNT(*) FROM ({section['query']}) sub"
+                    cur.execute(count_query)
+                    total_count = cur.fetchone()[0]
+                except:
+                    total_count = 0
 
-        # =====================================================================
-        # MESSAGES - Last 10
-        # =====================================================================
-        print_subheader("Messages/SMS (Last 10)")
-        cur.execute("""
-            SELECT m.sent_at, p.name, m.from_number, m.to_number,
-                   m.direction, m.status, m.body, m.cost
-            FROM telco.messages m
-            JOIN telco.providers p ON m.provider_id = p.provider_id
-            ORDER BY m.sent_at DESC NULLS LAST, m.id DESC
-            LIMIT 10
-        """)
-        rows = []
-        for row in cur.fetchall():
-            sent = row[0].strftime("%m-%d %H:%M") if row[0] else "-"
-            provider_color = Colors.CYAN if row[1] == 'telnyx' else (Colors.MAGENTA if row[1] == 'zadarma' else Colors.BLUE)
-            direction = row[4] or "-"
-            body = truncate(row[6] or "", 30)
-            cost = f"${row[7]:.3f}" if row[7] else "-"
-            rows.append([
-                sent,
-                f"{provider_color}{row[1]}{Colors.RESET}",
-                format_phone(row[2] or ""),
-                format_phone(row[3] or ""),
-                direction,
-                row[5] or "-",
-                body,
-                cost
-            ])
-        if rows:
-            print_table(["Sent", "Provider", "From", "To", "Dir", "Status", "Body", "Cost"],
-                       rows, [12, 10, 16, 16, 8, 10, 32, 8])
-        else:
-            print(f"  {Colors.DIM}No messages{Colors.RESET}")
+                # Section header
+                expand_indicator = f"{Colors.GREEN}[-]{Colors.RESET}" if is_expanded else f"{Colors.YELLOW}[+]{Colors.RESET}"
+                count_display = f"({total_count})" if total_count > 0 else f"{Colors.DIM}(0){Colors.RESET}"
+                print(f"  {Colors.CYAN}{key}.{Colors.RESET} {expand_indicator} {name} {count_display}")
 
-        # =====================================================================
-        # OVERALL STATISTICS
-        # =====================================================================
-        print_subheader("Overall Statistics")
+                if total_count > 0:
+                    # Get data
+                    cur.execute(f"{section['query']} LIMIT {limit}")
+                    rows = []
+                    for row in cur.fetchall():
+                        try:
+                            formatted = section["format"](row)
+                            rows.append(formatted)
+                        except Exception as e:
+                            rows.append([str(e)] + ["-"] * (len(section["headers"]) - 1))
 
-        # Call stats by provider
-        cur.execute("""
-            SELECT p.name,
-                   COUNT(*) as total_calls,
-                   SUM(c.duration_seconds) as total_duration,
-                   SUM(c.cost) as total_cost
-            FROM telco.calls c
-            JOIN telco.providers p ON c.provider_id = p.provider_id
-            GROUP BY p.name
-            ORDER BY total_calls DESC
-        """)
-        call_stats = cur.fetchall()
-        if call_stats:
-            print(f"  {Colors.BOLD}Calls by Provider:{Colors.RESET}")
-            for row in call_stats:
-                mins = (row[2] or 0) // 60
-                cost = f"${row[3]:.2f}" if row[3] else "$0.00"
-                print(f"    {row[0]}: {Colors.GREEN}{row[1]} calls{Colors.RESET}, {mins} mins, {cost}")
+                    if rows:
+                        print_table(section["headers"], rows, section["widths"])
+                        if total_count > limit:
+                            more = total_count - limit
+                            print(f"       {Colors.DIM}... {more} more (press {key} to show all 50){Colors.RESET}")
+                        elif is_expanded and total_count > 5:
+                            print(f"       {Colors.DIM}(press {key} to collapse){Colors.RESET}")
+                    print()
 
-        # Current balances
-        cur.execute("""
-            SELECT DISTINCT ON (p.name)
-                p.name, b.balance, b.currency
-            FROM telco.balance_snapshots b
-            JOIN telco.providers p ON b.provider_id = p.provider_id
-            ORDER BY p.name, b.snapshot_at DESC
-        """)
-        balances = cur.fetchall()
-        if balances:
-            print(f"\n  {Colors.BOLD}Current Balances:{Colors.RESET}")
-            for row in balances:
-                print(f"    {row[0]}: {Colors.GREEN}${row[1]:.2f} {row[2]}{Colors.RESET}")
+            # Menu
+            print(f"\n  {Colors.BOLD}Options:{Colors.RESET}")
+            print(f"    Press 1-9, A-I to expand/collapse a section")
+            print(f"    Press {Colors.CYAN}Q{Colors.RESET} to return to main menu")
+            print()
 
-    except Exception as e:
-        print(f"{Colors.RED}Error querying database: {e}{Colors.RESET}")
-    finally:
-        conn.close()
+            choice = input(f"  {Colors.BOLD}Select: {Colors.RESET}").strip().upper()
+
+            if choice == 'Q' or choice == '':
+                break
+            elif choice in [s["key"] for s in sections]:
+                if choice in expanded_sections:
+                    expanded_sections.remove(choice)
+                else:
+                    expanded_sections.add(choice)
+
+        except Exception as e:
+            print(f"{Colors.RED}Error querying database: {e}{Colors.RESET}")
+            import traceback
+            traceback.print_exc()
+            input(f"\n{Colors.DIM}Press Enter to continue...{Colors.RESET}")
+            break
+
+    conn.close()
 
 
 def show_menu():
@@ -914,9 +1097,9 @@ def main():
             show_warehouse_summary(creds)
 
         elif choice == 's':
-            # Run sync script
+            # Run expanded sync script
             print_header("SYNCING DATA FROM APIs")
-            sync_script = Path(__file__).parent / "sync" / "sync_initial.py"
+            sync_script = Path(__file__).parent / "sync" / "sync_expanded.py"
             if sync_script.exists():
                 import subprocess
                 print(f"  Running: {sync_script}")
