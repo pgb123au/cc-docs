@@ -20,6 +20,13 @@ try:
 except ImportError:
     RETELL_AVAILABLE = False
 
+# Try to import psycopg2 for database access
+try:
+    import psycopg2
+    POSTGRES_AVAILABLE = True
+except ImportError:
+    POSTGRES_AVAILABLE = False
+
 
 class Colors:
     RESET = '\033[0m'
@@ -521,6 +528,143 @@ def show_unified_view(zadarma: ZadarmaAPI, telnyx: TelnyxAPI, retell: RetellAPI)
         print(f"\n  {Colors.DIM}Total: {len(all_numbers)} numbers across all providers{Colors.RESET}")
 
 
+def get_db_connection(creds: Dict[str, str]):
+    """Get database connection from credentials"""
+    if not POSTGRES_AVAILABLE:
+        return None
+    try:
+        return psycopg2.connect(
+            host=creds.get("POSTGRES_HOST", "96.47.238.189"),
+            port=int(creds.get("POSTGRES_PORT", 5432)),
+            database=creds.get("POSTGRES_DB", "telco_warehouse"),
+            user=creds.get("POSTGRES_USER", "telco_sync"),
+            password=creds.get("POSTGRES_PASSWORD", "TelcoSync2024!")
+        )
+    except Exception as e:
+        print(f"{Colors.RED}Database connection error: {e}{Colors.RESET}")
+        return None
+
+
+def show_warehouse_summary(creds: Dict[str, str]):
+    """Show data warehouse summary from PostgreSQL"""
+    print_header("TELCO DATA WAREHOUSE")
+
+    if not POSTGRES_AVAILABLE:
+        print(f"  {Colors.RED}psycopg2 not installed. Run: pip install psycopg2-binary{Colors.RESET}")
+        return
+
+    conn = get_db_connection(creds)
+    if not conn:
+        return
+
+    try:
+        cur = conn.cursor()
+
+        # Database info
+        print_subheader("Database Connection")
+        print(f"  Host: {Colors.CYAN}{creds.get('POSTGRES_HOST', '96.47.238.189')}{Colors.RESET}")
+        print(f"  Database: {Colors.CYAN}telco_warehouse{Colors.RESET}")
+        print(f"  Schema: {Colors.CYAN}telco{Colors.RESET}")
+
+        # Table counts
+        print_subheader("Data Summary")
+        tables = [
+            ("Phone Numbers", "SELECT COUNT(*) FROM telco.phone_numbers"),
+            ("Calls/CDRs", "SELECT COUNT(*) FROM telco.calls"),
+            ("Balance Snapshots", "SELECT COUNT(*) FROM telco.balance_snapshots"),
+            ("Retell Agents", "SELECT COUNT(*) FROM telco.retell_agents"),
+            ("Recordings", "SELECT COUNT(*) FROM telco.recordings"),
+            ("Messages", "SELECT COUNT(*) FROM telco.messages"),
+        ]
+        for name, query in tables:
+            try:
+                cur.execute(query)
+                count = cur.fetchone()[0]
+                color = Colors.GREEN if count > 0 else Colors.DIM
+                print(f"  {name}: {color}{count}{Colors.RESET}")
+            except:
+                print(f"  {name}: {Colors.RED}Error{Colors.RESET}")
+
+        # Phone Numbers by provider
+        print_subheader("Phone Numbers by Provider")
+        cur.execute("""
+            SELECT p.name, COUNT(*) as cnt
+            FROM telco.phone_numbers pn
+            JOIN telco.providers p ON pn.provider_id = p.provider_id
+            GROUP BY p.name ORDER BY cnt DESC
+        """)
+        for row in cur.fetchall():
+            print(f"  {row[0]}: {Colors.GREEN}{row[1]}{Colors.RESET}")
+
+        # Recent Calls
+        print_subheader("Recent Calls (Last 10)")
+        cur.execute("""
+            SELECT c.started_at, p.name, c.from_number, c.to_number,
+                   c.duration_seconds, c.status, c.retell_agent_name
+            FROM telco.calls c
+            JOIN telco.providers p ON c.provider_id = p.provider_id
+            ORDER BY c.started_at DESC
+            LIMIT 10
+        """)
+        rows = []
+        for row in cur.fetchall():
+            started = row[0].strftime("%Y-%m-%d %H:%M") if row[0] else "?"
+            duration = f"{row[4]}s" if row[4] else "-"
+            agent = truncate(row[6], 20) if row[6] else "-"
+            status_color = Colors.GREEN if row[5] == 'ended' else Colors.YELLOW
+            rows.append([
+                started,
+                row[1],  # provider
+                format_phone(row[2] or ""),  # from
+                format_phone(row[3] or ""),  # to
+                duration,
+                f"{status_color}{row[5] or '?'}{Colors.RESET}",
+                agent
+            ])
+        if rows:
+            print_table(["Time", "Provider", "From", "To", "Dur", "Status", "Agent"],
+                       rows, [17, 8, 16, 16, 6, 10, 22])
+        else:
+            print(f"  {Colors.DIM}No calls recorded{Colors.RESET}")
+
+        # Latest Balance Snapshots
+        print_subheader("Latest Balances")
+        cur.execute("""
+            SELECT DISTINCT ON (p.name)
+                p.name, b.balance, b.currency, b.snapshot_at
+            FROM telco.balance_snapshots b
+            JOIN telco.providers p ON b.provider_id = p.provider_id
+            ORDER BY p.name, b.snapshot_at DESC
+        """)
+        for row in cur.fetchall():
+            snapshot_time = row[3].strftime("%Y-%m-%d %H:%M") if row[3] else "?"
+            print(f"  {row[0]}: {Colors.GREEN}${row[1]} {row[2]}{Colors.RESET} (as of {snapshot_time})")
+
+        # Call stats
+        print_subheader("Call Statistics (All Time)")
+        cur.execute("""
+            SELECT
+                COUNT(*) as total_calls,
+                SUM(duration_seconds) as total_duration,
+                AVG(duration_seconds) as avg_duration,
+                COUNT(CASE WHEN status = 'ended' THEN 1 END) as completed
+            FROM telco.calls
+        """)
+        row = cur.fetchone()
+        if row and row[0]:
+            total_mins = (row[1] or 0) // 60
+            avg_secs = int(row[2] or 0)
+            print(f"  Total Calls: {Colors.GREEN}{row[0]}{Colors.RESET}")
+            print(f"  Completed: {Colors.GREEN}{row[3]}{Colors.RESET}")
+            print(f"  Total Duration: {Colors.CYAN}{total_mins} minutes{Colors.RESET}")
+            print(f"  Avg Duration: {Colors.CYAN}{avg_secs} seconds{Colors.RESET}")
+
+    except Exception as e:
+        print(f"{Colors.RED}Error querying database: {e}{Colors.RESET}")
+    finally:
+        conn.close()
+
+
 def show_menu():
     """Display main menu"""
     print()
@@ -531,8 +675,10 @@ def show_menu():
     print(f"  {Colors.CYAN}2.{Colors.RESET} Telnyx Overview")
     print(f"  {Colors.CYAN}3.{Colors.RESET} Retell AI Overview")
     print(f"  {Colors.CYAN}4.{Colors.RESET} Unified Number View (All Providers)")
+    print(f"  {Colors.CYAN}5.{Colors.RESET} Data Warehouse (PostgreSQL)")
     print()
     print(f"  {Colors.CYAN}A.{Colors.RESET} Show All")
+    print(f"  {Colors.CYAN}S.{Colors.RESET} Sync Data (Pull from APIs)")
     print(f"  {Colors.CYAN}R.{Colors.RESET} Refresh")
     print(f"  {Colors.CYAN}Q.{Colors.RESET} Quit")
     print()
@@ -601,6 +747,9 @@ def main():
             else:
                 print(f"{Colors.RED}No providers configured{Colors.RESET}")
 
+        elif choice == '5':
+            show_warehouse_summary(creds)
+
         elif choice == 'a':
             if zadarma:
                 show_zadarma_info(zadarma)
@@ -608,6 +757,23 @@ def main():
                 show_telnyx_info(telnyx)
             if retell:
                 show_retell_info(retell)
+            show_warehouse_summary(creds)
+
+        elif choice == 's':
+            # Run sync script
+            print_header("SYNCING DATA FROM APIs")
+            sync_script = Path(__file__).parent / "sync" / "sync_initial.py"
+            if sync_script.exists():
+                import subprocess
+                print(f"  Running: {sync_script}")
+                print()
+                result = subprocess.run([sys.executable, str(sync_script)], cwd=str(sync_script.parent))
+                if result.returncode == 0:
+                    print(f"\n  {Colors.GREEN}Sync completed successfully{Colors.RESET}")
+                else:
+                    print(f"\n  {Colors.RED}Sync failed with code {result.returncode}{Colors.RESET}")
+            else:
+                print(f"  {Colors.RED}Sync script not found: {sync_script}{Colors.RESET}")
 
         elif choice == 'r':
             continue
