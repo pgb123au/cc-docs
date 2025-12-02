@@ -1711,6 +1711,291 @@ def show_call_details(conn, call_ids: List[str], creds: Dict[str, str]):
             input(f"\n  {Colors.DIM}Press Enter to continue...{Colors.RESET}")
 
 
+# ============================================================================
+# LATENCY COMPARISON
+# ============================================================================
+
+def show_latency_comparison(creds: Dict[str, str]):
+    """Compare voice agent latency for calls through Telnyx vs Zadarma"""
+    if not POSTGRES_AVAILABLE:
+        print(f"  {Colors.RED}psycopg2 not installed. Run: pip install psycopg2-binary{Colors.RESET}")
+        return
+
+    conn = get_db_connection(creds)
+    if not conn:
+        return
+
+    os.system('cls' if os.name == 'nt' else 'clear')
+    print_header("TELCO LATENCY COMPARISON")
+
+    print(f"""
+  {Colors.BOLD}Understanding Voice Agent Latency{Colors.RESET}
+  {Colors.DIM}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━{Colors.RESET}
+
+  When a caller speaks to an AI voice agent, the total response delay (E2E) includes:
+
+  {Colors.CYAN}1. Telco Network Delay{Colors.RESET}     - Audio packets through carrier network
+  {Colors.CYAN}2. Speech-to-Text (STT){Colors.RESET}   - Converting speech to text (Retell)
+  {Colors.CYAN}3. LLM Processing{Colors.RESET}         - AI thinking time (GPT-4o, Claude, etc.)
+  {Colors.CYAN}4. Knowledge Base{Colors.RESET}         - Looking up information
+  {Colors.CYAN}5. Text-to-Speech (TTS){Colors.RESET}   - Converting response to audio
+  {Colors.CYAN}6. Telco Return Path{Colors.RESET}      - Audio back to caller
+
+  {Colors.YELLOW}Note:{Colors.RESET} Telco delay is embedded in E2E but not separately measured.
+  We compare calls through different telcos to infer network differences.
+
+  {Colors.DIM}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━{Colors.RESET}
+""")
+
+    cur = conn.cursor()
+
+    # Map phone numbers to telcos
+    ZADARMA_NUMBER = '+61288800226'
+    TELNYX_NUMBER = '+61240620999'
+
+    # Get latency stats for Zadarma-routed calls
+    cur.execute("""
+        SELECT
+            COUNT(*) as total_calls,
+            COUNT(CASE WHEN raw_data->'latency' IS NOT NULL THEN 1 END) as calls_with_latency,
+            AVG((raw_data->'latency'->'e2e'->>'p50')::float) as avg_e2e_p50,
+            AVG((raw_data->'latency'->'e2e'->>'p90')::float) as avg_e2e_p90,
+            AVG((raw_data->'latency'->'llm'->>'p50')::float) as avg_llm_p50,
+            AVG((raw_data->'latency'->'tts'->>'p50')::float) as avg_tts_p50,
+            AVG((raw_data->'latency'->'knowledge_base'->>'p50')::float) as avg_kb_p50,
+            MIN((raw_data->'latency'->'e2e'->>'min')::float) as best_e2e,
+            MAX((raw_data->'latency'->'e2e'->>'max')::float) as worst_e2e,
+            AVG(duration_seconds) as avg_duration
+        FROM telco.calls c
+        JOIN telco.providers p ON c.provider_id = p.provider_id
+        WHERE p.name = 'retell'
+          AND to_number = %s
+          AND raw_data->'latency'->'e2e' IS NOT NULL
+    """, (ZADARMA_NUMBER,))
+    zadarma_stats = cur.fetchone()
+
+    # Get latency stats for Telnyx-routed calls
+    cur.execute("""
+        SELECT
+            COUNT(*) as total_calls,
+            COUNT(CASE WHEN raw_data->'latency' IS NOT NULL THEN 1 END) as calls_with_latency,
+            AVG((raw_data->'latency'->'e2e'->>'p50')::float) as avg_e2e_p50,
+            AVG((raw_data->'latency'->'e2e'->>'p90')::float) as avg_e2e_p90,
+            AVG((raw_data->'latency'->'llm'->>'p50')::float) as avg_llm_p50,
+            AVG((raw_data->'latency'->'tts'->>'p50')::float) as avg_tts_p50,
+            AVG((raw_data->'latency'->'knowledge_base'->>'p50')::float) as avg_kb_p50,
+            MIN((raw_data->'latency'->'e2e'->>'min')::float) as best_e2e,
+            MAX((raw_data->'latency'->'e2e'->>'max')::float) as worst_e2e,
+            AVG(duration_seconds) as avg_duration
+        FROM telco.calls c
+        JOIN telco.providers p ON c.provider_id = p.provider_id
+        WHERE p.name = 'retell'
+          AND to_number = %s
+          AND raw_data->'latency'->'e2e' IS NOT NULL
+    """, (TELNYX_NUMBER,))
+    telnyx_stats = cur.fetchone()
+
+    # Display comparison table
+    print(f"  {Colors.BOLD}AGGREGATE STATISTICS{Colors.RESET}")
+    print(f"  {Colors.DIM}(All times in milliseconds){Colors.RESET}\n")
+
+    headers = ["Metric", "Zadarma", "Telnyx", "Difference", "Winner"]
+    col_widths = [25, 15, 15, 15, 12]
+
+    def safe_val(val, fmt=".0f"):
+        if val is None:
+            return "-"
+        return f"{val:{fmt}}"
+
+    def compare(z_val, t_val, lower_better=True):
+        if z_val is None or t_val is None:
+            return "-", "-"
+        diff = z_val - t_val
+        if lower_better:
+            winner = f"{Colors.GREEN}Telnyx{Colors.RESET}" if diff > 0 else f"{Colors.GREEN}Zadarma{Colors.RESET}"
+        else:
+            winner = f"{Colors.GREEN}Zadarma{Colors.RESET}" if diff > 0 else f"{Colors.GREEN}Telnyx{Colors.RESET}"
+        diff_str = f"+{diff:.0f}" if diff > 0 else f"{diff:.0f}"
+        return diff_str, winner
+
+    rows = []
+
+    # Calls analyzed
+    z_calls = zadarma_stats[0] if zadarma_stats else 0
+    t_calls = telnyx_stats[0] if telnyx_stats else 0
+    rows.append(["Calls Analyzed", str(z_calls), str(t_calls), "-", "-"])
+
+    # E2E Latency (p50)
+    z_e2e = zadarma_stats[2] if zadarma_stats else None
+    t_e2e = telnyx_stats[2] if telnyx_stats else None
+    diff, winner = compare(z_e2e, t_e2e)
+    rows.append([f"{Colors.BOLD}E2E Latency (p50){Colors.RESET}", safe_val(z_e2e), safe_val(t_e2e), diff, winner])
+
+    # E2E Latency (p90)
+    z_e2e90 = zadarma_stats[3] if zadarma_stats else None
+    t_e2e90 = telnyx_stats[3] if telnyx_stats else None
+    diff, winner = compare(z_e2e90, t_e2e90)
+    rows.append(["E2E Latency (p90)", safe_val(z_e2e90), safe_val(t_e2e90), diff, winner])
+
+    # Best E2E
+    z_best = zadarma_stats[7] if zadarma_stats else None
+    t_best = telnyx_stats[7] if telnyx_stats else None
+    diff, winner = compare(z_best, t_best)
+    rows.append(["Best E2E", safe_val(z_best), safe_val(t_best), diff, winner])
+
+    # Worst E2E
+    z_worst = zadarma_stats[8] if zadarma_stats else None
+    t_worst = telnyx_stats[8] if telnyx_stats else None
+    diff, winner = compare(z_worst, t_worst)
+    rows.append(["Worst E2E", safe_val(z_worst), safe_val(t_worst), diff, winner])
+
+    rows.append(["", "", "", "", ""])  # Spacer
+
+    # Breakdown
+    rows.append([f"{Colors.DIM}--- Latency Breakdown ---{Colors.RESET}", "", "", "", ""])
+
+    # LLM
+    z_llm = zadarma_stats[4] if zadarma_stats else None
+    t_llm = telnyx_stats[4] if telnyx_stats else None
+    diff, winner = compare(z_llm, t_llm)
+    rows.append(["LLM Processing (p50)", safe_val(z_llm), safe_val(t_llm), diff, winner])
+
+    # TTS
+    z_tts = zadarma_stats[5] if zadarma_stats else None
+    t_tts = telnyx_stats[5] if telnyx_stats else None
+    diff, winner = compare(z_tts, t_tts)
+    rows.append(["TTS (p50)", safe_val(z_tts), safe_val(t_tts), diff, winner])
+
+    # KB
+    z_kb = zadarma_stats[6] if zadarma_stats else None
+    t_kb = telnyx_stats[6] if telnyx_stats else None
+    diff, winner = compare(z_kb, t_kb)
+    rows.append(["Knowledge Base (p50)", safe_val(z_kb), safe_val(t_kb), diff, winner])
+
+    # Inferred telco delay
+    if z_e2e and z_llm and z_tts and t_e2e and t_llm and t_tts:
+        z_other = z_e2e - z_llm - z_tts - (z_kb or 0)
+        t_other = t_e2e - t_llm - t_tts - (t_kb or 0)
+        diff, winner = compare(z_other, t_other)
+        rows.append([f"{Colors.YELLOW}Other (STT+Network){Colors.RESET}", safe_val(z_other), safe_val(t_other), diff, winner])
+
+    print_table(headers, rows, col_widths)
+
+    # Get recent calls for each
+    print(f"\n\n  {Colors.BOLD}LAST 10 CALLS - ZADARMA ({ZADARMA_NUMBER}){Colors.RESET}\n")
+
+    cur.execute("""
+        SELECT started_at, duration_seconds, retell_agent_name,
+               (raw_data->'latency'->'e2e'->>'p50')::float as e2e,
+               (raw_data->'latency'->'llm'->>'p50')::float as llm,
+               (raw_data->'latency'->'tts'->>'p50')::float as tts
+        FROM telco.calls c
+        JOIN telco.providers p ON c.provider_id = p.provider_id
+        WHERE p.name = 'retell'
+          AND to_number = %s
+          AND raw_data->'latency'->'e2e' IS NOT NULL
+        ORDER BY started_at DESC
+        LIMIT 10
+    """, (ZADARMA_NUMBER,))
+
+    zadarma_calls = cur.fetchall()
+    if zadarma_calls:
+        headers2 = ["Time", "Dur", "Agent", "E2E", "LLM", "TTS"]
+        widths2 = [18, 6, 40, 10, 10, 10]
+        rows2 = []
+        for call in zadarma_calls:
+            time_str = call[0].strftime("%Y-%m-%d %H:%M") if call[0] else "-"
+            agent = (call[2][:38] + "..") if call[2] and len(call[2]) > 40 else (call[2] or "-")
+            rows2.append([
+                time_str,
+                f"{call[1]}s" if call[1] else "-",
+                agent,
+                f"{call[3]:.0f}ms" if call[3] else "-",
+                f"{call[4]:.0f}ms" if call[4] else "-",
+                f"{call[5]:.0f}ms" if call[5] else "-"
+            ])
+        print_table(headers2, rows2, widths2)
+    else:
+        print(f"  {Colors.YELLOW}No Zadarma calls with latency data{Colors.RESET}")
+
+    print(f"\n\n  {Colors.BOLD}LAST 10 CALLS - TELNYX ({TELNYX_NUMBER}){Colors.RESET}\n")
+
+    cur.execute("""
+        SELECT started_at, duration_seconds, retell_agent_name,
+               (raw_data->'latency'->'e2e'->>'p50')::float as e2e,
+               (raw_data->'latency'->'llm'->>'p50')::float as llm,
+               (raw_data->'latency'->'tts'->>'p50')::float as tts
+        FROM telco.calls c
+        JOIN telco.providers p ON c.provider_id = p.provider_id
+        WHERE p.name = 'retell'
+          AND to_number = %s
+          AND raw_data->'latency'->'e2e' IS NOT NULL
+        ORDER BY started_at DESC
+        LIMIT 10
+    """, (TELNYX_NUMBER,))
+
+    telnyx_calls = cur.fetchall()
+    if telnyx_calls:
+        rows2 = []
+        for call in telnyx_calls:
+            time_str = call[0].strftime("%Y-%m-%d %H:%M") if call[0] else "-"
+            agent = (call[2][:38] + "..") if call[2] and len(call[2]) > 40 else (call[2] or "-")
+            rows2.append([
+                time_str,
+                f"{call[1]}s" if call[1] else "-",
+                agent,
+                f"{call[3]:.0f}ms" if call[3] else "-",
+                f"{call[4]:.0f}ms" if call[4] else "-",
+                f"{call[5]:.0f}ms" if call[5] else "-"
+            ])
+        print_table(headers2, rows2, widths2)
+    else:
+        print(f"  {Colors.YELLOW}No Telnyx calls with latency data{Colors.RESET}")
+
+    # Analysis summary
+    print(f"\n\n  {Colors.BOLD}ANALYSIS{Colors.RESET}")
+    print(f"  {Colors.DIM}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━{Colors.RESET}\n")
+
+    if z_e2e and t_e2e and z_llm and t_llm:
+        # Calculate isolated network difference
+        z_network_est = z_e2e - z_llm - z_tts - (z_kb or 0)
+        t_network_est = t_e2e - t_llm - t_tts - (t_kb or 0)
+        net_diff = z_network_est - t_network_est
+
+        print(f"  {Colors.CYAN}E2E Comparison:{Colors.RESET}")
+        print(f"    Zadarma avg: {z_e2e:.0f}ms | Telnyx avg: {t_e2e:.0f}ms")
+        e2e_diff = z_e2e - t_e2e
+        if abs(e2e_diff) < 50:
+            print(f"    {Colors.GREEN}→ Difference is negligible (<50ms){Colors.RESET}")
+        elif e2e_diff > 0:
+            print(f"    {Colors.YELLOW}→ Telnyx is {e2e_diff:.0f}ms faster on average{Colors.RESET}")
+        else:
+            print(f"    {Colors.YELLOW}→ Zadarma is {-e2e_diff:.0f}ms faster on average{Colors.RESET}")
+
+        print(f"\n  {Colors.CYAN}Estimated Network Component:{Colors.RESET}")
+        print(f"    (E2E - LLM - TTS - KB = STT + Network overhead)")
+        print(f"    Zadarma: ~{z_network_est:.0f}ms | Telnyx: ~{t_network_est:.0f}ms")
+
+        if abs(net_diff) < 30:
+            print(f"    {Colors.GREEN}→ Network performance is comparable{Colors.RESET}")
+        elif net_diff > 0:
+            print(f"    {Colors.YELLOW}→ Telnyx network appears ~{net_diff:.0f}ms faster{Colors.RESET}")
+        else:
+            print(f"    {Colors.YELLOW}→ Zadarma network appears ~{-net_diff:.0f}ms faster{Colors.RESET}")
+
+        print(f"\n  {Colors.CYAN}Important Caveats:{Colors.RESET}")
+        print(f"    • Sample sizes differ ({z_calls} vs {t_calls} calls)")
+        print(f"    • Different callers/times may affect results")
+        print(f"    • LLM/TTS times dominate; network is minor factor")
+        print(f"    • Both telcos route to same Retell servers")
+    else:
+        print(f"  {Colors.YELLOW}Insufficient data for detailed analysis{Colors.RESET}")
+        print(f"  Need calls with latency data through both Zadarma and Telnyx numbers")
+
+    conn.close()
+    input(f"\n\n  {Colors.DIM}Press Enter to continue...{Colors.RESET}")
+
+
 def show_menu():
     """Display main menu"""
     print()
@@ -1722,7 +2007,8 @@ def show_menu():
     print(f"  {Colors.CYAN}3.{Colors.RESET} Retell AI Overview")
     print(f"  {Colors.CYAN}4.{Colors.RESET} Unified Number View (All Providers)")
     print(f"  {Colors.CYAN}5.{Colors.RESET} Data Warehouse (PostgreSQL)")
-    print(f"  {Colors.CYAN}6.{Colors.RESET} {Colors.BOLD}Retell Calls Explorer{Colors.RESET} {Colors.GREEN}NEW{Colors.RESET}")
+    print(f"  {Colors.CYAN}6.{Colors.RESET} Retell Calls Explorer")
+    print(f"  {Colors.CYAN}7.{Colors.RESET} {Colors.BOLD}Latency Comparison{Colors.RESET} {Colors.GREEN}NEW{Colors.RESET}")
     print()
     print(f"  {Colors.CYAN}A.{Colors.RESET} Show All")
     print(f"  {Colors.CYAN}S.{Colors.RESET} Sync Data (Pull from APIs)")
@@ -1799,6 +2085,9 @@ def main():
 
         elif choice == '6':
             show_retell_calls_explorer(creds)
+
+        elif choice == '7':
+            show_latency_comparison(creds)
 
         elif choice == 'a':
             if zadarma:
