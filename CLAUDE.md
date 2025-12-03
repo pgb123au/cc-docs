@@ -153,6 +153,7 @@ python CC-Made-n8n_api_check_webhooks.py                # Check issues
 | 2 | `retell/RETELLAI_JSON_SCHEMAS.md` | Valid JSON structures |
 | 3 | `retell/AGENT_DEVELOPMENT_GUIDE.md` | 5 critical rules, variable binding, naming, versioning |
 | 4 | `retell/WHITELISTED_PATTERNS.md` | **Intentional design choices - DO NOT "fix" these** |
+| 5 | `retell/guides/BOOKING_FLOW_TROUBLESHOOTING.md` | Booking failures, edge loops, practitioner_id issues, diagnostic checklist |
 
 ### Before n8n Work
 | File | Content | Status |
