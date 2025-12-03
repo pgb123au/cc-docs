@@ -14,6 +14,15 @@ Files created/modified:
 
 ## CRITICAL SAFETY RULES
 
+### Test Patient (ONLY USE THIS)
+| Field | Value |
+|-------|-------|
+| **Name** | `Peter Ball` |
+| **Patient ID** | `1805465202989210063` |
+| **Phone** | `0412111000` |
+
+**⚠️ ALL tests, simulations, and webhook calls MUST use Peter Ball's data. Never use real patient data.**
+
 ### RetellAI Simulation Tests
 Tests with `"tool_mocks": []` execute REAL webhooks and modify REAL Cliniko data.
 
@@ -50,9 +59,6 @@ cd /c/Users/peter/Downloads/CC/n8n && git add . && git commit -m "Workflow - [de
 ---
 
 ## QUICK REFERENCE
-
-### Test Patient
-- **Name:** Peter Ball | **ID:** `1805465202989210063` | **Phone:** `0412111000`
 
 ### Production Phone Numbers
 - `+61288800226` - Main Sydney number
@@ -153,8 +159,31 @@ ssh -i "C:\Users\peter\.ssh\metabase-aws" ubuntu@54.149.95.69 \
 
 ---
 
+## BEFORE BUILDING NEW SCRIPTS
+
+**Check the `run.py` launcher system first!** Many scripts already exist.
+
+```bash
+# Launch the script menu to see all available scripts
+cd C:\Users\peter\Downloads\CC
+python run.py
+```
+
+**Script locations to check:**
+| Category | Location |
+|----------|----------|
+| n8n Core | `n8n/Python/` |
+| n8n Diagnostics | `n8n/Python/Diagnose-n8n-Errors/` |
+| RetellAI Scripts | `retell/scripts/` |
+| Telco Manager | `Telcos/telco.py` |
+
+**Don't reinvent the wheel** - search existing scripts before creating new ones.
+
+---
+
 ## ALWAYS DO
 
+- **Check existing scripts** in `run.py` before building new tools
 - Read reference docs before agent/workflow work
 - Run independent tool calls in parallel
 - Read files before editing
