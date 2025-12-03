@@ -1707,6 +1707,7 @@ def show_full_timeline_view(call_id: str, call_info: dict, raw_data: dict, timel
     """Display full detailed timeline on screen with scrolling"""
     import json
     import shutil
+    import requests
 
     # Get terminal dimensions
     try:
@@ -1724,39 +1725,147 @@ def show_full_timeline_view(call_id: str, call_info: dict, raw_data: dict, timel
 
     # Header
     lines.append(f"{Colors.BOLD}{'═' * width}{Colors.RESET}")
-    lines.append(f"{Colors.BOLD}  FULL TIMELINE VIEW{Colors.RESET}")
+    lines.append(f"{Colors.BOLD}  FULL CALL DEBUG VIEW{Colors.RESET}")
     lines.append(f"{Colors.BOLD}{'═' * width}{Colors.RESET}")
     lines.append("")
 
-    # Call info
-    lines.append(f"{Colors.CYAN}Call ID:{Colors.RESET}    {call_id}")
-    lines.append(f"{Colors.CYAN}Agent:{Colors.RESET}      {call_info.get('retell_agent_name', '-')}")
-    lines.append(f"{Colors.CYAN}From:{Colors.RESET}       {call_info.get('from_number', '-')} → {call_info.get('to_number', '-')}")
-    lines.append(f"{Colors.CYAN}Started:{Colors.RESET}    {str(call_info.get('started_at', '-'))[:19]}")
-    lines.append(f"{Colors.CYAN}Duration:{Colors.RESET}   {call_info.get('duration_seconds', 0)}s")
-    lines.append(f"{Colors.CYAN}Status:{Colors.RESET}     {call_info.get('status', '-')}")
+    # ==================== SECTION 1: CALL INFO ====================
+    lines.append(f"{Colors.YELLOW}┌─ CALL INFO ─────────────────────────────────────────────────┐{Colors.RESET}")
+    lines.append(f"  {Colors.CYAN}Call ID:{Colors.RESET}     {call_id}")
+    lines.append(f"  {Colors.CYAN}Agent ID:{Colors.RESET}    {call_info.get('retell_agent_id', '-')}")
+    lines.append(f"  {Colors.CYAN}Agent:{Colors.RESET}       {call_info.get('retell_agent_name', '-')}")
+    lines.append(f"  {Colors.CYAN}Direction:{Colors.RESET}   {call_info.get('direction', '-')}")
+    lines.append(f"  {Colors.CYAN}From → To:{Colors.RESET}   {call_info.get('from_number', '-')} → {call_info.get('to_number', '-')}")
+    lines.append(f"  {Colors.CYAN}Started:{Colors.RESET}     {call_info.get('started_at', '-')}")
+    lines.append(f"  {Colors.CYAN}Ended:{Colors.RESET}       {call_info.get('ended_at', '-')}")
+    lines.append(f"  {Colors.CYAN}Duration:{Colors.RESET}    {call_info.get('duration_seconds', 0)} seconds")
+    lines.append(f"  {Colors.CYAN}Status:{Colors.RESET}      {call_info.get('status', '-')}")
 
-    # Disconnection reason if present
+    # Disconnection reason - highlighted if present
     disconnect = raw_data.get('disconnection_reason', '') if raw_data else ''
     if disconnect:
-        lines.append(f"{Colors.CYAN}Disconnect:{Colors.RESET} {disconnect}")
+        if 'error' in disconnect.lower() or 'fail' in disconnect.lower():
+            lines.append(f"  {Colors.RED}Disconnect:{Colors.RESET}  {Colors.RED}{disconnect}{Colors.RESET}")
+        else:
+            lines.append(f"  {Colors.CYAN}Disconnect:{Colors.RESET}  {disconnect}")
 
+    # Cost
+    cost = call_info.get('cost')
+    if cost:
+        lines.append(f"  {Colors.CYAN}Cost:{Colors.RESET}        ${cost} {call_info.get('currency', 'USD')}")
+
+    lines.append(f"{Colors.YELLOW}└─────────────────────────────────────────────────────────────┘{Colors.RESET}")
     lines.append("")
-    lines.append(f"{Colors.DIM}{'─' * width}{Colors.RESET}")
 
-    # Dynamic variables section
+    # ==================== SECTION 2: LATENCY METRICS ====================
+    latency = raw_data.get('latency', {}) if raw_data else {}
+    if latency and any(v is not None for v in latency.values()):
+        lines.append(f"{Colors.YELLOW}┌─ LATENCY METRICS ───────────────────────────────────────────┐{Colors.RESET}")
+        for k, v in latency.items():
+            if v is not None:
+                # Highlight slow latencies
+                label = k.replace('_', ' ').title()
+                if v > 1000:
+                    lines.append(f"  {Colors.RED}{label}:{Colors.RESET} {v}ms {Colors.RED}⚠ SLOW{Colors.RESET}")
+                elif v > 500:
+                    lines.append(f"  {Colors.YELLOW}{label}:{Colors.RESET} {v}ms")
+                else:
+                    lines.append(f"  {Colors.CYAN}{label}:{Colors.RESET} {v}ms")
+        lines.append(f"{Colors.YELLOW}└─────────────────────────────────────────────────────────────┘{Colors.RESET}")
+        lines.append("")
+
+    # ==================== SECTION 3: DYNAMIC VARIABLES ====================
     collected_vars = raw_data.get('collected_dynamic_variables', {}) if raw_data else {}
-    if collected_vars:
-        lines.append("")
-        lines.append(f"{Colors.BOLD}Dynamic Variables (Final State):{Colors.RESET}")
-        for k, v in collected_vars.items():
-            lines.append(f"  {Colors.CYAN}{k}:{Colors.RESET} {v}")
-        lines.append("")
-        lines.append(f"{Colors.DIM}{'─' * width}{Colors.RESET}")
+    llm_vars = raw_data.get('retell_llm_dynamic_variables', {}) if raw_data else {}
 
-    # Timeline section
-    lines.append("")
-    lines.append(f"{Colors.BOLD}Timeline Events:{Colors.RESET}")
+    if collected_vars or llm_vars:
+        lines.append(f"{Colors.YELLOW}┌─ DYNAMIC VARIABLES ─────────────────────────────────────────┐{Colors.RESET}")
+
+        if collected_vars:
+            lines.append(f"  {Colors.BOLD}Collected (Final State):{Colors.RESET}")
+            for k, v in collected_vars.items():
+                v_str = str(v)
+                if len(v_str) > width - 20:
+                    v_str = v_str[:width - 23] + "..."
+                lines.append(f"    {Colors.CYAN}{k}:{Colors.RESET} {v_str}")
+
+        if llm_vars:
+            if collected_vars:
+                lines.append("")
+            lines.append(f"  {Colors.BOLD}LLM Input Variables:{Colors.RESET}")
+            for k, v in llm_vars.items():
+                v_str = str(v)
+                if len(v_str) > width - 20:
+                    v_str = v_str[:width - 23] + "..."
+                lines.append(f"    {Colors.DIM}{k}:{Colors.RESET} {v_str}")
+
+        lines.append(f"{Colors.YELLOW}└─────────────────────────────────────────────────────────────┘{Colors.RESET}")
+        lines.append("")
+
+    # ==================== SECTION 4: CALL ANALYSIS (AI Summary) ====================
+    analysis = raw_data.get('call_analysis', {}) if raw_data else {}
+    if analysis:
+        lines.append(f"{Colors.YELLOW}┌─ AI CALL ANALYSIS ──────────────────────────────────────────┐{Colors.RESET}")
+
+        # Common fields to display nicely
+        if analysis.get('call_summary'):
+            lines.append(f"  {Colors.BOLD}Summary:{Colors.RESET}")
+            wrapped = _wrap_text(analysis['call_summary'], width - 6)
+            for line in wrapped:
+                lines.append(f"    {line}")
+
+        if analysis.get('user_sentiment'):
+            sentiment = analysis['user_sentiment']
+            if sentiment.lower() in ['positive', 'satisfied']:
+                lines.append(f"  {Colors.GREEN}Sentiment:{Colors.RESET} {sentiment}")
+            elif sentiment.lower() in ['negative', 'frustrated', 'angry']:
+                lines.append(f"  {Colors.RED}Sentiment:{Colors.RESET} {sentiment}")
+            else:
+                lines.append(f"  {Colors.CYAN}Sentiment:{Colors.RESET} {sentiment}")
+
+        if analysis.get('call_successful') is not None:
+            success = analysis['call_successful']
+            if success:
+                lines.append(f"  {Colors.GREEN}Successful:{Colors.RESET} Yes")
+            else:
+                lines.append(f"  {Colors.RED}Successful:{Colors.RESET} No")
+
+        # Show other analysis fields
+        for k, v in analysis.items():
+            if k not in ['call_summary', 'user_sentiment', 'call_successful']:
+                v_str = str(v)
+                if len(v_str) > width - 20:
+                    v_str = v_str[:width - 23] + "..."
+                lines.append(f"  {Colors.CYAN}{k}:{Colors.RESET} {v_str}")
+
+        lines.append(f"{Colors.YELLOW}└─────────────────────────────────────────────────────────────┘{Colors.RESET}")
+        lines.append("")
+
+    # ==================== SECTION 5: TOKEN USAGE ====================
+    token_usage = raw_data.get('llm_token_usage', {}) if raw_data else {}
+    if token_usage:
+        lines.append(f"{Colors.YELLOW}┌─ TOKEN USAGE ───────────────────────────────────────────────┐{Colors.RESET}")
+        total = 0
+        for k, v in token_usage.items():
+            if isinstance(v, (int, float)):
+                total += v
+                lines.append(f"  {Colors.CYAN}{k}:{Colors.RESET} {v:,}")
+        if total > 0:
+            lines.append(f"  {Colors.BOLD}Total:{Colors.RESET} {total:,} tokens")
+        lines.append(f"{Colors.YELLOW}└─────────────────────────────────────────────────────────────┘{Colors.RESET}")
+        lines.append("")
+
+    # ==================== SECTION 6: PUBLIC LOG URL ====================
+    public_log_url = raw_data.get('public_log_url', '') if raw_data else ''
+    if public_log_url:
+        lines.append(f"{Colors.YELLOW}┌─ PUBLIC LOG (LLM Reasoning) ────────────────────────────────┐{Colors.RESET}")
+        lines.append(f"  {Colors.DIM}URL:{Colors.RESET} {public_log_url[:width-8]}")
+        lines.append(f"  {Colors.DIM}(Full log available in Debug Export - press D){Colors.RESET}")
+        lines.append(f"{Colors.YELLOW}└─────────────────────────────────────────────────────────────┘{Colors.RESET}")
+        lines.append("")
+
+    # ==================== SECTION 7: TIMELINE ====================
+    lines.append(f"{Colors.YELLOW}┌─ CONVERSATION TIMELINE ──────────────────────────────────────┐{Colors.RESET}")
     lines.append("")
 
     if not timeline:
@@ -1885,7 +1994,7 @@ def show_full_timeline_view(call_id: str, call_info: dict, raw_data: dict, timel
                         lines.append(f"           {line}")
                 lines.append("")
 
-    lines.append(f"{Colors.DIM}{'─' * width}{Colors.RESET}")
+    lines.append(f"{Colors.YELLOW}└─────────────────────────────────────────────────────────────┘{Colors.RESET}")
 
     # Summary
     if timeline:
@@ -1898,11 +2007,13 @@ def show_full_timeline_view(call_id: str, call_info: dict, raw_data: dict, timel
         lines.append("")
         lines.append(f"{Colors.BOLD}Summary:{Colors.RESET} {agent_msgs} agent | {user_msgs} user | {tool_calls} tool calls | {tool_results} results | {nodes} nodes")
 
+    lines.append("")
     lines.append(f"{Colors.BOLD}{'═' * width}{Colors.RESET}")
 
     # Now paginate the output
     total_lines = len(lines)
     current_pos = 0
+    show_log = False  # Track if we're showing the public log
 
     while True:
         os.system('cls' if os.name == 'nt' else 'clear')
@@ -1921,6 +2032,8 @@ def show_full_timeline_view(call_id: str, call_info: dict, raw_data: dict, timel
             nav.append(f"{Colors.CYAN}D{Colors.RESET}=Down")
         nav.append(f"{Colors.CYAN}T{Colors.RESET}=Top")
         nav.append(f"{Colors.CYAN}B{Colors.RESET}=Bottom")
+        if public_log_url:
+            nav.append(f"{Colors.CYAN}L{Colors.RESET}=View Log")
         nav.append(f"{Colors.CYAN}Q{Colors.RESET}=Back")
         print(f"{Colors.BOLD}Nav:{Colors.RESET} " + " | ".join(nav))
 
@@ -1937,6 +2050,134 @@ def show_full_timeline_view(call_id: str, call_info: dict, raw_data: dict, timel
             current_pos = 0
         elif choice == 'B':
             current_pos = max(0, total_lines - page_size)
+        elif choice == 'L' and public_log_url:
+            # Fetch and display the public log
+            show_public_log_view(public_log_url, width, term_height)
+
+
+def show_public_log_view(url: str, width: int, term_height: int):
+    """Fetch and display the public log with pagination"""
+    import requests
+
+    print(f"\n{Colors.YELLOW}Fetching public log...{Colors.RESET}")
+
+    try:
+        resp = requests.get(url, timeout=30)
+        if resp.status_code != 200:
+            print(f"{Colors.RED}Failed to fetch log: HTTP {resp.status_code}{Colors.RESET}")
+            input(f"\n{Colors.DIM}Press Enter to continue...{Colors.RESET}")
+            return
+
+        log_content = resp.text
+    except Exception as e:
+        print(f"{Colors.RED}Error fetching log: {e}{Colors.RESET}")
+        input(f"\n{Colors.DIM}Press Enter to continue...{Colors.RESET}")
+        return
+
+    # Parse and format the log for readability
+    lines = []
+    lines.append(f"{Colors.BOLD}{'═' * width}{Colors.RESET}")
+    lines.append(f"{Colors.BOLD}  PUBLIC LOG - LLM Reasoning{Colors.RESET}")
+    lines.append(f"{Colors.BOLD}{'═' * width}{Colors.RESET}")
+    lines.append("")
+
+    # Split log into lines and format
+    log_lines = log_content.split('\n')
+
+    for line in log_lines:
+        line = line.rstrip()
+
+        # Highlight important patterns
+        if 'error' in line.lower():
+            lines.append(f"{Colors.RED}{line}{Colors.RESET}")
+        elif 'tool_call' in line.lower() or 'function' in line.lower():
+            lines.append(f"{Colors.YELLOW}{line}{Colors.RESET}")
+        elif 'user:' in line.lower() or '"role": "user"' in line.lower():
+            lines.append(f"{Colors.GREEN}{line}{Colors.RESET}")
+        elif 'assistant:' in line.lower() or '"role": "assistant"' in line.lower():
+            lines.append(f"{Colors.CYAN}{line}{Colors.RESET}")
+        elif line.startswith('{') or line.startswith('['):
+            lines.append(f"{Colors.DIM}{line}{Colors.RESET}")
+        else:
+            # Wrap long lines
+            if len(line) > width:
+                while len(line) > width:
+                    lines.append(line[:width])
+                    line = line[width:]
+                if line:
+                    lines.append(line)
+            else:
+                lines.append(line)
+
+    lines.append("")
+    lines.append(f"{Colors.BOLD}{'═' * width}{Colors.RESET}")
+    lines.append(f"{Colors.DIM}Total: {len(log_lines)} lines, {len(log_content):,} characters{Colors.RESET}")
+
+    # Paginate
+    page_size = term_height - 8
+    total_lines = len(lines)
+    current_pos = 0
+
+    while True:
+        os.system('cls' if os.name == 'nt' else 'clear')
+
+        end_pos = min(current_pos + page_size, total_lines)
+        for i in range(current_pos, end_pos):
+            print(lines[i])
+
+        print(f"\n{Colors.DIM}Line {current_pos + 1}-{end_pos} of {total_lines}{Colors.RESET}")
+        nav = []
+        if current_pos > 0:
+            nav.append(f"{Colors.CYAN}U{Colors.RESET}=Up")
+        if end_pos < total_lines:
+            nav.append(f"{Colors.CYAN}D{Colors.RESET}=Down")
+        nav.append(f"{Colors.CYAN}T{Colors.RESET}=Top")
+        nav.append(f"{Colors.CYAN}B{Colors.RESET}=Bottom")
+        nav.append(f"{Colors.CYAN}S{Colors.RESET}=Search")
+        nav.append(f"{Colors.CYAN}Q{Colors.RESET}=Back")
+        print(f"{Colors.BOLD}Nav:{Colors.RESET} " + " | ".join(nav))
+
+        choice = input(f"{Colors.BOLD}>{Colors.RESET} ").strip().upper()
+
+        if choice == 'Q' or choice == '':
+            break
+        elif choice == 'U' and current_pos > 0:
+            current_pos = max(0, current_pos - page_size)
+        elif choice == 'D' and end_pos < total_lines:
+            current_pos = min(total_lines - page_size, current_pos + page_size)
+            current_pos = max(0, current_pos)
+        elif choice == 'T':
+            current_pos = 0
+        elif choice == 'B':
+            current_pos = max(0, total_lines - page_size)
+        elif choice == 'S':
+            # Search in log
+            search_term = input(f"{Colors.CYAN}Search for: {Colors.RESET}").strip()
+            if search_term:
+                # Find first occurrence after current position
+                found = False
+                for i in range(current_pos, total_lines):
+                    # Strip ANSI codes for search
+                    clean_line = lines[i]
+                    for code in [Colors.RED, Colors.GREEN, Colors.YELLOW, Colors.CYAN, Colors.MAGENTA, Colors.BOLD, Colors.DIM, Colors.RESET]:
+                        clean_line = clean_line.replace(code, '')
+                    if search_term.lower() in clean_line.lower():
+                        current_pos = max(0, i - 2)  # Show a couple lines before match
+                        found = True
+                        break
+                if not found:
+                    # Wrap around to start
+                    for i in range(0, current_pos):
+                        clean_line = lines[i]
+                        for code in [Colors.RED, Colors.GREEN, Colors.YELLOW, Colors.CYAN, Colors.MAGENTA, Colors.BOLD, Colors.DIM, Colors.RESET]:
+                            clean_line = clean_line.replace(code, '')
+                        if search_term.lower() in clean_line.lower():
+                            current_pos = max(0, i - 2)
+                            found = True
+                            break
+                if not found:
+                    print(f"{Colors.YELLOW}Not found: {search_term}{Colors.RESET}")
+                    input(f"{Colors.DIM}Press Enter...{Colors.RESET}")
 
 
 def _wrap_text(text: str, width: int) -> list:
