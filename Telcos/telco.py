@@ -1456,8 +1456,9 @@ def show_call_timeline(all_call_data: List[dict]):
     except:
         term_width = 120
     # Use most of the width, leaving some margin
-    width = min(term_width - 4, 160)
-    content_width = width - 32  # Account for TIME and TYPE columns
+    width = min(term_width - 4, 180)
+    # Column widths: TIME(8) + DELTA(8) + TYPE(20) + spacers(4) = 40
+    content_width = width - 40
 
     while True:
         os.system('cls' if os.name == 'nt' else 'clear')
@@ -1506,30 +1507,73 @@ def show_call_timeline(all_call_data: List[dict]):
             if used_fallback:
                 print(f"{Colors.YELLOW}Note: Using basic transcript (tool calls not available){Colors.RESET}")
 
-            # Header
-            print(f"\n{Colors.BOLD}{'─'*width}{Colors.RESET}")
-            print(f"{Colors.BOLD}{'TIME':<8} {'TYPE':<18} {'CONTENT':<{content_width}}{Colors.RESET}")
-            print(f"{Colors.DIM}{'─'*width}{Colors.RESET}")
+            # Pre-process timeline to extract timestamps and calculate deltas
+            processed = []
+            prev_time = 0.0
+            current_node = "start"
+            node_counter = 0
 
             for item in timeline:
                 role = item.get("role", "")
-                content = item.get("content", "")
                 words = item.get("words", [])
 
                 # Get timestamp from words if available
-                timestamp = ""
+                curr_time = None
                 if words and len(words) > 0 and isinstance(words[0], dict):
-                    start_time = words[0].get("start", 0)
-                    timestamp = f"{start_time:.1f}s"
+                    curr_time = words[0].get("start", 0)
+
+                # Track node transitions
+                if role == "node_transition":
+                    node_counter += 1
+
+                # Calculate delta
+                delta = None
+                if curr_time is not None:
+                    delta = curr_time - prev_time
+                    prev_time = curr_time
+
+                processed.append({
+                    "item": item,
+                    "time": curr_time,
+                    "delta": delta,
+                    "node_num": node_counter
+                })
+
+            # Header
+            print(f"\n{Colors.BOLD}{'─'*width}{Colors.RESET}")
+            print(f"{Colors.BOLD}{'TIME':<8}{'DELTA':<8}  {'TYPE':<20}  {'CONTENT':<{content_width}}{Colors.RESET}")
+            print(f"{Colors.DIM}{'─'*width}{Colors.RESET}")
+
+            for p in processed:
+                item = p["item"]
+                role = item.get("role", "")
+                content = item.get("content", "")
+                curr_time = p["time"]
+                delta = p["delta"]
+                node_num = p["node_num"]
+
+                # Format timestamp
+                timestamp = f"{curr_time:.1f}s" if curr_time is not None else ""
+
+                # Format delta - highlight slow responses
+                if delta is not None:
+                    if delta > 5.0:
+                        delta_str = f"{Colors.RED}+{delta:.1f}s{Colors.RESET}"
+                    elif delta > 2.0:
+                        delta_str = f"{Colors.YELLOW}+{delta:.1f}s{Colors.RESET}"
+                    else:
+                        delta_str = f"{Colors.DIM}+{delta:.1f}s{Colors.RESET}"
+                else:
+                    delta_str = ""
 
                 # Format based on role
                 if role == "agent":
                     text = content[:content_width-3] + "..." if len(content or "") > content_width else content or ""
-                    print(f"{timestamp:<8} {Colors.CYAN}{'AGENT':<18}{Colors.RESET} {text}")
+                    print(f"{timestamp:<8}{delta_str:<17}  {Colors.CYAN}{'AGENT':<20}{Colors.RESET}  {text}")
 
                 elif role == "user":
                     text = content[:content_width-3] + "..." if len(content or "") > content_width else content or ""
-                    print(f"{timestamp:<8} {Colors.GREEN}{'USER':<18}{Colors.RESET} {text}")
+                    print(f"{timestamp:<8}{delta_str:<17}  {Colors.GREEN}{'USER':<20}{Colors.RESET}  {text}")
 
                 elif role == "tool_call_invocation":
                     tool_name = item.get("name", "unknown")
@@ -1544,7 +1588,7 @@ def show_call_timeline(all_call_data: List[dict]):
                             args_preview = args_preview[:content_width - len(tool_name) - 8] + "..."
                     except:
                         args_preview = args[:content_width - len(tool_name) - 5] if args else ""
-                    print(f"{timestamp:<8} {Colors.YELLOW}{'TOOL CALL':<18}{Colors.RESET} {Colors.BOLD}{tool_name}{Colors.RESET}({args_preview})")
+                    print(f"{timestamp:<8}{delta_str:<17}  {Colors.YELLOW}{'TOOL CALL':<20}{Colors.RESET}  {Colors.BOLD}{tool_name}{Colors.RESET}({args_preview})")
 
                 elif role == "tool_call_result":
                     result = content or ""
@@ -1590,10 +1634,13 @@ def show_call_timeline(all_call_data: List[dict]):
                     except:
                         pass
 
-                    print(f"{timestamp:<8} {Colors.MAGENTA}{'TOOL RESULT':<18}{Colors.RESET} {result_preview}{duration_ms}")
+                    print(f"{timestamp:<8}{delta_str:<17}  {Colors.MAGENTA}{'TOOL RESULT':<20}{Colors.RESET}  {result_preview}{duration_ms}")
 
                 elif role == "node_transition":
-                    print(f"{Colors.DIM}{timestamp:<8} {'─── node transition':<{width-8}}{'─'*3}{Colors.RESET}")
+                    # Show node number in transition line
+                    node_label = f"─── node {node_num} "
+                    remaining = width - len(node_label) - 8 - 9  # account for timestamp col and ending dashes
+                    print(f"{Colors.DIM}{timestamp:<8}{'':<9}{node_label}{'─'*remaining}{Colors.RESET}")
 
             print(f"{Colors.BOLD}{'─'*width}{Colors.RESET}")
 
@@ -1651,9 +1698,9 @@ def export_timeline(call_id: str, call_info: dict, timeline: list) -> str:
 
     with open(filepath, 'w', encoding='utf-8') as f:
         # Header
-        f.write("=" * 100 + "\n")
+        f.write("=" * 120 + "\n")
         f.write(f"CALL TIMELINE EXPORT\n")
-        f.write("=" * 100 + "\n\n")
+        f.write("=" * 120 + "\n\n")
 
         # Call info
         f.write(f"Call ID:    {call_id}\n")
@@ -1663,9 +1710,13 @@ def export_timeline(call_id: str, call_info: dict, timeline: list) -> str:
         f.write(f"From:       {call_info.get('from_number', '-')}\n")
         f.write(f"To:         {call_info.get('to_number', '-')}\n")
         f.write(f"Status:     {call_info.get('status', '-')}\n")
-        f.write("\n" + "=" * 100 + "\n")
-        f.write(f"{'TIME':<10} {'TYPE':<20} {'CONTENT'}\n")
-        f.write("-" * 100 + "\n")
+        f.write("\n" + "=" * 120 + "\n")
+        f.write(f"{'TIME':<10} {'DELTA':<10} {'TYPE':<22} {'CONTENT'}\n")
+        f.write("-" * 120 + "\n")
+
+        # Pre-process to calculate deltas
+        prev_time = 0.0
+        node_counter = 0
 
         for item in timeline:
             role = item.get("role", "")
@@ -1673,37 +1724,49 @@ def export_timeline(call_id: str, call_info: dict, timeline: list) -> str:
             words = item.get("words", [])
 
             # Get timestamp
-            timestamp = ""
+            curr_time = None
+            timestamp_str = ""
             if words and len(words) > 0 and isinstance(words[0], dict):
-                start_time = words[0].get("start", 0)
-                timestamp = f"{start_time:.1f}s"
+                curr_time = words[0].get("start", 0)
+                timestamp_str = f"{curr_time:.1f}s"
+
+            # Calculate delta
+            delta_str = ""
+            if curr_time is not None:
+                delta = curr_time - prev_time
+                delta_str = f"+{delta:.1f}s"
+                prev_time = curr_time
+
+            # Track nodes
+            if role == "node_transition":
+                node_counter += 1
 
             if role == "agent":
-                f.write(f"{timestamp:<10} {'AGENT':<20} {content}\n")
+                f.write(f"{timestamp_str:<10} {delta_str:<10} {'AGENT':<22} {content}\n")
             elif role == "user":
-                f.write(f"{timestamp:<10} {'USER':<20} {content}\n")
+                f.write(f"{timestamp_str:<10} {delta_str:<10} {'USER':<22} {content}\n")
             elif role == "tool_call_invocation":
                 tool_name = item.get("name", "unknown")
                 args = item.get("arguments", "")
-                f.write(f"{timestamp:<10} {'TOOL CALL':<20} {tool_name}\n")
+                f.write(f"{timestamp_str:<10} {delta_str:<10} {'TOOL CALL':<22} {tool_name}\n")
                 try:
                     args_dict = json.loads(args) if args else {}
                     for k, v in args_dict.items():
-                        f.write(f"{'':>10} {'':>20}   {k}: {v}\n")
+                        f.write(f"{'':>10} {'':>10} {'':>22}   {k}: {v}\n")
                 except:
-                    f.write(f"{'':>10} {'':>20}   args: {args}\n")
+                    f.write(f"{'':>10} {'':>10} {'':>22}   args: {args}\n")
             elif role == "tool_call_result":
                 result = content or ""
-                f.write(f"{timestamp:<10} {'TOOL RESULT':<20} ")
+                f.write(f"{timestamp_str:<10} {delta_str:<10} {'TOOL RESULT':<22} ")
                 try:
                     result_dict = json.loads(result) if result else {}
-                    f.write(json.dumps(result_dict, indent=2).replace('\n', '\n' + ' '*32) + "\n")
+                    f.write(json.dumps(result_dict, indent=2).replace('\n', '\n' + ' '*44) + "\n")
                 except:
                     f.write(f"{result}\n")
             elif role == "node_transition":
-                f.write(f"{timestamp:<10} {'--- node transition ---':<80}\n")
+                f.write(f"{timestamp_str:<10} {delta_str:<10} {'--- node ' + str(node_counter) + ' ---':<90}\n")
 
-        f.write("=" * 100 + "\n")
+        f.write("=" * 120 + "\n")
 
         # Summary
         agent_msgs = sum(1 for i in timeline if i.get("role") == "agent")
