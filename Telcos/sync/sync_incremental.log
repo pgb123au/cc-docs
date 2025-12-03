@@ -1,0 +1,42 @@
+==================================================
+TELCO INCREMENTAL SYNC
+Started: 2025-12-04 06:15:02.721617
+==================================================
+[OK] Connected to database
+
+[RETELL]
+  Last sync: 2025-12-04 05:38:26.498000+11:00
+  No new calls
+
+[ZADARMA]
+  [ERROR] API error: Not authorized
+
+[TELNYX]
+  Found 50 call events
+  Synced 0 new events
+
+==================================================
+Total synced: 0 records
+Completed in 29.56s
+==================================================
+==================================================
+TELCO INCREMENTAL SYNC
+Started: 2025-12-04 06:20:02.911076
+==================================================
+[OK] Connected to database
+
+[RETELL]
+  Last sync: 2025-12-04 05:38:26.498000+11:00
+  No new calls
+
+[ZADARMA]
+  [ERROR] API error: Not authorized
+
+[TELNYX]
+  Found 50 call events
+  Synced 0 new events
+
+==================================================
+Total synced: 0 records
+Completed in 25.73s
+==================================================

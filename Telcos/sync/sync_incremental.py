@@ -131,9 +131,9 @@ class ZadarmaAPI:
     def get_statistics(self, start: str = None, end: str = None) -> dict:
         """Get call statistics. Dates in format YYYY-MM-DD"""
         if not start:
-            start = (datetime.now() - timedelta(hours=1)).strftime("%Y-%m-%d %H:%M:%S")
+            start = datetime.now().strftime("%Y-%m-%d")
         if not end:
-            end = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            end = datetime.now().strftime("%Y-%m-%d")
         return self.request("/v1/statistics/", {"start": start, "end": end})
 
 # ============================================================================
@@ -341,14 +341,12 @@ def sync_zadarma(conn):
         print("  [ERROR] Provider not found")
         return 0
 
-    # Get stats for last hour (Zadarma doesn't support timestamp filtering well)
+    # Get today's stats (Zadarma API uses YYYY-MM-DD format)
     api = ZadarmaAPI(CREDS["ZADARMA_API_KEY"], CREDS["ZADARMA_API_SECRET"])
 
-    # Fetch last hour of data
-    start = (datetime.now() - timedelta(hours=1)).strftime("%Y-%m-%d %H:%M:%S")
-    end = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-    stats = api.get_statistics(start, end)
+    # Fetch today's data
+    today = datetime.now().strftime("%Y-%m-%d")
+    stats = api.get_statistics(today, today)
 
     if stats.get("status") != "success":
         print(f"  [ERROR] API error: {stats.get('message', 'unknown')}")
@@ -356,10 +354,10 @@ def sync_zadarma(conn):
 
     calls = stats.get("stats", [])
     if not calls:
-        print("  No new calls")
+        print("  No calls today")
         return 0
 
-    print(f"  Found {len(calls)} calls in last hour")
+    print(f"  Found {len(calls)} calls today")
 
     synced = 0
     for c in calls:
