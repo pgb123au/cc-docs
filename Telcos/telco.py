@@ -1762,7 +1762,7 @@ def show_full_timeline_view(call_id: str, call_info: dict, raw_data: dict, timel
     if latency and any(v is not None for v in latency.values()):
         lines.append(f"{Colors.YELLOW}┌─ LATENCY METRICS ───────────────────────────────────────────┐{Colors.RESET}")
         for k, v in latency.items():
-            if v is not None:
+            if v is not None and isinstance(v, (int, float)):
                 # Highlight slow latencies
                 label = k.replace('_', ' ').title()
                 if v > 1000:
@@ -1771,6 +1771,10 @@ def show_full_timeline_view(call_id: str, call_info: dict, raw_data: dict, timel
                     lines.append(f"  {Colors.YELLOW}{label}:{Colors.RESET} {v}ms")
                 else:
                     lines.append(f"  {Colors.CYAN}{label}:{Colors.RESET} {v}ms")
+            elif v is not None:
+                # Handle non-numeric values (like nested dicts)
+                label = k.replace('_', ' ').title()
+                lines.append(f"  {Colors.CYAN}{label}:{Colors.RESET} {str(v)[:50]}")
         lines.append(f"{Colors.YELLOW}└─────────────────────────────────────────────────────────────┘{Colors.RESET}")
         lines.append("")
 
