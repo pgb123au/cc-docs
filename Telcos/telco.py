@@ -1668,6 +1668,7 @@ def show_call_timeline(all_call_data: List[dict]):
         if total_calls > 1:
             opts.append(f"{Colors.CYAN}1-{total_calls}{Colors.RESET}=Jump")
         opts.append(f"{Colors.CYAN}E{Colors.RESET}=Export")
+        opts.append(f"{Colors.CYAN}D{Colors.RESET}=Debug Export")
         opts.append(f"{Colors.CYAN}Q{Colors.RESET}=Back")
         print(" | ".join(opts))
 
@@ -1680,10 +1681,17 @@ def show_call_timeline(all_call_data: List[dict]):
         elif choice == 'N' and call_index < total_calls - 1:
             call_index += 1
         elif choice == 'E':
-            # Export timeline to file
+            # Export timeline to file (compact format)
             export_path = export_timeline(call_id, call_info, timeline)
             if export_path:
                 print(f"\n{Colors.GREEN}Exported to:{Colors.RESET} {export_path}")
+                input(f"\n{Colors.DIM}Press Enter to continue...{Colors.RESET}")
+        elif choice == 'D':
+            # Full debug export with all data
+            print(f"\n{Colors.YELLOW}Exporting full debug data (may take a moment to fetch logs)...{Colors.RESET}")
+            export_path = export_full_debug(call_id, call_info, raw_data, timeline)
+            if export_path:
+                print(f"\n{Colors.GREEN}Full debug exported to:{Colors.RESET} {export_path}")
                 input(f"\n{Colors.DIM}Press Enter to continue...{Colors.RESET}")
         elif choice.isdigit():
             idx = int(choice) - 1
@@ -1882,6 +1890,231 @@ def export_timeline(call_id: str, call_info: dict, timeline: list) -> str:
         f.write("3. Node transitions show agent flow - unexpected transitions may indicate logic issues\n")
         f.write("4. Compare user intent vs agent response to identify misunderstandings\n")
         f.write("5. Check if tool calls have correct parameters based on conversation context\n")
+
+    return str(filepath)
+
+
+def export_full_debug(call_id: str, call_info: dict, raw_data: dict, timeline: list) -> str:
+    """Export comprehensive debug info for Claude - includes everything"""
+    import json
+    import requests
+    from pathlib import Path
+    from datetime import datetime
+
+    downloads = Path.home() / "Downloads"
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"debug_{call_id[:20]}_{ts}.md"
+    filepath = downloads / filename
+
+    with open(filepath, 'w', encoding='utf-8') as f:
+        # Header
+        f.write("# Full Call Debug Export\n\n")
+        f.write("**Complete debug information for RetellAI call analysis.**\n")
+        f.write("This export contains ALL available data - use for deep debugging of agent/webhook issues.\n\n")
+        f.write("---\n\n")
+
+        # ==================== CALL METADATA ====================
+        f.write("## 1. Call Metadata\n\n")
+        f.write("| Field | Value |\n")
+        f.write("|-------|-------|\n")
+        f.write(f"| Call ID | `{call_id}` |\n")
+        f.write(f"| Agent ID | `{call_info.get('retell_agent_id', '-')}` |\n")
+        f.write(f"| Agent Name | {call_info.get('retell_agent_name', '-')} |\n")
+        f.write(f"| Direction | {call_info.get('direction', '-')} |\n")
+        f.write(f"| From | {call_info.get('from_number', '-')} |\n")
+        f.write(f"| To | {call_info.get('to_number', '-')} |\n")
+        f.write(f"| Started | {call_info.get('started_at', '-')} |\n")
+        f.write(f"| Ended | {call_info.get('ended_at', '-')} |\n")
+        f.write(f"| Duration | {call_info.get('duration_seconds', '-')} seconds |\n")
+        f.write(f"| Status | {call_info.get('status', '-')} |\n")
+        f.write(f"| Disposition | {call_info.get('disposition', '-')} |\n")
+        f.write(f"| Hangup Cause | {call_info.get('hangup_cause', '-')} |\n")
+        f.write(f"| Disconnection Reason | {raw_data.get('disconnection_reason', '-')} |\n")
+        f.write(f"| Cost | {call_info.get('cost', '-')} {call_info.get('currency', '')} |\n\n")
+
+        # ==================== LATENCY METRICS ====================
+        latency = raw_data.get('latency', {})
+        if latency and any(v is not None for v in latency.values()):
+            f.write("## 2. Latency Metrics\n\n")
+            f.write("| Metric | Value |\n")
+            f.write("|--------|-------|\n")
+            for k, v in latency.items():
+                if v is not None:
+                    f.write(f"| {k} | {v} ms |\n")
+            f.write("\n")
+
+        # ==================== DYNAMIC VARIABLES ====================
+        collected_vars = raw_data.get('collected_dynamic_variables', {})
+        llm_vars = raw_data.get('retell_llm_dynamic_variables', {})
+
+        if collected_vars or llm_vars:
+            f.write("## 3. Dynamic Variables\n\n")
+
+            if collected_vars:
+                f.write("### Collected Variables (Final State)\n\n")
+                f.write("```json\n")
+                f.write(json.dumps(collected_vars, indent=2))
+                f.write("\n```\n\n")
+
+            if llm_vars:
+                f.write("### LLM Dynamic Variables\n\n")
+                f.write("```json\n")
+                f.write(json.dumps(llm_vars, indent=2))
+                f.write("\n```\n\n")
+
+        # ==================== CALL ANALYSIS ====================
+        analysis = raw_data.get('call_analysis', {})
+        if analysis:
+            f.write("## 4. Call Analysis (AI-Generated)\n\n")
+            f.write("```json\n")
+            f.write(json.dumps(analysis, indent=2))
+            f.write("\n```\n\n")
+
+        # ==================== TIMELINE WITH FULL DETAILS ====================
+        f.write("## 5. Full Timeline\n\n")
+
+        if timeline:
+            # Pre-process for timing
+            prev_time = 0.0
+            node_counter = 0
+
+            for idx, item in enumerate(timeline):
+                role = item.get("role", "")
+                content = item.get("content", "")
+                words = item.get("words", [])
+
+                # Get timestamp
+                curr_time = None
+                if words and len(words) > 0 and isinstance(words[0], dict):
+                    curr_time = words[0].get("start", 0)
+
+                if role == "node_transition":
+                    node_counter += 1
+
+                # Calculate delta
+                delta = None
+                delta_note = ""
+                if curr_time is not None:
+                    delta = curr_time - prev_time
+                    prev_time = curr_time
+                    if delta > 5.0:
+                        delta_note = " **⚠️ SLOW**"
+                    elif delta > 2.0:
+                        delta_note = " *(slow)*"
+
+                time_str = f"{curr_time:.2f}s" if curr_time is not None else "-"
+                delta_str = f"+{delta:.2f}s" if delta is not None else "-"
+
+                f.write(f"### Event {idx + 1}: {role.upper()}\n\n")
+                f.write(f"- **Time:** {time_str}\n")
+                f.write(f"- **Delta:** {delta_str}{delta_note}\n")
+
+                if role == "agent":
+                    f.write(f"- **Type:** Agent Speech\n\n")
+                    f.write(f"**Content:**\n> {content}\n\n")
+
+                elif role == "user":
+                    f.write(f"- **Type:** User Speech\n\n")
+                    f.write(f"**Content:**\n> {content}\n\n")
+
+                elif role == "tool_call_invocation":
+                    tool_name = item.get("name", "unknown")
+                    tool_id = item.get("tool_call_id", "")
+                    args = item.get("arguments", "{}")
+
+                    f.write(f"- **Type:** Tool Call\n")
+                    f.write(f"- **Tool Name:** `{tool_name}`\n")
+                    if tool_id:
+                        f.write(f"- **Tool Call ID:** `{tool_id}`\n")
+                    f.write(f"\n**Arguments:**\n```json\n")
+                    try:
+                        args_dict = json.loads(args) if args else {}
+                        f.write(json.dumps(args_dict, indent=2))
+                    except:
+                        f.write(args)
+                    f.write("\n```\n\n")
+
+                elif role == "tool_call_result":
+                    f.write(f"- **Type:** Tool Result\n\n")
+                    f.write(f"**Result:**\n```json\n")
+                    try:
+                        result = json.loads(content) if content else {}
+                        f.write(json.dumps(result, indent=2))
+                    except:
+                        f.write(content or "(empty)")
+                    f.write("\n```\n\n")
+
+                elif role == "node_transition":
+                    f.write(f"- **Type:** Node Transition (Node {node_counter})\n\n")
+                    f.write("---\n\n")
+                else:
+                    f.write(f"- **Type:** {role}\n\n")
+                    if content:
+                        f.write(f"**Content:**\n```\n{content}\n```\n\n")
+        else:
+            f.write("*No timeline data available for this call.*\n\n")
+
+        # ==================== TOKEN USAGE ====================
+        token_usage = raw_data.get('llm_token_usage', {})
+        if token_usage:
+            f.write("## 6. LLM Token Usage\n\n")
+            f.write("```json\n")
+            f.write(json.dumps(token_usage, indent=2))
+            f.write("\n```\n\n")
+
+        # ==================== SIP HEADERS ====================
+        sip_headers = raw_data.get('custom_sip_headers', {})
+        if sip_headers:
+            f.write("## 7. Custom SIP Headers\n\n")
+            f.write("```json\n")
+            f.write(json.dumps(sip_headers, indent=2))
+            f.write("\n```\n\n")
+
+        # ==================== PUBLIC LOG ====================
+        public_log_url = raw_data.get('public_log_url', '')
+        if public_log_url:
+            f.write("## 8. Public Log (LLM Reasoning)\n\n")
+            f.write(f"**URL:** {public_log_url}\n\n")
+
+            # Try to fetch the log
+            try:
+                resp = requests.get(public_log_url, timeout=30)
+                if resp.status_code == 200:
+                    log_content = resp.text
+                    f.write("**Log Contents:**\n\n")
+                    f.write("```\n")
+                    # Limit to reasonable size
+                    if len(log_content) > 50000:
+                        f.write(log_content[:50000])
+                        f.write("\n\n... (truncated - log exceeds 50KB) ...\n")
+                    else:
+                        f.write(log_content)
+                    f.write("\n```\n\n")
+                else:
+                    f.write(f"*Could not fetch log: HTTP {resp.status_code}*\n\n")
+            except Exception as e:
+                f.write(f"*Could not fetch log: {str(e)}*\n\n")
+
+        # ==================== RAW DATA DUMP ====================
+        f.write("## 9. Complete Raw Data\n\n")
+        f.write("Full raw_data from RetellAI API (for reference):\n\n")
+        f.write("```json\n")
+        # Remove the transcript_with_tool_calls since we already showed it above
+        raw_copy = {k: v for k, v in raw_data.items() if k not in ['transcript_with_tool_calls', 'transcript_object']}
+        f.write(json.dumps(raw_copy, indent=2, default=str))
+        f.write("\n```\n\n")
+
+        # ==================== DEBUGGING CHECKLIST ====================
+        f.write("---\n\n")
+        f.write("## Debugging Checklist\n\n")
+        f.write("When analyzing this call, check:\n\n")
+        f.write("1. **Slow Responses** - Look for `⚠️ SLOW` markers in timeline (>5s delay)\n")
+        f.write("2. **Tool Errors** - Check tool results for `error`, `success: false`, or unexpected values\n")
+        f.write("3. **Node Flow** - Verify node transitions match expected agent flow\n")
+        f.write("4. **Variables** - Check collected_dynamic_variables for state issues\n")
+        f.write("5. **Disconnection** - Check disconnection_reason for unexpected hangups\n")
+        f.write("6. **Public Log** - Search for LLM reasoning issues in Section 8\n")
+        f.write("7. **Tool Arguments** - Verify webhook calls have correct parameters\n")
 
     return str(filepath)
 
