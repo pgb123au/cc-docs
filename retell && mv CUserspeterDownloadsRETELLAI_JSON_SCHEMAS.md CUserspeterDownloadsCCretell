@@ -1,0 +1,533 @@
+# RetellAI Technical Reference (Updated Nov 2025)
+
+Quick reference for building conversational voice agents with RetellAI.
+
+---
+
+## API Base & Auth
+
+```
+Base URL: https://api.retellai.com
+Auth Header: Authorization: Bearer YOUR_API_KEY
+```
+
+---
+
+## Core API Endpoints
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/create-phone-call` | POST | Initiate outbound call |
+| `/create-web-call` | POST | Create web-based call |
+| `/get-call/{call_id}` | GET | Retrieve call details |
+| `/list-calls` | POST | List/filter calls |
+| `/update-call/{call_id}` | PATCH | Update call mid-conversation |
+| `/create-agent` | POST | Create new agent |
+| `/get-agent/{agent_id}` | GET | Get agent config |
+| `/update-agent/{agent_id}` | PATCH | Update agent |
+| `/create-retell-llm` | POST | Create Response Engine |
+| `/get-retell-llm/{llm_id}` | GET | Get LLM config |
+| `/update-retell-llm/{llm_id}` | PATCH | Update LLM |
+
+---
+
+## Webhook Events
+
+### Event Types
+| Event | Trigger |
+|-------|---------|
+| `call_started` | Call begins (won't fire if dial fails) |
+| `call_ended` | Call completes/transfers/errors |
+| `call_analyzed` | Post-call analysis complete |
+
+### Webhook Spec
+- Method: POST
+- Timeout: 10 seconds
+- Retries: Up to 3 times on non-2xx
+- Non-blocking: Events fire in order but independently
+
+### Webhook Payload Structure
+```json
+{
+  "event": "call_ended",
+  "call": {
+    "call_type": "phone_call",
+    "call_id": "Jabr9TXYYJHfvl6Syypi88rdAHYHmcq6",
+    "agent_id": "oBeDLoLOeuAbiuaMFXRtDOLriTJ5tSxD",
+    "from_number": "+12137771234",
+    "to_number": "+12137771235",
+    "direction": "inbound",
+    "call_status": "ended",
+    "start_timestamp": 1714608475945,
+    "end_timestamp": 1714608491736,
+    "disconnection_reason": "user_hangup",
+    "transcript": "...",
+    "transcript_object": [...],
+    "transcript_with_tool_calls": [...],
+    "metadata": {},
+    "retell_llm_dynamic_variables": {},
+    "recording_url": "https://...",
+    "call_analysis": {...}
+  }
+}
+```
+
+---
+
+## Disconnection Reasons
+
+### Normal Endings
+| Reason | Description |
+|--------|-------------|
+| `user_hangup` | User hung up |
+| `agent_hangup` | Agent ended call |
+| `call_transfer` | Call transferred |
+| `voicemail_reached` | Voicemail detected (with settings) |
+| `inactivity` | `end_call_after_silence_ms` reached |
+| `max_duration_reached` | Max call length hit |
+
+### Connection Failures (call_status: `not_connected`)
+| Reason | Description |
+|--------|-------------|
+| `dial_busy` | Number busy |
+| `dial_failed` | Dial failed (unknown SIP error) |
+| `dial_no_answer` | No answer |
+| `invalid_destination` | Invalid number |
+| `telephony_provider_permission_denied` | SIP auth failed |
+| `telephony_provider_unavailable` | Provider down |
+| `sip_routing_error` | SIP loop/too many hops |
+| `marked_as_spam` | Spam flagged |
+| `user_declined` | Call declined |
+| `concurrency_limit_reached` | Limit hit |
+| `no_valid_payment` | Payment issue |
+| `scam_detected` | Scam detection triggered |
+
+### Errors
+| Reason | Description |
+|--------|-------------|
+| `error_llm_websocket_open` | LLM WS failed to open |
+| `error_llm_websocket_lost_connection` | LLM WS disconnected |
+| `error_llm_websocket_runtime` | LLM WS error |
+| `error_llm_websocket_corrupt_payload` | Bad LLM payload |
+| `error_no_audio_received` | No audio from user |
+| `error_asr` | Speech recognition error |
+| `error_retell` | Retell internal error |
+| `error_user_not_joined` | Web call user didn't join |
+| `registered_call_timeout` | Call registered but not started |
+
+---
+
+## Agent Configuration
+
+### Voice Settings
+```json
+{
+  "voice_id": "11labs-Adrian",
+  "voice_model": "eleven_turbo_v2_5",
+  "voice_stability": 1,        // 0-2, lower=stable
+  "voice_speed": 1,            // 0.5-2
+  "voice_volume": 1,           // 0-2
+  "fallback_voice_ids": ["openai-Alloy", "deepgram-Angus"]
+}
+```
+
+### Voice Models (ElevenLabs)
+- `eleven_turbo_v2`
+- `eleven_flash_v2`
+- `eleven_turbo_v2_5`
+- `eleven_flash_v2_5`
+- `eleven_multilingual_v2`
+- `tts-1` (OpenAI)
+- `gpt-4o-mini-tts`
+
+### Interaction Settings
+```json
+{
+  "responsiveness": 1,              // 0-1, higher=faster
+  "interruption_sensitivity": 1,   // 0-1, 0=never interrupt
+  "enable_backchannel": true,
+  "backchannel_frequency": 0.8,    // 0-1
+  "backchannel_words": ["yeah", "uh-huh"],
+  "reminder_trigger_ms": 10000,
+  "reminder_max_count": 1
+}
+```
+
+### Ambient Sounds
+- `coffee-shop`
+- `convention-hall`
+- `summer-outdoor`
+- `mountain-outdoor`
+- `static-noise`
+- `call-center`
+
+### Languages (ASR)
+```
+en-US, en-GB, en-AU, en-IN, en-NZ,
+de-DE, es-ES, es-419, fr-FR, fr-CA,
+ja-JP, pt-PT, pt-BR, zh-CN, ru-RU,
+it-IT, ko-KR, nl-NL, nl-BE, pl-PL,
+tr-TR, th-TH, vi-VN, ro-RO, bg-BG,
+ca-ES, da-DK, fi-FI, el-GR, hu-HU,
+id-ID, no-NO, sk-SK, sv-SE, multi
+```
+
+### Call Limits
+```json
+{
+  "end_call_after_silence_ms": 600000,  // 10min default, min 10s
+  "max_call_duration_ms": 3600000,      // 1hr default, max 2hr
+  "ring_duration_ms": 30000,            // 5s-90s
+  "first_message_delay_ms": 1000        // 0-5000ms
+}
+```
+
+---
+
+## Response Engine (LLM) Config
+
+### Available Models
+**OpenAI:** `gpt-4.1`, `gpt-4.1-mini`, `gpt-4.1-nano`, `gpt-4o`, `gpt-4o-mini`, `gpt-5`, `gpt-5-mini`, `gpt-5-nano`
+**Anthropic:** `claude-4.5-sonnet`, `claude-4.0-sonnet`, `claude-3.7-sonnet`, `claude-3.5-haiku`
+**Google:** `gemini-2.0-flash`, `gemini-2.0-flash-lite`, `gemini-2.5-flash`, `gemini-2.5-flash-lite`
+**Realtime:** `gpt-4o-realtime`
+
+### LLM Structure
+```json
+{
+  "llm_id": "llm_xxx",
+  "model": "gpt-4.1",
+  "s2s_model": "gpt-4o-realtime",
+  "model_temperature": 0,
+  "model_high_priority": true,
+  "tool_call_strict_mode": true,
+  "start_speaker": "agent",         // "agent" or "user" (REQUIRED)
+  "begin_message": "Hello! How can I help?",
+  "begin_after_user_silence_ms": 2000,
+  "general_prompt": "You are...",
+  "general_tools": [...],
+  "states": [...],
+  "knowledge_base_ids": ["kb_xxx"],
+  "kb_config": {
+    "top_k": 3,
+    "filter_score": 0.6
+  }
+}
+```
+
+---
+
+## Tool Types
+
+### Pre-built Tools
+```json
+// End Call
+{
+  "type": "end_call",
+  "name": "end_call",
+  "description": "End the call with user."
+}
+
+// Transfer Call
+{
+  "type": "transfer_call",
+  "name": "transfer_to_support",
+  "description": "Transfer to support team.",
+  "transfer_destination": {
+    "type": "predefined",
+    "number": "+16175551212",
+    "ignore_e164_validation": false
+  },
+  "transfer_option": {
+    "type": "warm_transfer",  // or "cold_transfer"
+    "show_transferee_as_caller": false
+  }
+}
+
+// Press Digit (IVR)
+{
+  "type": "press_digit",
+  "name": "press_one",
+  "description": "Press 1 for support"
+}
+
+// Check Availability (Cal.com)
+{
+  "type": "check_availability_cal",
+  "name": "check_availability",
+  "description": "Check available appointment times",
+  "cal_api_key": "cal_live_xxx",
+  "event_type_id": 60444,
+  "timezone": "America/Los_Angeles"
+}
+
+// Book Appointment (Cal.com)
+{
+  "type": "book_appointment_cal",
+  "name": "book_appointment",
+  "description": "Book an appointment",
+  "cal_api_key": "cal_live_xxx",
+  "event_type_id": 60444,
+  "timezone": "America/Los_Angeles"
+}
+```
+
+### Custom Function
+```json
+{
+  "type": "custom",
+  "name": "get_customer_info",
+  "description": "Retrieve customer information",
+  "url": "https://your-api.com/customer",
+  "method": "POST",
+  "headers": {
+    "Authorization": "Bearer {{api_key}}"
+  },
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "phone": {
+        "type": "string",
+        "description": "Customer phone number"
+      }
+    },
+    "required": ["phone"]
+  },
+  "timeout_ms": 10000,
+  "response_variables": {
+    "customer_name": "$.data.name"
+  }
+}
+```
+
+### Custom Function Request Format
+```json
+{
+  "call": { /* full call object with transcript */ },
+  "args": { "phone": "+1234567890" }
+}
+```
+- Timeout: Configurable (default 2 min)
+- Retries: Up to 2 times on failure
+- Response limit: 15,000 characters
+- Verify: `X-Retell-Signature` header with HMAC
+
+---
+
+## Dynamic Variables
+
+### Syntax
+```
+{{variable_name}}
+```
+
+### System Variables (Auto-populated)
+| Variable | Description |
+|----------|-------------|
+| `{{current_time}}` | Time in America/Los_Angeles |
+| `{{current_time_Australia/Sydney}}` | Time in any timezone |
+| `{{current_calendar}}` | 14-day calendar |
+| `{{current_agent_state}}` | Current state name |
+| `{{previous_agent_state}}` | Previous state |
+| `{{session_type}}` | "voice" or "chat" |
+| `{{session_duration}}` | Call duration so far |
+
+### Phone Call Variables
+| Variable | Description |
+|----------|-------------|
+| `{{direction}}` | "inbound" or "outbound" |
+| `{{user_number}}` | User's phone number |
+| `{{agent_number}}` | Agent's phone number |
+| `{{call_id}}` | Call session ID |
+| `{{call_type}}` | "phone_call" or "web_call" |
+
+### Setting Variables
+
+**Outbound (Create Call):**
+```json
+{
+  "retell_llm_dynamic_variables": {
+    "customer_name": "John",
+    "order_id": "12345"
+  }
+}
+```
+
+**Inbound (Webhook Response):**
+```json
+{
+  "retell_llm_dynamic_variables": {
+    "customer_name": "John"
+  }
+}
+```
+
+**Important:** All values must be strings!
+
+---
+
+## Call Analysis
+
+### Built-in Fields
+- `call_summary` - AI-generated summary
+- `user_sentiment` - Positive/Negative/Neutral
+- `call_successful` - boolean
+- `in_voicemail` - boolean
+
+### Custom Analysis
+```json
+{
+  "post_call_analysis_data": [
+    {
+      "name": "appointment_booked",
+      "type": "boolean",
+      "description": "Was an appointment scheduled?"
+    },
+    {
+      "name": "lead_score",
+      "type": "number",
+      "description": "1-10 lead quality score"
+    }
+  ],
+  "post_call_analysis_model": "gpt-4o-mini"
+}
+```
+
+---
+
+## States (Multi-Prompt)
+
+```json
+{
+  "states": [
+    {
+      "name": "greeting",
+      "state_prompt": "Greet the customer warmly...",
+      "tools": [...],
+      "edges": [
+        {
+          "destination_state_name": "qualification",
+          "description": "User wants to learn about services"
+        }
+      ]
+    },
+    {
+      "name": "qualification",
+      "state_prompt": "Ask qualifying questions...",
+      "tools": [...],
+      "edges": [...]
+    }
+  ],
+  "starting_state": "greeting"
+}
+```
+
+---
+
+## Inbound Webhook
+
+Set on phone number for dynamic routing/variables.
+
+### Request (from Retell)
+```json
+{
+  "from_number": "+12137771234",
+  "to_number": "+12137771235",
+  "call_id": "xxx",
+  "extra_info": {}
+}
+```
+
+### Response (your server)
+```json
+{
+  "agent_id": "agent_xxx",
+  "retell_llm_dynamic_variables": {
+    "customer_name": "John"
+  },
+  "metadata": {
+    "internal_id": "cust_123"
+  }
+}
+```
+
+---
+
+## SDKs
+
+### Node.js
+```bash
+npm install retell-sdk
+```
+```javascript
+import Retell from 'retell-sdk';
+const client = new Retell({ apiKey: 'YOUR_API_KEY' });
+
+const call = await client.call.createPhoneCall({
+  from_number: '+1234567890',
+  to_number: '+0987654321',
+  agent_id: 'agent_xxx'
+});
+```
+
+### Python
+```bash
+pip install retell-sdk
+```
+```python
+from retell import Retell
+client = Retell(api_key="YOUR_API_KEY")
+
+call = client.call.create_phone_call(
+    from_number="+1234567890",
+    to_number="+0987654321",
+    agent_id="agent_xxx"
+)
+```
+
+### Webhook Verification
+```javascript
+import { Retell } from 'retell-sdk';
+
+if (!Retell.verify(JSON.stringify(req.body), 
+    process.env.RETELL_SECRET_KEY,
+    req.headers['x-retell-signature'])) {
+  return res.status(401).send('Unauthorized');
+}
+```
+
+---
+
+## Recent Updates (2024-2025)
+
+- **Agent Swap** - Switch agents mid-call with context inheritance
+- **MCP Node** - Connect Model Context Protocol tools
+- **DTMF Input** - Capture keypad input for numbers/cards
+- **Dynamic Routing** - Route transfers based on user intent
+- **Claude 4.5 Sonnet** - Now available for all agents
+- **Update Call API** - Override dynamic variables mid-call
+- **Node KB** - Per-node knowledge base assignment
+- **Medical Vocabulary** - Specialized transcription for healthcare
+- **LLM Token Limit** - Increased to 32,768 tokens
+- **V1 APIs Deprecated** - Use v2 response_engine format
+
+---
+
+## Quick Tips
+
+1. **Always use `response_engine`** - `llm_websocket_url` is deprecated
+2. **Set `start_speaker`** - Required field for LLM creation
+3. **Strings only** - Dynamic variables must be string values
+4. **Test states** - Use dashboard simulation before production
+5. **Handle missing vars** - Design prompts for undefined variables
+6. **Verify webhooks** - Always check `X-Retell-Signature`
+7. **Monitor disconnections** - Check `disconnection_reason` for debugging
+
+---
+
+## Links
+
+- Docs: https://docs.retellai.com
+- API Reference: https://docs.retellai.com/api-references
+- Changelog: https://www.retellai.com/changelog
+- Status: https://status.retellai.com

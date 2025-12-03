@@ -76,7 +76,31 @@ cd C:\Users\peter\Downloads\CC\Telcos && python telco.py
 # n8n webhook tools
 cd C:\Users\peter\Downloads\CC\n8n\Python
 python CC-Made-n8n_api_download_workflows.py --retell
+
+# Execute SQL on n8n Postgres (via SSH)
+ssh -i "C:\Users\peter\.ssh\metabase-aws" ubuntu@54.149.95.69 \
+  "docker exec -i n8n-postgres-1 psql -U n8n -d retellai_prod -c \"SELECT * FROM patients LIMIT 5;\""
 ```
+
+### Direct Database Access
+
+**SSH + Docker exec** to run SQL on n8n's Postgres:
+```bash
+# Interactive psql session
+ssh -i "C:\Users\peter\.ssh\metabase-aws" ubuntu@54.149.95.69
+docker exec -it n8n-postgres-1 psql -U n8n -d retellai_prod
+
+# One-liner SQL query
+ssh -i "C:\Users\peter\.ssh\metabase-aws" ubuntu@54.149.95.69 \
+  "docker exec -i n8n-postgres-1 psql -U n8n -d retellai_prod -c \"YOUR SQL HERE;\""
+```
+
+| Database | Contains |
+|----------|----------|
+| `n8n` | Workflow definitions, credentials, execution logs |
+| `retellai_prod` | patients, webhook_cache, retell_calls, sync_metadata |
+
+**Reference:** `n8n/Guides Docs/N8N_SETUP_CREDENTIAL_FOR_N8N_DATABASE.md`
 
 ---
 
@@ -154,4 +178,4 @@ python CC-Made-n8n_api_download_workflows.py --retell
 
 ---
 
-**Last Updated:** 2025-12-03
+**Last Updated:** 2025-12-04
