@@ -56,6 +56,7 @@ Tests with `"tool_mocks": []` execute REAL webhooks and modify REAL Cliniko data
 |---------|----------|--------|
 | **Webhook Specs** | `n8n/Webhooks Docs/RETELLAI_WEBHOOKS_CURRENT.md` | **ONLY SOURCE OF TRUTH** |
 | **Webhook Troubleshooting** | `n8n/Webhooks Docs/N8N_WEBHOOK_TROUBLESHOOTING.md` | **MAINTAINED** |
+| **System Emails** | `n8n/Webhooks Docs/SYSTEM_EMAILS_REFERENCE.md` | **CURRENT** |
 | **Archived Webhook Docs** | `n8n/Webhooks Docs/archive/` | **OUTDATED - DO NOT USE FOR SPECS** |
 
 **CRITICAL:** Only `RETELLAI_WEBHOOKS_CURRENT.md` is maintained for webhook specs. Archive docs contain outdated parameters, endpoints, and mappings that WILL cause bugs.
@@ -160,6 +161,7 @@ python CC-Made-n8n_api_check_webhooks.py                # Check issues
 |------|---------|--------|
 | `n8n/Webhooks Docs/RETELLAI_WEBHOOKS_CURRENT.md` | Webhook specs, endpoints, parameters, response mappings | **ONLY SOURCE OF TRUTH** |
 | `n8n/Webhooks Docs/N8N_WEBHOOK_TROUBLESHOOTING.md` | Debugging, common errors, fixes, testing commands | **MAINTAINED** |
+| `n8n/Webhooks Docs/SYSTEM_EMAILS_REFERENCE.md` | All email workflows, unified table template, sender config | **CURRENT** |
 
 **WARNING:** Do NOT use any docs from `n8n/Webhooks Docs/archive/` for webhook specs - they are outdated and will cause bugs.
 
