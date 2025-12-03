@@ -1465,13 +1465,35 @@ def show_call_timeline(all_call_data: List[dict]):
         print(f"  {Colors.BOLD}Agent:{Colors.RESET} {call_info.get('retell_agent_name', '-')}")
         print(f"  {Colors.BOLD}Duration:{Colors.RESET} {call_info.get('duration_seconds', '-')} seconds")
 
-        # Get timeline data
+        # Get timeline data - try multiple sources
         timeline = raw_data.get("transcript_with_tool_calls", []) if raw_data else []
+        used_fallback = False
+
+        # Check if call is still ongoing
+        call_status = raw_data.get("call_status", "") if raw_data else ""
 
         if not timeline:
-            print(f"\n  {Colors.YELLOW}No timeline data available for this call{Colors.RESET}")
-            print(f"  {Colors.DIM}(transcript_with_tool_calls not found in raw_data){Colors.RESET}")
+            # Try fallback to transcript_object (basic conversation without tools)
+            transcript_obj = raw_data.get("transcript_object", []) if raw_data else []
+            if transcript_obj:
+                timeline = transcript_obj
+                used_fallback = True
+
+        if not timeline:
+            if call_status == "ongoing":
+                print(f"\n  {Colors.YELLOW}⏳ Call is still in progress - timeline not yet available{Colors.RESET}")
+                print(f"  {Colors.DIM}Refresh the data after the call ends to see the timeline{Colors.RESET}")
+            else:
+                print(f"\n  {Colors.YELLOW}No timeline data available for this call{Colors.RESET}")
+                print(f"  {Colors.DIM}(transcript_with_tool_calls not found in raw_data){Colors.RESET}")
+
+            # Show public log URL if available
+            public_log = raw_data.get("public_log_url", "") if raw_data else ""
+            if public_log:
+                print(f"\n  {Colors.CYAN}Public log URL:{Colors.RESET} {public_log}")
         else:
+            if used_fallback:
+                print(f"\n  {Colors.YELLOW}Note: Using basic transcript (tool calls not available){Colors.RESET}")
             print(f"\n  {Colors.BOLD}{'='*90}{Colors.RESET}")
             print(f"  {Colors.BOLD}{'TIME':<10} {'TYPE':<20} {'CONTENT':<58}{Colors.RESET}")
             print(f"  {Colors.DIM}{'─'*90}{Colors.RESET}")

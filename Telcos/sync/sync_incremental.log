@@ -40,3 +40,109 @@ Started: 2025-12-04 06:20:02.911076
 Total synced: 0 records
 Completed in 25.73s
 ==================================================
+==================================================
+TELCO INCREMENTAL SYNC
+Started: 2025-12-04 06:25:02.702520
+==================================================
+[OK] Connected to database
+
+[RETELL]
+  Last sync: 2025-12-04 05:38:26.498000+11:00
+  No new calls
+
+[ZADARMA]
+  No calls today
+
+[TELNYX]
+  Found 50 call events
+  Synced 0 new events
+
+==================================================
+Total synced: 0 records
+Completed in 21.36s
+==================================================
+^C^C==================================================
+TELCO INCREMENTAL SYNC
+Started: 2025-12-04 06:40:02.693992
+==================================================
+[OK] Connected to database
+
+[RETELL]
+  Last sync: 2025-12-04 06:28:29.803000+11:00
+  Found 1 new calls
+  Synced 1 calls
+
+[ZADARMA]
+  No calls today
+
+[TELNYX]
+  Found 50 call events
+  Synced 0 new events
+
+==================================================
+Total synced: 1 records
+Completed in 26.19s
+==================================================
+^C==================================================
+TELCO INCREMENTAL SYNC
+Started: 2025-12-04 06:50:02.838130
+==================================================
+[OK] Connected to database
+
+[RETELL]
+  Last sync: 2025-12-04 06:38:57.733000+11:00
+  No new calls
+
+[ZADARMA]
+  No calls today
+
+[TELNYX]
+  Found 50 call events
+  Synced 0 new events
+
+==================================================
+Total synced: 0 records
+Completed in 22.20s
+==================================================
+^C==================================================
+TELCO INCREMENTAL SYNC
+Started: 2025-12-04 07:00:02.820372
+==================================================
+[OK] Connected to database
+
+[RETELL]
+  Last sync: 2025-12-04 06:38:57.733000+11:00
+  No new calls
+
+[ZADARMA]
+  No calls today
+
+[TELNYX]
+  Found 50 call events
+  Synced 0 new events
+
+==================================================
+Total synced: 0 records
+Completed in 21.15s
+==================================================
+==================================================
+TELCO INCREMENTAL SYNC
+Started: 2025-12-04 07:05:02.922764
+==================================================
+[OK] Connected to database
+
+[RETELL]
+  Last sync: 2025-12-04 06:38:57.733000+11:00
+  No new calls
+
+[ZADARMA]
+  No calls today
+
+[TELNYX]
+  Found 50 call events
+  Synced 0 new events
+
+==================================================
+Total synced: 0 records
+Completed in 20.99s
+==================================================

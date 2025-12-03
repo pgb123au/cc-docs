@@ -333,6 +333,7 @@ class RetellAPI:
         return {
             "call_id": getattr(c, 'call_id', ''),
             "agent_id": getattr(c, 'agent_id', ''),
+            "agent_name": getattr(c, 'agent_name', ''),
             "from_number": getattr(c, 'from_number', ''),
             "to_number": getattr(c, 'to_number', ''),
             "direction": getattr(c, 'direction', ''),
@@ -341,11 +342,22 @@ class RetellAPI:
             "end_timestamp": getattr(c, 'end_timestamp', None),
             "duration_ms": getattr(c, 'duration_ms', 0),
             "transcript": getattr(c, 'transcript', ''),
+            "transcript_object": make_json_serializable(getattr(c, 'transcript_object', [])),
+            "transcript_with_tool_calls": make_json_serializable(getattr(c, 'transcript_with_tool_calls', [])),
             "recording_url": getattr(c, 'recording_url', ''),
+            "public_log_url": getattr(c, 'public_log_url', ''),
             "call_analysis": call_analysis,
+            "call_cost": make_json_serializable(getattr(c, 'call_cost', None)),
+            "llm_token_usage": make_json_serializable(getattr(c, 'llm_token_usage', None)),
             "disconnection_reason": getattr(c, 'disconnection_reason', ''),
             "call_type": getattr(c, 'call_type', ''),
             "latency": make_json_serializable(getattr(c, 'latency', None)),
+            "agent_version": getattr(c, 'agent_version', None),
+            "collected_dynamic_variables": make_json_serializable(getattr(c, 'collected_dynamic_variables', {})),
+            "retell_llm_dynamic_variables": make_json_serializable(getattr(c, 'retell_llm_dynamic_variables', {})),
+            "custom_sip_headers": make_json_serializable(getattr(c, 'custom_sip_headers', {})),
+            "data_storage_setting": getattr(c, 'data_storage_setting', ''),
+            "opt_in_signed_url": getattr(c, 'opt_in_signed_url', False),
         }
 
     def _agent_to_dict(self, a):
