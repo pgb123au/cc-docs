@@ -2172,8 +2172,8 @@ def show_menu():
     print(f"  {Colors.CYAN}7.{Colors.RESET} {Colors.BOLD}Latency Comparison{Colors.RESET} {Colors.GREEN}NEW{Colors.RESET}")
     print()
     print(f"  {Colors.CYAN}A.{Colors.RESET} Show All")
-    print(f"  {Colors.CYAN}S.{Colors.RESET} Sync Data (Pull from APIs)")
-    print(f"  {Colors.CYAN}R.{Colors.RESET} Refresh")
+    print(f"  {Colors.CYAN}S.{Colors.RESET} Full Sync (Pull all data from APIs)")
+    print(f"  {Colors.CYAN}R.{Colors.RESET} Quick Sync (Fetch latest since last sync)")
     print(f"  {Colors.CYAN}Q.{Colors.RESET} Quit")
     print()
 
@@ -2276,7 +2276,21 @@ def main():
                 print(f"  {Colors.RED}Sync script not found: {sync_script}{Colors.RESET}")
 
         elif choice == 'r':
-            continue
+            # Run incremental sync (quick refresh of latest data)
+            print_header("QUICK SYNC - Fetching Latest Data")
+            sync_script = Path(__file__).parent / "sync" / "sync_incremental.py"
+            if sync_script.exists():
+                import subprocess
+                print(f"  Running incremental sync...")
+                print()
+                result = subprocess.run([sys.executable, str(sync_script)], cwd=str(sync_script.parent))
+                if result.returncode == 0:
+                    print(f"\n  {Colors.GREEN}Sync completed{Colors.RESET}")
+                else:
+                    print(f"\n  {Colors.RED}Sync failed with code {result.returncode}{Colors.RESET}")
+            else:
+                print(f"  {Colors.RED}Incremental sync script not found: {sync_script}{Colors.RESET}")
+                print(f"  {Colors.DIM}Use 'S' for full sync instead{Colors.RESET}")
 
         else:
             print(f"{Colors.RED}Invalid option{Colors.RESET}")
