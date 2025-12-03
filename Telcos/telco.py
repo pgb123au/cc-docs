@@ -1455,10 +1455,13 @@ def show_call_timeline(all_call_data: List[dict]):
         term_width = shutil.get_terminal_size().columns
     except:
         term_width = 120
-    # Use most of the width, leaving some margin
-    width = min(term_width - 4, 180)
-    # Column widths: TIME(8) + DELTA(8) + TYPE(20) + spacers(4) = 40
-    content_width = width - 40
+    # Use most of the width
+    width = min(term_width - 2, 200)
+    # Fixed column widths for alignment
+    col_time = 7
+    col_delta = 9
+    col_type = 14
+    col_content = width - col_time - col_delta - col_type - 3  # 3 for separators
 
     while True:
         os.system('cls' if os.name == 'nt' else 'clear')
@@ -1510,7 +1513,6 @@ def show_call_timeline(all_call_data: List[dict]):
             # Pre-process timeline to extract timestamps and calculate deltas
             processed = []
             prev_time = 0.0
-            current_node = "start"
             node_counter = 0
 
             for item in timeline:
@@ -1541,7 +1543,7 @@ def show_call_timeline(all_call_data: List[dict]):
 
             # Header
             print(f"\n{Colors.BOLD}{'─'*width}{Colors.RESET}")
-            print(f"{Colors.BOLD}{'TIME':<8}{'DELTA':<8}  {'TYPE':<20}  {'CONTENT':<{content_width}}{Colors.RESET}")
+            print(f"{Colors.BOLD}{'TIME':>{col_time}} {'DELTA':>{col_delta}}  {'TYPE':<{col_type}}  CONTENT{Colors.RESET}")
             print(f"{Colors.DIM}{'─'*width}{Colors.RESET}")
 
             for p in processed:
@@ -1552,28 +1554,29 @@ def show_call_timeline(all_call_data: List[dict]):
                 delta = p["delta"]
                 node_num = p["node_num"]
 
-                # Format timestamp
-                timestamp = f"{curr_time:.1f}s" if curr_time is not None else ""
+                # Format timestamp (right-aligned)
+                time_str = f"{curr_time:.1f}s" if curr_time is not None else ""
 
-                # Format delta - highlight slow responses
+                # Format delta - highlight slow responses (right-aligned)
                 if delta is not None:
+                    delta_val = f"+{delta:.1f}s"
                     if delta > 5.0:
-                        delta_str = f"{Colors.RED}+{delta:.1f}s{Colors.RESET}"
+                        delta_str = f"{Colors.RED}{delta_val:>{col_delta}}{Colors.RESET}"
                     elif delta > 2.0:
-                        delta_str = f"{Colors.YELLOW}+{delta:.1f}s{Colors.RESET}"
+                        delta_str = f"{Colors.YELLOW}{delta_val:>{col_delta}}{Colors.RESET}"
                     else:
-                        delta_str = f"{Colors.DIM}+{delta:.1f}s{Colors.RESET}"
+                        delta_str = f"{Colors.DIM}{delta_val:>{col_delta}}{Colors.RESET}"
                 else:
-                    delta_str = ""
+                    delta_str = " " * col_delta
 
                 # Format based on role
                 if role == "agent":
-                    text = content[:content_width-3] + "..." if len(content or "") > content_width else content or ""
-                    print(f"{timestamp:<8}{delta_str:<17}  {Colors.CYAN}{'AGENT':<20}{Colors.RESET}  {text}")
+                    text = content[:col_content-3] + "..." if len(content or "") > col_content else content or ""
+                    print(f"{time_str:>{col_time}} {delta_str}  {Colors.CYAN}{'AGENT':<{col_type}}{Colors.RESET}  {text}")
 
                 elif role == "user":
-                    text = content[:content_width-3] + "..." if len(content or "") > content_width else content or ""
-                    print(f"{timestamp:<8}{delta_str:<17}  {Colors.GREEN}{'USER':<20}{Colors.RESET}  {text}")
+                    text = content[:col_content-3] + "..." if len(content or "") > col_content else content or ""
+                    print(f"{time_str:>{col_time}} {delta_str}  {Colors.GREEN}{'USER':<{col_type}}{Colors.RESET}  {text}")
 
                 elif role == "tool_call_invocation":
                     tool_name = item.get("name", "unknown")
@@ -1581,14 +1584,14 @@ def show_call_timeline(all_call_data: List[dict]):
                     # Parse args if JSON
                     try:
                         args_dict = json.loads(args) if args else {}
-                        # Format args nicely
-                        args_parts = [f"{k}={repr(v)[:30]}" for k, v in args_dict.items()]
+                        args_parts = [f"{k}={repr(v)}" for k, v in args_dict.items()]
                         args_preview = ", ".join(args_parts)
-                        if len(args_preview) > content_width - len(tool_name) - 5:
-                            args_preview = args_preview[:content_width - len(tool_name) - 8] + "..."
+                        max_args = col_content - len(tool_name) - 3
+                        if len(args_preview) > max_args:
+                            args_preview = args_preview[:max_args-3] + "..."
                     except:
-                        args_preview = args[:content_width - len(tool_name) - 5] if args else ""
-                    print(f"{timestamp:<8}{delta_str:<17}  {Colors.YELLOW}{'TOOL CALL':<20}{Colors.RESET}  {Colors.BOLD}{tool_name}{Colors.RESET}({args_preview})")
+                        args_preview = args[:col_content - len(tool_name) - 6] if args else ""
+                    print(f"{time_str:>{col_time}} {delta_str}  {Colors.YELLOW}{'TOOL CALL':<{col_type}}{Colors.RESET}  {Colors.BOLD}{tool_name}{Colors.RESET}({args_preview})")
 
                 elif role == "tool_call_result":
                     result = content or ""
@@ -1597,7 +1600,7 @@ def show_call_timeline(all_call_data: List[dict]):
                         result_dict = json.loads(result) if result else {}
                         # Extract key info based on common patterns
                         if "error" in result_dict:
-                            result_preview = f"{Colors.RED}ERROR: {result_dict.get('error', '')[:content_width-10]}{Colors.RESET}"
+                            result_preview = f"{Colors.RED}ERROR: {result_dict.get('error', '')[:col_content-10]}{Colors.RESET}"
                         elif "found" in result_dict:
                             result_preview = f"found={result_dict.get('found')}"
                             if result_dict.get("patient", {}).get("full_name"):
@@ -1605,8 +1608,11 @@ def show_call_timeline(all_call_data: List[dict]):
                         elif "success" in result_dict:
                             success = result_dict.get('success')
                             result_preview = f"{Colors.GREEN}success={success}{Colors.RESET}" if success else f"{Colors.RED}success={success}{Colors.RESET}"
+                            # Add more context from result
                             if result_dict.get("message"):
-                                result_preview += f" - {result_dict['message'][:50]}"
+                                result_preview += f" - {result_dict['message'][:60]}"
+                            elif result_dict.get("class_name"):
+                                result_preview += f" - {result_dict.get('class_name')} ({result_dict.get('spots_available', '?')} spots)"
                         elif "classes" in result_dict:
                             classes = result_dict.get("classes", [])
                             result_preview = f"{len(classes)} classes found"
@@ -1620,10 +1626,10 @@ def show_call_timeline(all_call_data: List[dict]):
                             result_preview = f"{Colors.GREEN}booking_id={result_dict.get('booking_id')}{Colors.RESET}"
                         else:
                             result_preview = str(result_dict)
-                            if len(result_preview) > content_width:
-                                result_preview = result_preview[:content_width-3] + "..."
+                            if len(result_preview) > col_content:
+                                result_preview = result_preview[:col_content-3] + "..."
                     except:
-                        result_preview = result[:content_width-3] + "..." if len(result) > content_width else result
+                        result_preview = result[:col_content-3] + "..." if len(result) > col_content else result
 
                     # Add duration if available
                     duration_ms = ""
@@ -1634,13 +1640,13 @@ def show_call_timeline(all_call_data: List[dict]):
                     except:
                         pass
 
-                    print(f"{timestamp:<8}{delta_str:<17}  {Colors.MAGENTA}{'TOOL RESULT':<20}{Colors.RESET}  {result_preview}{duration_ms}")
+                    print(f"{time_str:>{col_time}} {delta_str}  {Colors.MAGENTA}{'TOOL RESULT':<{col_type}}{Colors.RESET}  {result_preview}{duration_ms}")
 
                 elif role == "node_transition":
-                    # Show node number in transition line
-                    node_label = f"─── node {node_num} "
-                    remaining = width - len(node_label) - 8 - 9  # account for timestamp col and ending dashes
-                    print(f"{Colors.DIM}{timestamp:<8}{'':<9}{node_label}{'─'*remaining}{Colors.RESET}")
+                    # Clean node separator line
+                    label = f" node {node_num} "
+                    side_len = (width - len(label) - col_time - col_delta - 4) // 2
+                    print(f"{time_str:>{col_time}} {delta_str}  {Colors.DIM}{'─'*side_len}{label}{'─'*side_len}{Colors.RESET}")
 
             print(f"{Colors.BOLD}{'─'*width}{Colors.RESET}")
 
@@ -1686,99 +1692,196 @@ def show_call_timeline(all_call_data: List[dict]):
 
 
 def export_timeline(call_id: str, call_info: dict, timeline: list) -> str:
-    """Export timeline to a text file in Downloads folder"""
+    """Export timeline to a markdown file optimized for Claude analysis"""
     import json
     from pathlib import Path
     from datetime import datetime
 
     downloads = Path.home() / "Downloads"
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"timeline_{call_id[:20]}_{timestamp}.txt"
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"timeline_{call_id[:20]}_{ts}.md"
     filepath = downloads / filename
 
     with open(filepath, 'w', encoding='utf-8') as f:
-        # Header
-        f.write("=" * 120 + "\n")
-        f.write(f"CALL TIMELINE EXPORT\n")
-        f.write("=" * 120 + "\n\n")
+        # Header for Claude
+        f.write("# Call Timeline Analysis\n\n")
+        f.write("This is a timeline export from a RetellAI voice agent call. ")
+        f.write("Use this to debug agent behavior, identify slow tool responses, ")
+        f.write("and understand conversation flow.\n\n")
 
-        # Call info
-        f.write(f"Call ID:    {call_id}\n")
-        f.write(f"Started:    {call_info.get('started_at', '-')}\n")
-        f.write(f"Duration:   {call_info.get('duration_seconds', '-')} seconds\n")
-        f.write(f"Agent:      {call_info.get('retell_agent_name', '-')}\n")
-        f.write(f"From:       {call_info.get('from_number', '-')}\n")
-        f.write(f"To:         {call_info.get('to_number', '-')}\n")
-        f.write(f"Status:     {call_info.get('status', '-')}\n")
-        f.write("\n" + "=" * 120 + "\n")
-        f.write(f"{'TIME':<10} {'DELTA':<10} {'TYPE':<22} {'CONTENT'}\n")
-        f.write("-" * 120 + "\n")
+        # Call metadata
+        f.write("## Call Information\n\n")
+        f.write(f"| Field | Value |\n")
+        f.write(f"|-------|-------|\n")
+        f.write(f"| Call ID | `{call_id}` |\n")
+        f.write(f"| Started | {call_info.get('started_at', '-')} |\n")
+        f.write(f"| Duration | {call_info.get('duration_seconds', '-')} seconds |\n")
+        f.write(f"| Agent | {call_info.get('retell_agent_name', '-')} |\n")
+        f.write(f"| From | {call_info.get('from_number', '-')} |\n")
+        f.write(f"| To | {call_info.get('to_number', '-')} |\n")
+        f.write(f"| Status | {call_info.get('status', '-')} |\n\n")
 
-        # Pre-process to calculate deltas
+        # Pre-process to calculate deltas and identify issues
         prev_time = 0.0
         node_counter = 0
+        slow_responses = []
+        errors = []
+        processed = []
 
         for item in timeline:
             role = item.get("role", "")
             content = item.get("content", "")
             words = item.get("words", [])
 
-            # Get timestamp
             curr_time = None
-            timestamp_str = ""
             if words and len(words) > 0 and isinstance(words[0], dict):
                 curr_time = words[0].get("start", 0)
-                timestamp_str = f"{curr_time:.1f}s"
 
-            # Calculate delta
-            delta_str = ""
+            delta = None
             if curr_time is not None:
                 delta = curr_time - prev_time
-                delta_str = f"+{delta:.1f}s"
                 prev_time = curr_time
 
-            # Track nodes
             if role == "node_transition":
                 node_counter += 1
 
+            # Track issues
+            if delta is not None and delta > 5.0:
+                slow_responses.append({"time": curr_time, "delta": delta, "role": role, "content": content[:50]})
+
+            if role == "tool_call_result" and content:
+                try:
+                    result = json.loads(content)
+                    if result.get("error") or result.get("success") == False:
+                        errors.append({"time": curr_time, "content": content})
+                except:
+                    pass
+
+            processed.append({
+                "item": item,
+                "time": curr_time,
+                "delta": delta,
+                "node_num": node_counter
+            })
+
+        # Issues summary for Claude
+        if slow_responses or errors:
+            f.write("## Issues Detected\n\n")
+            if slow_responses:
+                f.write("### Slow Responses (>5s delay)\n\n")
+                for s in slow_responses:
+                    f.write(f"- **{s['time']:.1f}s** (+{s['delta']:.1f}s): {s['role']} - {s['content']}...\n")
+                f.write("\n")
+            if errors:
+                f.write("### Errors\n\n")
+                for e in errors:
+                    f.write(f"- **{e['time']:.1f}s**: ")
+                    try:
+                        err = json.loads(e['content'])
+                        f.write(f"`{err.get('error', err.get('message', 'Unknown error'))}`\n")
+                    except:
+                        f.write(f"`{e['content'][:100]}`\n")
+                f.write("\n")
+
+        # Timeline
+        f.write("## Full Timeline\n\n")
+        f.write("Legend: TIME = seconds from call start, DELTA = time since previous event\n\n")
+        f.write("```\n")
+        f.write(f"{'TIME':>7} {'DELTA':>8}  {'TYPE':<14}  CONTENT\n")
+        f.write("-" * 100 + "\n")
+
+        for p in processed:
+            item = p["item"]
+            role = item.get("role", "")
+            content = item.get("content", "")
+            curr_time = p["time"]
+            delta = p["delta"]
+            node_num = p["node_num"]
+
+            time_str = f"{curr_time:.1f}s" if curr_time is not None else ""
+            delta_str = f"+{delta:.1f}s" if delta is not None else ""
+
+            # Mark slow with asterisk
+            slow_marker = " *SLOW*" if delta is not None and delta > 5.0 else ""
+
             if role == "agent":
-                f.write(f"{timestamp_str:<10} {delta_str:<10} {'AGENT':<22} {content}\n")
+                f.write(f"{time_str:>7} {delta_str:>8}  {'AGENT':<14}  {content}\n")
             elif role == "user":
-                f.write(f"{timestamp_str:<10} {delta_str:<10} {'USER':<22} {content}\n")
+                f.write(f"{time_str:>7} {delta_str:>8}  {'USER':<14}  {content}\n")
             elif role == "tool_call_invocation":
                 tool_name = item.get("name", "unknown")
-                args = item.get("arguments", "")
-                f.write(f"{timestamp_str:<10} {delta_str:<10} {'TOOL CALL':<22} {tool_name}\n")
+                f.write(f"{time_str:>7} {delta_str:>8}  {'TOOL_CALL':<14}  {tool_name}{slow_marker}\n")
                 try:
-                    args_dict = json.loads(args) if args else {}
-                    for k, v in args_dict.items():
-                        f.write(f"{'':>10} {'':>10} {'':>22}   {k}: {v}\n")
+                    args = json.loads(item.get("arguments", "{}"))
+                    for k, v in args.items():
+                        f.write(f"{'':>7} {'':>8}  {'':>14}    {k}: {json.dumps(v)}\n")
                 except:
-                    f.write(f"{'':>10} {'':>10} {'':>22}   args: {args}\n")
+                    pass
             elif role == "tool_call_result":
-                result = content or ""
-                f.write(f"{timestamp_str:<10} {delta_str:<10} {'TOOL RESULT':<22} ")
+                f.write(f"{time_str:>7} {delta_str:>8}  {'TOOL_RESULT':<14}  ")
                 try:
-                    result_dict = json.loads(result) if result else {}
-                    f.write(json.dumps(result_dict, indent=2).replace('\n', '\n' + ' '*44) + "\n")
+                    result = json.loads(content) if content else {}
+                    # Compact important fields
+                    if "error" in result:
+                        f.write(f"ERROR: {result['error']}\n")
+                    elif "found" in result:
+                        f.write(f"found={result['found']}")
+                        if result.get("patient", {}).get("full_name"):
+                            f.write(f", patient={result['patient']['full_name']}")
+                        f.write("\n")
+                    elif "success" in result:
+                        f.write(f"success={result['success']}")
+                        if result.get("message"):
+                            f.write(f", message={result['message']}")
+                        if result.get("duration_ms"):
+                            f.write(f" ({result['duration_ms']}ms)")
+                        f.write("\n")
+                        # Show relevant details on next lines
+                        for key in ['class_name', 'class_date', 'spots_available', 'booking_id']:
+                            if key in result:
+                                f.write(f"{'':>7} {'':>8}  {'':>14}    {key}: {result[key]}\n")
+                    else:
+                        # Compact JSON output
+                        compact = json.dumps(result, separators=(',', ':'))
+                        if len(compact) > 80:
+                            f.write(f"\n")
+                            for k, v in result.items():
+                                f.write(f"{'':>7} {'':>8}  {'':>14}    {k}: {json.dumps(v)[:60]}\n")
+                        else:
+                            f.write(f"{compact}\n")
                 except:
-                    f.write(f"{result}\n")
+                    f.write(f"{content[:80]}\n")
             elif role == "node_transition":
-                f.write(f"{timestamp_str:<10} {delta_str:<10} {'--- node ' + str(node_counter) + ' ---':<90}\n")
+                f.write(f"{'':>7} {'':>8}  {'----- NODE ' + str(node_num) + ' -----':<60}\n")
 
-        f.write("=" * 120 + "\n")
+        f.write("```\n\n")
 
-        # Summary
+        # Summary stats
         agent_msgs = sum(1 for i in timeline if i.get("role") == "agent")
         user_msgs = sum(1 for i in timeline if i.get("role") == "user")
         tool_calls = sum(1 for i in timeline if i.get("role") == "tool_call_invocation")
         tool_results = sum(1 for i in timeline if i.get("role") == "tool_call_result")
+        nodes = sum(1 for i in timeline if i.get("role") == "node_transition")
 
-        f.write(f"\nSUMMARY:\n")
-        f.write(f"  Agent messages: {agent_msgs}\n")
-        f.write(f"  User messages:  {user_msgs}\n")
-        f.write(f"  Tool calls:     {tool_calls}\n")
-        f.write(f"  Tool results:   {tool_results}\n")
+        f.write("## Summary\n\n")
+        f.write(f"| Metric | Count |\n")
+        f.write(f"|--------|-------|\n")
+        f.write(f"| Agent messages | {agent_msgs} |\n")
+        f.write(f"| User messages | {user_msgs} |\n")
+        f.write(f"| Tool calls | {tool_calls} |\n")
+        f.write(f"| Tool results | {tool_results} |\n")
+        f.write(f"| Node transitions | {nodes} |\n")
+        f.write(f"| Slow responses (>5s) | {len(slow_responses)} |\n")
+        f.write(f"| Errors | {len(errors)} |\n")
+
+        # Analysis hints for Claude
+        f.write("\n## Analysis Notes\n\n")
+        f.write("When analyzing this call:\n")
+        f.write("1. Check for slow responses (marked *SLOW* or >5s delta) - these indicate webhook or processing delays\n")
+        f.write("2. Look for errors in TOOL_RESULT - these may indicate webhook failures or invalid data\n")
+        f.write("3. Node transitions show agent flow - unexpected transitions may indicate logic issues\n")
+        f.write("4. Compare user intent vs agent response to identify misunderstandings\n")
+        f.write("5. Check if tool calls have correct parameters based on conversation context\n")
 
     return str(filepath)
 

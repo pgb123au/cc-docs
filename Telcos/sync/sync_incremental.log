@@ -146,4 +146,24 @@ Started: 2025-12-04 07:05:02.922764
 Total synced: 0 records
 Completed in 20.99s
 ==================================================
-^C^C^C
+^C^C^C==================================================
+TELCO INCREMENTAL SYNC
+Started: 2025-12-04 07:25:02.802924
+==================================================
+[OK] Connected to database
+
+[RETELL]
+  Last sync: 2025-12-04 06:38:57.733000+11:00
+  No new calls
+
+[ZADARMA]
+  No calls today
+
+[TELNYX]
+  Found 50 call events
+  Synced 0 new events
+
+==================================================
+Total synced: 0 records
+Completed in 22.30s
+==================================================
