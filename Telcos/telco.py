@@ -1446,7 +1446,18 @@ def show_full_transcripts(all_call_data: List[dict]):
 def show_call_timeline(all_call_data: List[dict]):
     """Display call timeline showing transcript interleaved with tool calls"""
     import json
+    import shutil
+    from pathlib import Path
+
     call_index = 0
+    # Get terminal width, default to 120 if can't detect
+    try:
+        term_width = shutil.get_terminal_size().columns
+    except:
+        term_width = 120
+    # Use most of the width, leaving some margin
+    width = min(term_width - 4, 160)
+    content_width = width - 32  # Account for TIME and TYPE columns
 
     while True:
         os.system('cls' if os.name == 'nt' else 'clear')
@@ -1459,11 +1470,11 @@ def show_call_timeline(all_call_data: List[dict]):
         total_calls = len(all_call_data)
         print_header(f"CALL TIMELINE - Call {call_index + 1} of {total_calls}")
 
-        # Call summary
-        print(f"\n  {Colors.BOLD}Call ID:{Colors.RESET} {call_id}")
-        print(f"  {Colors.BOLD}Time:{Colors.RESET} {call_info.get('started_at', '-')}")
-        print(f"  {Colors.BOLD}Agent:{Colors.RESET} {call_info.get('retell_agent_name', '-')}")
-        print(f"  {Colors.BOLD}Duration:{Colors.RESET} {call_info.get('duration_seconds', '-')} seconds")
+        # Call summary - compact single line
+        duration = call_info.get('duration_seconds', 0) or 0
+        agent = call_info.get('retell_agent_name', '-')
+        started = str(call_info.get('started_at', '-'))[:19]
+        print(f"\n{Colors.DIM}Call:{Colors.RESET} {call_id}  {Colors.DIM}|{Colors.RESET}  {started}  {Colors.DIM}|{Colors.RESET}  {duration}s  {Colors.DIM}|{Colors.RESET}  {agent}")
 
         # Get timeline data - try multiple sources
         timeline = raw_data.get("transcript_with_tool_calls", []) if raw_data else []
@@ -1481,22 +1492,24 @@ def show_call_timeline(all_call_data: List[dict]):
 
         if not timeline:
             if call_status == "ongoing":
-                print(f"\n  {Colors.YELLOW}⏳ Call is still in progress - timeline not yet available{Colors.RESET}")
-                print(f"  {Colors.DIM}Refresh the data after the call ends to see the timeline{Colors.RESET}")
+                print(f"\n{Colors.YELLOW}Call is still in progress - timeline not yet available{Colors.RESET}")
+                print(f"{Colors.DIM}Refresh the data after the call ends to see the timeline{Colors.RESET}")
             else:
-                print(f"\n  {Colors.YELLOW}No timeline data available for this call{Colors.RESET}")
-                print(f"  {Colors.DIM}(transcript_with_tool_calls not found in raw_data){Colors.RESET}")
+                print(f"\n{Colors.YELLOW}No timeline data available for this call{Colors.RESET}")
+                print(f"{Colors.DIM}(transcript_with_tool_calls not found in raw_data){Colors.RESET}")
 
             # Show public log URL if available
             public_log = raw_data.get("public_log_url", "") if raw_data else ""
             if public_log:
-                print(f"\n  {Colors.CYAN}Public log URL:{Colors.RESET} {public_log}")
+                print(f"\n{Colors.CYAN}Public log URL:{Colors.RESET} {public_log}")
         else:
             if used_fallback:
-                print(f"\n  {Colors.YELLOW}Note: Using basic transcript (tool calls not available){Colors.RESET}")
-            print(f"\n  {Colors.BOLD}{'='*90}{Colors.RESET}")
-            print(f"  {Colors.BOLD}{'TIME':<10} {'TYPE':<20} {'CONTENT':<58}{Colors.RESET}")
-            print(f"  {Colors.DIM}{'─'*90}{Colors.RESET}")
+                print(f"{Colors.YELLOW}Note: Using basic transcript (tool calls not available){Colors.RESET}")
+
+            # Header
+            print(f"\n{Colors.BOLD}{'─'*width}{Colors.RESET}")
+            print(f"{Colors.BOLD}{'TIME':<8} {'TYPE':<18} {'CONTENT':<{content_width}}{Colors.RESET}")
+            print(f"{Colors.DIM}{'─'*width}{Colors.RESET}")
 
             for item in timeline:
                 role = item.get("role", "")
@@ -1511,47 +1524,45 @@ def show_call_timeline(all_call_data: List[dict]):
 
                 # Format based on role
                 if role == "agent":
-                    role_color = Colors.CYAN
-                    role_display = "AGENT"
-                    text = content[:55] + "..." if len(content or "") > 55 else content or ""
-                    print(f"  {timestamp:<10} {role_color}{role_display:<20}{Colors.RESET} {text}")
+                    text = content[:content_width-3] + "..." if len(content or "") > content_width else content or ""
+                    print(f"{timestamp:<8} {Colors.CYAN}{'AGENT':<18}{Colors.RESET} {text}")
 
                 elif role == "user":
-                    role_color = Colors.GREEN
-                    role_display = "USER"
-                    text = content[:55] + "..." if len(content or "") > 55 else content or ""
-                    print(f"  {timestamp:<10} {role_color}{role_display:<20}{Colors.RESET} {text}")
+                    text = content[:content_width-3] + "..." if len(content or "") > content_width else content or ""
+                    print(f"{timestamp:<8} {Colors.GREEN}{'USER':<18}{Colors.RESET} {text}")
 
                 elif role == "tool_call_invocation":
-                    role_color = Colors.YELLOW
                     tool_name = item.get("name", "unknown")
-                    tool_call_id = item.get("tool_call_id", "")[:8]
                     args = item.get("arguments", "")
                     # Parse args if JSON
                     try:
                         args_dict = json.loads(args) if args else {}
-                        args_preview = str(args_dict)[:40] + "..." if len(str(args_dict)) > 40 else str(args_dict)
+                        # Format args nicely
+                        args_parts = [f"{k}={repr(v)[:30]}" for k, v in args_dict.items()]
+                        args_preview = ", ".join(args_parts)
+                        if len(args_preview) > content_width - len(tool_name) - 5:
+                            args_preview = args_preview[:content_width - len(tool_name) - 8] + "..."
                     except:
-                        args_preview = args[:40] + "..." if len(args) > 40 else args
-                    print(f"  {timestamp:<10} {role_color}{'TOOL CALL':<20}{Colors.RESET} {Colors.BOLD}{tool_name}{Colors.RESET}")
-                    print(f"  {'':<10} {Colors.DIM}└─ args: {args_preview}{Colors.RESET}")
+                        args_preview = args[:content_width - len(tool_name) - 5] if args else ""
+                    print(f"{timestamp:<8} {Colors.YELLOW}{'TOOL CALL':<18}{Colors.RESET} {Colors.BOLD}{tool_name}{Colors.RESET}({args_preview})")
 
                 elif role == "tool_call_result":
-                    role_color = Colors.MAGENTA
-                    tool_call_id = item.get("tool_call_id", "")[:8]
                     result = content or ""
                     # Parse result if JSON
                     try:
                         result_dict = json.loads(result) if result else {}
-                        # Extract key info
+                        # Extract key info based on common patterns
                         if "error" in result_dict:
-                            result_preview = f"ERROR: {result_dict.get('error', '')[:50]}"
+                            result_preview = f"{Colors.RED}ERROR: {result_dict.get('error', '')[:content_width-10]}{Colors.RESET}"
                         elif "found" in result_dict:
                             result_preview = f"found={result_dict.get('found')}"
                             if result_dict.get("patient", {}).get("full_name"):
                                 result_preview += f", patient={result_dict['patient']['full_name']}"
                         elif "success" in result_dict:
-                            result_preview = f"success={result_dict.get('success')}"
+                            success = result_dict.get('success')
+                            result_preview = f"{Colors.GREEN}success={success}{Colors.RESET}" if success else f"{Colors.RED}success={success}{Colors.RESET}"
+                            if result_dict.get("message"):
+                                result_preview += f" - {result_dict['message'][:50]}"
                         elif "classes" in result_dict:
                             classes = result_dict.get("classes", [])
                             result_preview = f"{len(classes)} classes found"
@@ -1562,52 +1573,52 @@ def show_call_timeline(all_call_data: List[dict]):
                             appts = result_dict.get("appointments", [])
                             result_preview = f"{len(appts)} appointments"
                         elif "booking_id" in result_dict:
-                            result_preview = f"booking_id={result_dict.get('booking_id')}"
+                            result_preview = f"{Colors.GREEN}booking_id={result_dict.get('booking_id')}{Colors.RESET}"
                         else:
-                            result_preview = str(result_dict)[:50] + "..." if len(str(result_dict)) > 50 else str(result_dict)
+                            result_preview = str(result_dict)
+                            if len(result_preview) > content_width:
+                                result_preview = result_preview[:content_width-3] + "..."
                     except:
-                        result_preview = result[:50] + "..." if len(result) > 50 else result
+                        result_preview = result[:content_width-3] + "..." if len(result) > content_width else result
 
-                    # Check for duration in result
+                    # Add duration if available
                     duration_ms = ""
                     try:
                         result_dict = json.loads(result) if result else {}
                         if "duration_ms" in result_dict:
-                            duration_ms = f" ({result_dict['duration_ms']}ms)"
+                            duration_ms = f" {Colors.DIM}({result_dict['duration_ms']}ms){Colors.RESET}"
                     except:
                         pass
 
-                    print(f"  {timestamp:<10} {role_color}{'TOOL RESULT':<20}{Colors.RESET} {result_preview}{Colors.DIM}{duration_ms}{Colors.RESET}")
+                    print(f"{timestamp:<8} {Colors.MAGENTA}{'TOOL RESULT':<18}{Colors.RESET} {result_preview}{duration_ms}")
 
                 elif role == "node_transition":
-                    print(f"  {timestamp:<10} {Colors.DIM}{'─── node transition ───':<78}{Colors.RESET}")
+                    print(f"{Colors.DIM}{timestamp:<8} {'─── node transition':<{width-8}}{'─'*3}{Colors.RESET}")
 
-            print(f"  {Colors.BOLD}{'='*90}{Colors.RESET}")
+            print(f"{Colors.BOLD}{'─'*width}{Colors.RESET}")
 
-            # Summary stats
+            # Summary stats - compact
             agent_msgs = sum(1 for i in timeline if i.get("role") == "agent")
             user_msgs = sum(1 for i in timeline if i.get("role") == "user")
             tool_calls = sum(1 for i in timeline if i.get("role") == "tool_call_invocation")
             tool_results = sum(1 for i in timeline if i.get("role") == "tool_call_result")
 
-            print(f"\n  {Colors.BOLD}SUMMARY:{Colors.RESET}")
-            print(f"    Agent messages: {agent_msgs}")
-            print(f"    User messages:  {user_msgs}")
-            print(f"    Tool calls:     {tool_calls}")
-            print(f"    Tool results:   {tool_results}")
+            print(f"\n{Colors.BOLD}Summary:{Colors.RESET} Agent: {agent_msgs} | User: {user_msgs} | Tool calls: {tool_calls} | Tool results: {tool_results}")
 
-        # Navigation
-        print(f"\n  {Colors.BOLD}Navigation:{Colors.RESET}")
+        # Navigation - compact
+        print(f"\n{Colors.BOLD}Options:{Colors.RESET} ", end="")
+        opts = []
         if call_index > 0:
-            print(f"    {Colors.CYAN}P{Colors.RESET} - Previous call")
+            opts.append(f"{Colors.CYAN}P{Colors.RESET}=Prev")
         if call_index < total_calls - 1:
-            print(f"    {Colors.CYAN}N{Colors.RESET} - Next call")
+            opts.append(f"{Colors.CYAN}N{Colors.RESET}=Next")
         if total_calls > 1:
-            print(f"    {Colors.CYAN}1-{total_calls}{Colors.RESET} - Jump to specific call")
-        print(f"    {Colors.CYAN}Q{Colors.RESET} - Back to call details")
-        print()
+            opts.append(f"{Colors.CYAN}1-{total_calls}{Colors.RESET}=Jump")
+        opts.append(f"{Colors.CYAN}E{Colors.RESET}=Export")
+        opts.append(f"{Colors.CYAN}Q{Colors.RESET}=Back")
+        print(" | ".join(opts))
 
-        choice = input(f"  {Colors.BOLD}Select: {Colors.RESET}").strip().upper()
+        choice = input(f"\n{Colors.BOLD}Select: {Colors.RESET}").strip().upper()
 
         if choice == 'Q' or choice == '':
             break
@@ -1615,10 +1626,98 @@ def show_call_timeline(all_call_data: List[dict]):
             call_index -= 1
         elif choice == 'N' and call_index < total_calls - 1:
             call_index += 1
+        elif choice == 'E':
+            # Export timeline to file
+            export_path = export_timeline(call_id, call_info, timeline)
+            if export_path:
+                print(f"\n{Colors.GREEN}Exported to:{Colors.RESET} {export_path}")
+                input(f"\n{Colors.DIM}Press Enter to continue...{Colors.RESET}")
         elif choice.isdigit():
             idx = int(choice) - 1
             if 0 <= idx < total_calls:
                 call_index = idx
+
+
+def export_timeline(call_id: str, call_info: dict, timeline: list) -> str:
+    """Export timeline to a text file in Downloads folder"""
+    import json
+    from pathlib import Path
+    from datetime import datetime
+
+    downloads = Path.home() / "Downloads"
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"timeline_{call_id[:20]}_{timestamp}.txt"
+    filepath = downloads / filename
+
+    with open(filepath, 'w', encoding='utf-8') as f:
+        # Header
+        f.write("=" * 100 + "\n")
+        f.write(f"CALL TIMELINE EXPORT\n")
+        f.write("=" * 100 + "\n\n")
+
+        # Call info
+        f.write(f"Call ID:    {call_id}\n")
+        f.write(f"Started:    {call_info.get('started_at', '-')}\n")
+        f.write(f"Duration:   {call_info.get('duration_seconds', '-')} seconds\n")
+        f.write(f"Agent:      {call_info.get('retell_agent_name', '-')}\n")
+        f.write(f"From:       {call_info.get('from_number', '-')}\n")
+        f.write(f"To:         {call_info.get('to_number', '-')}\n")
+        f.write(f"Status:     {call_info.get('status', '-')}\n")
+        f.write("\n" + "=" * 100 + "\n")
+        f.write(f"{'TIME':<10} {'TYPE':<20} {'CONTENT'}\n")
+        f.write("-" * 100 + "\n")
+
+        for item in timeline:
+            role = item.get("role", "")
+            content = item.get("content", "")
+            words = item.get("words", [])
+
+            # Get timestamp
+            timestamp = ""
+            if words and len(words) > 0 and isinstance(words[0], dict):
+                start_time = words[0].get("start", 0)
+                timestamp = f"{start_time:.1f}s"
+
+            if role == "agent":
+                f.write(f"{timestamp:<10} {'AGENT':<20} {content}\n")
+            elif role == "user":
+                f.write(f"{timestamp:<10} {'USER':<20} {content}\n")
+            elif role == "tool_call_invocation":
+                tool_name = item.get("name", "unknown")
+                args = item.get("arguments", "")
+                f.write(f"{timestamp:<10} {'TOOL CALL':<20} {tool_name}\n")
+                try:
+                    args_dict = json.loads(args) if args else {}
+                    for k, v in args_dict.items():
+                        f.write(f"{'':>10} {'':>20}   {k}: {v}\n")
+                except:
+                    f.write(f"{'':>10} {'':>20}   args: {args}\n")
+            elif role == "tool_call_result":
+                result = content or ""
+                f.write(f"{timestamp:<10} {'TOOL RESULT':<20} ")
+                try:
+                    result_dict = json.loads(result) if result else {}
+                    f.write(json.dumps(result_dict, indent=2).replace('\n', '\n' + ' '*32) + "\n")
+                except:
+                    f.write(f"{result}\n")
+            elif role == "node_transition":
+                f.write(f"{timestamp:<10} {'--- node transition ---':<80}\n")
+
+        f.write("=" * 100 + "\n")
+
+        # Summary
+        agent_msgs = sum(1 for i in timeline if i.get("role") == "agent")
+        user_msgs = sum(1 for i in timeline if i.get("role") == "user")
+        tool_calls = sum(1 for i in timeline if i.get("role") == "tool_call_invocation")
+        tool_results = sum(1 for i in timeline if i.get("role") == "tool_call_result")
+
+        f.write(f"\nSUMMARY:\n")
+        f.write(f"  Agent messages: {agent_msgs}\n")
+        f.write(f"  User messages:  {user_msgs}\n")
+        f.write(f"  Tool calls:     {tool_calls}\n")
+        f.write(f"  Tool results:   {tool_results}\n")
+
+    return str(filepath)
 
 
 def show_call_details(conn, call_ids: List[str], creds: Dict[str, str]):
