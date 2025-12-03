@@ -1667,6 +1667,7 @@ def show_call_timeline(all_call_data: List[dict]):
             opts.append(f"{Colors.CYAN}N{Colors.RESET}=Next")
         if total_calls > 1:
             opts.append(f"{Colors.CYAN}1-{total_calls}{Colors.RESET}=Jump")
+        opts.append(f"{Colors.CYAN}F{Colors.RESET}=Full View")
         opts.append(f"{Colors.CYAN}E{Colors.RESET}=Export")
         opts.append(f"{Colors.CYAN}D{Colors.RESET}=Debug Export")
         opts.append(f"{Colors.CYAN}Q{Colors.RESET}=Back")
@@ -1680,6 +1681,9 @@ def show_call_timeline(all_call_data: List[dict]):
             call_index -= 1
         elif choice == 'N' and call_index < total_calls - 1:
             call_index += 1
+        elif choice == 'F':
+            # Show full detailed timeline view
+            show_full_timeline_view(call_id, call_info, raw_data, timeline)
         elif choice == 'E':
             # Export timeline to file (compact format)
             export_path = export_timeline(call_id, call_info, timeline)
@@ -1697,6 +1701,267 @@ def show_call_timeline(all_call_data: List[dict]):
             idx = int(choice) - 1
             if 0 <= idx < total_calls:
                 call_index = idx
+
+
+def show_full_timeline_view(call_id: str, call_info: dict, raw_data: dict, timeline: list):
+    """Display full detailed timeline on screen with scrolling"""
+    import json
+    import shutil
+
+    # Get terminal dimensions
+    try:
+        term_width = shutil.get_terminal_size().columns
+        term_height = shutil.get_terminal_size().lines
+    except:
+        term_width = 120
+        term_height = 40
+
+    width = min(term_width - 4, 200)
+    page_size = term_height - 10  # Leave room for header/footer
+
+    # Build the full output
+    lines = []
+
+    # Header
+    lines.append(f"{Colors.BOLD}{'═' * width}{Colors.RESET}")
+    lines.append(f"{Colors.BOLD}  FULL TIMELINE VIEW{Colors.RESET}")
+    lines.append(f"{Colors.BOLD}{'═' * width}{Colors.RESET}")
+    lines.append("")
+
+    # Call info
+    lines.append(f"{Colors.CYAN}Call ID:{Colors.RESET}    {call_id}")
+    lines.append(f"{Colors.CYAN}Agent:{Colors.RESET}      {call_info.get('retell_agent_name', '-')}")
+    lines.append(f"{Colors.CYAN}From:{Colors.RESET}       {call_info.get('from_number', '-')} → {call_info.get('to_number', '-')}")
+    lines.append(f"{Colors.CYAN}Started:{Colors.RESET}    {str(call_info.get('started_at', '-'))[:19]}")
+    lines.append(f"{Colors.CYAN}Duration:{Colors.RESET}   {call_info.get('duration_seconds', 0)}s")
+    lines.append(f"{Colors.CYAN}Status:{Colors.RESET}     {call_info.get('status', '-')}")
+
+    # Disconnection reason if present
+    disconnect = raw_data.get('disconnection_reason', '') if raw_data else ''
+    if disconnect:
+        lines.append(f"{Colors.CYAN}Disconnect:{Colors.RESET} {disconnect}")
+
+    lines.append("")
+    lines.append(f"{Colors.DIM}{'─' * width}{Colors.RESET}")
+
+    # Dynamic variables section
+    collected_vars = raw_data.get('collected_dynamic_variables', {}) if raw_data else {}
+    if collected_vars:
+        lines.append("")
+        lines.append(f"{Colors.BOLD}Dynamic Variables (Final State):{Colors.RESET}")
+        for k, v in collected_vars.items():
+            lines.append(f"  {Colors.CYAN}{k}:{Colors.RESET} {v}")
+        lines.append("")
+        lines.append(f"{Colors.DIM}{'─' * width}{Colors.RESET}")
+
+    # Timeline section
+    lines.append("")
+    lines.append(f"{Colors.BOLD}Timeline Events:{Colors.RESET}")
+    lines.append("")
+
+    if not timeline:
+        lines.append(f"  {Colors.YELLOW}No timeline data available{Colors.RESET}")
+    else:
+        prev_time = 0.0
+        node_counter = 0
+
+        for idx, item in enumerate(timeline):
+            role = item.get("role", "")
+            content = item.get("content", "")
+            words = item.get("words", [])
+
+            # Get timestamp
+            curr_time = None
+            if words and len(words) > 0 and isinstance(words[0], dict):
+                curr_time = words[0].get("start", 0)
+
+            if role == "node_transition":
+                node_counter += 1
+
+            # Calculate delta
+            delta = None
+            if curr_time is not None:
+                delta = curr_time - prev_time
+                prev_time = curr_time
+
+            # Format time and delta
+            time_str = f"{curr_time:.2f}s" if curr_time is not None else "     -"
+            if delta is not None:
+                if delta > 5.0:
+                    delta_str = f"{Colors.RED}+{delta:.2f}s ⚠{Colors.RESET}"
+                elif delta > 2.0:
+                    delta_str = f"{Colors.YELLOW}+{delta:.2f}s{Colors.RESET}"
+                else:
+                    delta_str = f"{Colors.DIM}+{delta:.2f}s{Colors.RESET}"
+            else:
+                delta_str = ""
+
+            # Event header line
+            event_num = f"[{idx + 1:3d}]"
+
+            if role == "node_transition":
+                lines.append("")
+                lines.append(f"{Colors.DIM}{'─' * 20} Node {node_counter} {'─' * (width - 30)}{Colors.RESET}")
+                lines.append("")
+
+            elif role == "agent":
+                lines.append(f"{event_num} {Colors.CYAN}▶ AGENT{Colors.RESET}  {time_str}  {delta_str}")
+                # Word wrap content
+                wrapped = _wrap_text(content, width - 12)
+                for line in wrapped:
+                    lines.append(f"           {line}")
+                lines.append("")
+
+            elif role == "user":
+                lines.append(f"{event_num} {Colors.GREEN}◀ USER{Colors.RESET}   {time_str}  {delta_str}")
+                wrapped = _wrap_text(content, width - 12)
+                for line in wrapped:
+                    lines.append(f"           {line}")
+                lines.append("")
+
+            elif role == "tool_call_invocation":
+                tool_name = item.get("name", "unknown")
+                tool_id = item.get("tool_call_id", "")
+                args = item.get("arguments", "{}")
+
+                lines.append(f"{event_num} {Colors.YELLOW}⚡ TOOL CALL{Colors.RESET}  {time_str}  {delta_str}")
+                lines.append(f"           {Colors.BOLD}Function:{Colors.RESET} {tool_name}")
+                if tool_id:
+                    lines.append(f"           {Colors.DIM}ID: {tool_id}{Colors.RESET}")
+
+                # Parse and display arguments nicely
+                try:
+                    args_dict = json.loads(args) if args else {}
+                    if args_dict:
+                        lines.append(f"           {Colors.BOLD}Arguments:{Colors.RESET}")
+                        for k, v in args_dict.items():
+                            v_str = json.dumps(v) if isinstance(v, (dict, list)) else str(v)
+                            if len(v_str) > width - 25:
+                                v_str = v_str[:width - 28] + "..."
+                            lines.append(f"             {Colors.CYAN}{k}:{Colors.RESET} {v_str}")
+                except:
+                    lines.append(f"           {Colors.DIM}Args: {args[:width-20]}{Colors.RESET}")
+                lines.append("")
+
+            elif role == "tool_call_result":
+                lines.append(f"{event_num} {Colors.MAGENTA}↩ TOOL RESULT{Colors.RESET}  {time_str}  {delta_str}")
+
+                # Parse and display result
+                try:
+                    result = json.loads(content) if content else {}
+
+                    # Check for errors first
+                    if result.get("error"):
+                        lines.append(f"           {Colors.RED}ERROR: {result['error']}{Colors.RESET}")
+                    elif result.get("success") == False:
+                        lines.append(f"           {Colors.RED}SUCCESS: false{Colors.RESET}")
+                        if result.get("message"):
+                            lines.append(f"           {Colors.RED}Message: {result['message']}{Colors.RESET}")
+                    else:
+                        # Show key fields
+                        for k, v in result.items():
+                            v_str = json.dumps(v) if isinstance(v, (dict, list)) else str(v)
+                            if len(v_str) > width - 25:
+                                v_str = v_str[:width - 28] + "..."
+                            # Color success green
+                            if k == "success" and v == True:
+                                lines.append(f"             {Colors.GREEN}{k}: {v_str}{Colors.RESET}")
+                            elif k == "error":
+                                lines.append(f"             {Colors.RED}{k}: {v_str}{Colors.RESET}")
+                            else:
+                                lines.append(f"             {Colors.CYAN}{k}:{Colors.RESET} {v_str}")
+                except:
+                    wrapped = _wrap_text(content or "(empty)", width - 12)
+                    for line in wrapped:
+                        lines.append(f"           {line}")
+                lines.append("")
+
+            else:
+                # Unknown role
+                lines.append(f"{event_num} {Colors.DIM}{role.upper()}{Colors.RESET}  {time_str}  {delta_str}")
+                if content:
+                    wrapped = _wrap_text(content, width - 12)
+                    for line in wrapped:
+                        lines.append(f"           {line}")
+                lines.append("")
+
+    lines.append(f"{Colors.DIM}{'─' * width}{Colors.RESET}")
+
+    # Summary
+    if timeline:
+        agent_msgs = sum(1 for i in timeline if i.get("role") == "agent")
+        user_msgs = sum(1 for i in timeline if i.get("role") == "user")
+        tool_calls = sum(1 for i in timeline if i.get("role") == "tool_call_invocation")
+        tool_results = sum(1 for i in timeline if i.get("role") == "tool_call_result")
+        nodes = sum(1 for i in timeline if i.get("role") == "node_transition")
+
+        lines.append("")
+        lines.append(f"{Colors.BOLD}Summary:{Colors.RESET} {agent_msgs} agent | {user_msgs} user | {tool_calls} tool calls | {tool_results} results | {nodes} nodes")
+
+    lines.append(f"{Colors.BOLD}{'═' * width}{Colors.RESET}")
+
+    # Now paginate the output
+    total_lines = len(lines)
+    current_pos = 0
+
+    while True:
+        os.system('cls' if os.name == 'nt' else 'clear')
+
+        # Show current page
+        end_pos = min(current_pos + page_size, total_lines)
+        for i in range(current_pos, end_pos):
+            print(lines[i])
+
+        # Navigation
+        print(f"\n{Colors.DIM}Line {current_pos + 1}-{end_pos} of {total_lines}{Colors.RESET}")
+        nav = []
+        if current_pos > 0:
+            nav.append(f"{Colors.CYAN}U{Colors.RESET}=Up")
+        if end_pos < total_lines:
+            nav.append(f"{Colors.CYAN}D{Colors.RESET}=Down")
+        nav.append(f"{Colors.CYAN}T{Colors.RESET}=Top")
+        nav.append(f"{Colors.CYAN}B{Colors.RESET}=Bottom")
+        nav.append(f"{Colors.CYAN}Q{Colors.RESET}=Back")
+        print(f"{Colors.BOLD}Nav:{Colors.RESET} " + " | ".join(nav))
+
+        choice = input(f"{Colors.BOLD}>{Colors.RESET} ").strip().upper()
+
+        if choice == 'Q' or choice == '':
+            break
+        elif choice == 'U' and current_pos > 0:
+            current_pos = max(0, current_pos - page_size)
+        elif choice == 'D' and end_pos < total_lines:
+            current_pos = min(total_lines - page_size, current_pos + page_size)
+            current_pos = max(0, current_pos)
+        elif choice == 'T':
+            current_pos = 0
+        elif choice == 'B':
+            current_pos = max(0, total_lines - page_size)
+
+
+def _wrap_text(text: str, width: int) -> list:
+    """Wrap text to specified width, returning list of lines"""
+    if not text:
+        return [""]
+    words = text.split()
+    lines = []
+    current_line = []
+    current_len = 0
+
+    for word in words:
+        if current_len + len(word) + 1 <= width:
+            current_line.append(word)
+            current_len += len(word) + 1
+        else:
+            if current_line:
+                lines.append(" ".join(current_line))
+            current_line = [word]
+            current_len = len(word)
+
+    if current_line:
+        lines.append(" ".join(current_line))
+
+    return lines if lines else [""]
 
 
 def export_timeline(call_id: str, call_info: dict, timeline: list) -> str:
