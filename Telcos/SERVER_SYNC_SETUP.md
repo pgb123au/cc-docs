@@ -157,4 +157,57 @@ POSTGRES_PASSWORD=TelcoSync2024!
 | `Telcos/telco.py` | Telco Manager UI |
 
 ---
-*Last updated: 2024-12-04*
+
+## Automated Health Monitoring
+
+### Health Check Script
+A health check script runs daily at 6 AM and checks:
+- Disk usage (warns at >80%)
+- Memory usage (warns at >90%)
+- PostgreSQL status
+- Cron service status
+- Telco sync last run time
+- Reboot requirements
+- Available security updates
+- Database size and call count
+
+### Cron Schedule
+```
+0 6 * * * /usr/bin/python3 /opt/telco_sync/server_health_check.py
+```
+
+### Manual Health Check
+```bash
+ssh root@96.47.238.189 '/usr/bin/python3 /opt/telco_sync/server_health_check.py'
+```
+
+### Health Check Log
+```bash
+ssh root@96.47.238.189 'cat /var/log/telco_health.log'
+```
+
+### n8n Workflows (import to n8n)
+- `Server_Health_Receiver.json` - Webhook to receive health reports and send alerts
+- `Server_Health_Monitor_Complete.json` - Full AWS server monitoring
+
+---
+
+## Version Information
+
+| Component | Current Version | Check Command |
+|-----------|----------------|---------------|
+| n8n | Check latest | `docker exec n8n-n8n-1 n8n --version` |
+| PostgreSQL | 16.x | `psql --version` |
+| Ubuntu | 24.04 LTS | `lsb_release -d` |
+
+### Check for n8n Updates
+```bash
+# Current version
+docker exec n8n-n8n-1 n8n --version
+
+# Latest available
+curl -s https://api.github.com/repos/n8n-io/n8n/releases/latest | grep tag_name
+```
+
+---
+*Last updated: 2025-12-04*
