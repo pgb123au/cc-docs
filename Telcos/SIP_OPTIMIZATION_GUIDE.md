@@ -263,3 +263,73 @@ curl -s "https://api.zadarma.com/v1/sip/" \
 ```
 
 See `Telcos/Zadarma/ZADARMA_REFERENCE.md` for full API documentation.
+
+---
+
+## Mobile Message (SMS Provider)
+
+### Overview
+
+Mobile Message (mobilemessage.com.au) is an Australian SMS gateway provider used for sending SMS confirmations and notifications from RetellAI agents.
+
+**Website:** https://mobilemessage.com.au/
+**Type:** SMS Gateway (not voice/SIP)
+
+### Integration Details
+
+| Setting | Value |
+|---------|-------|
+| **API Endpoint** | `https://api.mobilemessage.com.au/simple/send-sms` |
+| **Authentication** | API username + password |
+| **Sender ID** | `61412111000` (configured sender number) |
+| **SMS Format** | HTTP GET/POST with URL parameters |
+
+### API Usage
+
+```bash
+# Send SMS via Mobile Message API
+curl "https://api.mobilemessage.com.au/simple/send-sms?api_username=USERNAME&api_password=PASSWORD&sender=61412111000&to=RECIPIENT&message=MESSAGE"
+```
+
+### n8n Integration
+
+Mobile Message is integrated via the `SMS to Mobile Message v1.x` workflow:
+- **Webhook Path:** `reignite-retell/send-sms`
+- **Tool ID:** `tool-send-sms`
+- **Latest Version:** v1.8
+
+### Credentials Location
+
+Credentials are stored in:
+- `Telcos/.credentials` (MOBILEMSG_API_USERNAME, MOBILEMSG_API_PASSWORD, MOBILEMSG_SENDER_ID)
+- n8n workflow (hardcoded in HTTP Request URL)
+
+### Use Cases
+
+1. **Appointment Confirmations** - SMS sent after booking
+2. **Reminders** - Pre-appointment notifications
+3. **Follow-ups** - Post-call follow-up messages
+
+### Cost
+
+Contact Mobile Message for current pricing. Generally per-SMS based on volume.
+
+---
+
+## Telco Provider Summary
+
+| Provider | Type | Numbers | Primary Use |
+|----------|------|---------|-------------|
+| **Telnyx** | Voice (SIP) | 1 (+61240620999) | Primary AI voice agent |
+| **Zadarma** | Voice (SIP) | 7 | Backup, secondary coverage |
+| **Retell AI** | Platform | 2 managed | Agent assignments |
+| **Mobile Message** | SMS Gateway | N/A | SMS notifications |
+
+### Monthly Costs
+
+| Provider | Cost |
+|----------|------|
+| Telnyx | ~$2 USD/mo |
+| Zadarma | ~$21 USD/mo (7 numbers) |
+| Mobile Message | Per-SMS usage |
+| **Total Voice** | ~$23 USD/mo |
