@@ -28,7 +28,7 @@
 | Transport | TCP |
 | SIP Region | Australia |
 | ANI Format | +E.164 |
-| Codecs | G722, G729, OPUS |
+| Codecs | OPUS, G722, G729 (optimized 2025-12-04) |
 
 **Outbound Settings:**
 | Setting | Value |
@@ -114,7 +114,7 @@ For a Telnyx number to work with Retell:
    - FQDN: `sip.retellai.com`
    - DNS: SRV
    - Transport: TCP
-   - Codecs: G722, G729, OPUS
+   - Codecs: OPUS, G722, G729 (OPUS first for AI voice)
 2. Set outbound credentials
 3. Assign phone number to connection
 
@@ -140,4 +140,4 @@ For a Telnyx number to work with Retell:
 
 ---
 
-**Last Updated:** 2025-12-02
+**Last Updated:** 2025-12-04
