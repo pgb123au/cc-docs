@@ -56,6 +56,19 @@ cd /c/Users/peter/Downloads/CC/retell && git add . && git commit -m "Agent vX.XX
 cd /c/Users/peter/Downloads/CC/n8n && git add . && git commit -m "Workflow - [desc]" && git push
 ```
 
+### After Modifying n8n Workflows
+
+**If you changed webhook parameters, responses, or endpoints:**
+- [ ] Update `n8n/Webhooks Docs/RETELLAI_WEBHOOKS_CURRENT.md`
+
+**To regenerate workflow docs automatically:**
+```bash
+cd C:\Users\peter\Downloads\CC\n8n\Python
+python CC-Made-generate-workflow-docs.py
+```
+
+**Quick doc check:** Run `/n8n-doc-check` slash command to be prompted about documentation updates.
+
 ---
 
 ## QUICK REFERENCE
