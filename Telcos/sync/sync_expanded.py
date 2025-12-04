@@ -818,6 +818,7 @@ def sync_retell(conn):
         transcript_words = len(transcript.split()) if transcript else 0
 
         # Insert/update call
+        # Use COALESCE to preserve existing phone numbers if new values are NULL/empty
         with conn.cursor() as cur:
             cur.execute("""
                 INSERT INTO telco.calls
@@ -827,10 +828,20 @@ def sync_retell(conn):
                  has_recording, recording_url, raw_data)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 ON CONFLICT (provider_id, external_call_id) DO UPDATE SET
-                    status = EXCLUDED.status, transcript = EXCLUDED.transcript,
-                    full_transcript = EXCLUDED.full_transcript, transcript_words = EXCLUDED.transcript_words
-            """, (provider_id, c.get('call_id'), c.get('from_number'), c.get('to_number'),
-                  c.get('direction'), started_at, ended_at, duration_sec,
+                    from_number = COALESCE(NULLIF(EXCLUDED.from_number, ''), telco.calls.from_number),
+                    to_number = COALESCE(NULLIF(EXCLUDED.to_number, ''), telco.calls.to_number),
+                    direction = COALESCE(NULLIF(EXCLUDED.direction, ''), telco.calls.direction),
+                    ended_at = COALESCE(EXCLUDED.ended_at, telco.calls.ended_at),
+                    duration_seconds = COALESCE(EXCLUDED.duration_seconds, telco.calls.duration_seconds),
+                    status = EXCLUDED.status,
+                    transcript = COALESCE(NULLIF(EXCLUDED.transcript, ''), telco.calls.transcript),
+                    full_transcript = COALESCE(NULLIF(EXCLUDED.full_transcript, ''), telco.calls.full_transcript),
+                    transcript_words = GREATEST(EXCLUDED.transcript_words, telco.calls.transcript_words),
+                    has_recording = EXCLUDED.has_recording OR telco.calls.has_recording,
+                    recording_url = COALESCE(NULLIF(EXCLUDED.recording_url, ''), telco.calls.recording_url),
+                    raw_data = EXCLUDED.raw_data
+            """, (provider_id, c.get('call_id'), c.get('from_number') or None, c.get('to_number') or None,
+                  c.get('direction') or None, started_at, ended_at, duration_sec,
                   c.get('call_status'), c.get('agent_id'), agent_name,
                   transcript[:500] if transcript else None,  # Short version
                   transcript,  # Full version
