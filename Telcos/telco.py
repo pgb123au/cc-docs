@@ -225,6 +225,73 @@ class RetellAPI:
 
 
 # ============================================================================
+# MOBILE MESSAGE API (SMS Provider)
+# ============================================================================
+
+class MobileMessageAPI:
+    """Mobile Message SMS Gateway API (mobilemessage.com.au)"""
+
+    def __init__(self, username: str, password: str, sender_id: str = "61412111000"):
+        self.username = username
+        self.password = password
+        self.sender_id = sender_id
+        self.base_url = "https://api.mobilemessage.com.au"
+
+    def send_sms(self, to: str, message: str) -> dict:
+        """Send an SMS message"""
+        # Normalize phone number
+        to = to.replace(" ", "").replace("-", "")
+        if to.startswith("0"):
+            to = "61" + to[1:]
+        elif to.startswith("+"):
+            to = to[1:]
+
+        params = {
+            "api_username": self.username,
+            "api_password": self.password,
+            "sender": self.sender_id,
+            "to": to,
+            "message": message
+        }
+
+        try:
+            response = requests.get(f"{self.base_url}/simple/send-sms", params=params, timeout=30)
+            return {
+                "success": response.status_code == 200,
+                "status_code": response.status_code,
+                "response": response.text
+            }
+        except Exception as e:
+            return {
+                "success": False,
+                "error": str(e)
+            }
+
+    def get_balance(self) -> dict:
+        """Get account balance/credits (if API supports it)"""
+        # Mobile Message may not have a balance API - return placeholder
+        return {
+            "status": "unknown",
+            "message": "Balance check not available via API. Check mobilemessage.com.au portal."
+        }
+
+    def test_connection(self) -> dict:
+        """Test API connection by checking credentials"""
+        # We can't truly test without sending an SMS, so just verify credentials are set
+        if self.username and self.password:
+            return {
+                "status": "configured",
+                "username": self.username,
+                "sender_id": self.sender_id,
+                "api_endpoint": self.base_url
+            }
+        return {
+            "status": "not_configured",
+            "error": "Missing username or password"
+        }
+
+
+# ============================================================================
 # DISPLAY FUNCTIONS
 # ============================================================================
 
@@ -474,7 +541,53 @@ def show_retell_info(api: RetellAPI):
         print("  No agents found")
 
 
-def show_unified_view(zadarma: ZadarmaAPI, telnyx: TelnyxAPI, retell: RetellAPI):
+def show_mobilemsg_info(api: MobileMessageAPI):
+    """Display Mobile Message SMS provider information"""
+    print_header("MOBILE MESSAGE (SMS)")
+
+    print_subheader("Provider Info")
+    print(f"  Website: {Colors.CYAN}mobilemessage.com.au{Colors.RESET}")
+    print(f"  Type: {Colors.GREEN}SMS Gateway{Colors.RESET}")
+
+    # Connection status
+    print_subheader("Configuration")
+    status = api.test_connection()
+    if status.get("status") == "configured":
+        print(f"  Status: {Colors.GREEN}Configured{Colors.RESET}")
+        print(f"  Username: {Colors.CYAN}{status.get('username', '?')}{Colors.RESET}")
+        print(f"  Sender ID: {Colors.CYAN}{format_phone(status.get('sender_id', ''))}{Colors.RESET}")
+        print(f"  API Endpoint: {Colors.DIM}{status.get('api_endpoint', '')}{Colors.RESET}")
+    else:
+        print(f"  Status: {Colors.RED}Not Configured{Colors.RESET}")
+        print(f"  {Colors.DIM}Error: {status.get('error', 'Unknown')}{Colors.RESET}")
+
+    # Balance info
+    print_subheader("Account Balance")
+    balance = api.get_balance()
+    print(f"  {Colors.YELLOW}{balance.get('message', 'Balance info not available')}{Colors.RESET}")
+
+    # Integration info
+    print_subheader("Integration")
+    print(f"  n8n Webhook: {Colors.CYAN}reignite-retell/send-sms{Colors.RESET}")
+    print(f"  Tool ID: {Colors.DIM}tool-send-sms{Colors.RESET}")
+    print(f"  Workflow: {Colors.DIM}SMS to Mobile Message v1.x{Colors.RESET}")
+
+    # Test SMS option
+    print_subheader("Send Test SMS")
+    print(f"  {Colors.DIM}Enter 'T' to send a test SMS to 0412111000 (Peter Ball){Colors.RESET}")
+    test_choice = input(f"  Send test? [T/N]: ").strip().lower()
+    if test_choice == 't':
+        print(f"\n  {Colors.YELLOW}Sending test SMS...{Colors.RESET}")
+        result = api.send_sms("0412111000", "Test SMS from Telco Manager")
+        if result.get("success"):
+            print(f"  {Colors.GREEN}SMS sent successfully!{Colors.RESET}")
+            print(f"  {Colors.DIM}Response: {result.get('response', '')}{Colors.RESET}")
+        else:
+            print(f"  {Colors.RED}SMS failed{Colors.RESET}")
+            print(f"  {Colors.DIM}Error: {result.get('error', result.get('response', 'Unknown'))}{Colors.RESET}")
+
+
+def show_unified_view(zadarma: ZadarmaAPI, telnyx: TelnyxAPI, retell: RetellAPI, mobilemsg: MobileMessageAPI = None):
     """Show all phone numbers from all providers in one view"""
     print_header("UNIFIED PHONE NUMBER VIEW")
 
@@ -542,6 +655,15 @@ def show_unified_view(zadarma: ZadarmaAPI, telnyx: TelnyxAPI, retell: RetellAPI)
                    rows, [18, 10, 12, 8, 32])
 
         print(f"\n  {Colors.DIM}Total: {len(all_numbers)} numbers across all providers{Colors.RESET}")
+
+    # SMS Provider Summary
+    if mobilemsg:
+        print_subheader("SMS Provider")
+        status = mobilemsg.test_connection()
+        if status.get("status") == "configured":
+            print(f"  {Colors.GREEN}Mobile Message{Colors.RESET} - Sender: {format_phone(status.get('sender_id', ''))}")
+        else:
+            print(f"  {Colors.RED}Mobile Message - Not configured{Colors.RESET}")
 
 
 def get_db_connection(creds: Dict[str, str]):
@@ -3191,15 +3313,16 @@ def show_menu():
     """Display main menu"""
     print()
     print(f"{Colors.BOLD}TELCO MANAGER{Colors.RESET}")
-    print(f"{Colors.DIM}Unified view of Zadarma, Telnyx & Retell{Colors.RESET}")
+    print(f"{Colors.DIM}Unified view of Zadarma, Telnyx, Retell & Mobile Message{Colors.RESET}")
     print()
     print(f"  {Colors.CYAN}1.{Colors.RESET} Zadarma Overview")
     print(f"  {Colors.CYAN}2.{Colors.RESET} Telnyx Overview")
     print(f"  {Colors.CYAN}3.{Colors.RESET} Retell AI Overview")
-    print(f"  {Colors.CYAN}4.{Colors.RESET} Unified Number View (All Providers)")
-    print(f"  {Colors.CYAN}5.{Colors.RESET} Data Warehouse (PostgreSQL)")
-    print(f"  {Colors.CYAN}6.{Colors.RESET} Retell Calls Explorer")
-    print(f"  {Colors.CYAN}7.{Colors.RESET} {Colors.BOLD}Latency Comparison{Colors.RESET} {Colors.GREEN}NEW{Colors.RESET}")
+    print(f"  {Colors.CYAN}4.{Colors.RESET} Mobile Message (SMS)")
+    print(f"  {Colors.CYAN}5.{Colors.RESET} Unified Number View (All Providers)")
+    print(f"  {Colors.CYAN}6.{Colors.RESET} Data Warehouse (PostgreSQL)")
+    print(f"  {Colors.CYAN}7.{Colors.RESET} Retell Calls Explorer")
+    print(f"  {Colors.CYAN}8.{Colors.RESET} Latency Comparison")
     print()
     print(f"  {Colors.CYAN}A.{Colors.RESET} Show All")
     print(f"  {Colors.CYAN}S.{Colors.RESET} Full Sync (Pull all data from APIs)")
@@ -3235,6 +3358,17 @@ def main():
     else:
         print(f"{Colors.YELLOW}[WARN] Retell API key not found{Colors.RESET}")
 
+    # Initialize Mobile Message
+    mobilemsg = None
+    if creds.get("MOBILEMSG_API_USERNAME") and creds.get("MOBILEMSG_API_PASSWORD"):
+        mobilemsg = MobileMessageAPI(
+            creds["MOBILEMSG_API_USERNAME"],
+            creds["MOBILEMSG_API_PASSWORD"],
+            creds.get("MOBILEMSG_SENDER_ID", "61412111000")
+        )
+    else:
+        print(f"{Colors.YELLOW}[WARN] Mobile Message credentials not found in .credentials{Colors.RESET}")
+
     while True:
         os.system('cls' if os.name == 'nt' else 'clear')
         show_menu()
@@ -3264,20 +3398,27 @@ def main():
                 print(f"{Colors.RED}Retell not configured{Colors.RESET}")
 
         elif choice == '4':
+            if mobilemsg:
+                show_mobilemsg_info(mobilemsg)
+            else:
+                print(f"{Colors.RED}Mobile Message not configured{Colors.RESET}")
+
+        elif choice == '5':
             if zadarma or telnyx:
                 show_unified_view(zadarma or ZadarmaAPI("", ""),
                                  telnyx or TelnyxAPI(""),
-                                 retell or RetellAPI(""))
+                                 retell or RetellAPI(""),
+                                 mobilemsg)
             else:
                 print(f"{Colors.RED}No providers configured{Colors.RESET}")
 
-        elif choice == '5':
+        elif choice == '6':
             show_warehouse_summary(creds)
 
-        elif choice == '6':
+        elif choice == '7':
             show_retell_calls_explorer(creds)
 
-        elif choice == '7':
+        elif choice == '8':
             show_latency_comparison(creds)
 
         elif choice == 'a':
@@ -3287,6 +3428,8 @@ def main():
                 show_telnyx_info(telnyx)
             if retell:
                 show_retell_info(retell)
+            if mobilemsg:
+                show_mobilemsg_info(mobilemsg)
             show_warehouse_summary(creds)
 
         elif choice == 's':
