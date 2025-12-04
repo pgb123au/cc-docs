@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document details the optimized SIP configuration for RetellAI voice agents using Telnyx as the telephony provider.
+This document details the optimized SIP configuration for RetellAI voice agents using Telnyx and Zadarma as telephony providers.
 
 **Last Updated:** 2025-12-04
 **Connection:** RetellAI_Reignite_AU
@@ -173,3 +173,93 @@ curl -X GET "https://api.telnyx.com/v2/fqdns" \
 - [RetellAI Custom Telephony](https://docs.retellai.com/deploy/custom-telephony)
 - [Telnyx Audio and Codecs](https://support.telnyx.com/en/articles/3192298-audio-and-codecs)
 - [Telnyx Voice AI HD Codecs](https://telnyx.com/resources/conversational-ai-hd-voice-codecs)
+
+---
+
+## Zadarma Configuration
+
+### Overview
+
+Zadarma numbers connect to RetellAI via LiveKit's SIP infrastructure (`5t4n6j0wnrl.sip.livekit.cloud`). LiveKit is RetellAI's underlying real-time communication platform.
+
+**Note:** Zadarma has more limited codec options compared to Telnyx - primarily G.711 (alaw/ulaw).
+
+### Phone Numbers & Expiry Dates
+
+| Number | City | Status | SIP Destination | Expiry Date | Auto-Renew |
+|--------|------|--------|-----------------|-------------|------------|
+| +61288800226 | Sydney | Active | LiveKit (RetellAI) | 2026-09-18 | Yearly |
+| +61399997398 | Melbourne | Active | LiveKit (RetellAI) | 2025-12-26 | Monthly |
+| +61288800208 | Sydney | Active | LiveKit (RetellAI) | 2025-12-27 | Monthly |
+| +61731068880 | Brisbane | Active | LiveKit (RetellAI) | 2026-06-14 | Yearly |
+| +61399997351 | Melbourne | Active | LiveKit (RetellAI) | 2026-06-14 | Yearly |
+| +61399980489 | Melbourne | Active | Zadarma SIP (818506) | 2026-06-14 | Yearly |
+| +61288805883 | Sydney | Active | Zadarma SIP (06557) | 2026-07-05 | Yearly |
+
+### Zadarma SIP Settings
+
+| Setting | Value | Notes |
+|---------|-------|-------|
+| **SIP Server** | `sip.zadarma.com` | Primary server |
+| **Port (Standard)** | `5060` | UDP |
+| **Port (Secure)** | `5061` | TLS encrypted |
+| **Codecs** | G.711 alaw, G.711 ulaw | Limited options |
+| **Channels per Number** | 3 | Concurrent calls |
+| **Monthly Cost** | $3 USD per number | Total: ~$21/month |
+
+### LiveKit Integration (for RetellAI)
+
+Numbers routed to RetellAI use LiveKit's SIP endpoint:
+- **FQDN**: `5t4n6j0wnrl.sip.livekit.cloud`
+- **Format**: `+{number}@5t4n6j0wnrl.sip.livekit.cloud`
+
+### Optimization Options
+
+| Setting | Current | Recommendation | How to Change |
+|---------|---------|----------------|---------------|
+| **Transport** | UDP | Consider TLS (port 5061) | Zadarma Portal |
+| **Encryption** | None | Enable SRTP if needed | Zadarma Portal |
+| **Codec** | G.711 | Limited - no OPUS/G722 | N/A (Zadarma limitation) |
+
+### Zadarma vs Telnyx Comparison
+
+| Feature | Telnyx | Zadarma |
+|---------|--------|---------|
+| HD Codecs (OPUS/G722) | ✅ Yes | ❌ No |
+| API Codec Control | ✅ Full | ❌ Limited |
+| TLS/SRTP | ✅ Yes | ✅ Yes (manual) |
+| Regional Servers | ✅ Sydney | ⚠️ Generic |
+| Cost (AU number) | ~$2-3/mo | $3/mo |
+| Best For | Primary AI agents | Backup/overflow |
+
+### Recommendation
+
+**Use Telnyx for primary RetellAI production numbers** due to:
+- OPUS codec support (adaptive, HD quality)
+- Sydney-based media servers (lower latency)
+- Full API control over settings
+
+**Use Zadarma for:**
+- Backup numbers
+- Cost-effective additional coverage
+- Numbers already established with clients
+
+---
+
+## Zadarma API Reference
+
+### List Phone Numbers with Expiry
+
+```bash
+curl -s "https://api.zadarma.com/v1/direct_numbers/" \
+  -H "Authorization: {api_key}:{signature}"
+```
+
+### List SIP Accounts
+
+```bash
+curl -s "https://api.zadarma.com/v1/sip/" \
+  -H "Authorization: {api_key}:{signature}"
+```
+
+See `Telcos/Zadarma/ZADARMA_REFERENCE.md` for full API documentation.
