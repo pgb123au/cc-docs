@@ -173,7 +173,7 @@ A health check script runs daily at 6 AM and checks:
 
 ### Cron Schedule
 ```
-0 6 * * * /usr/bin/python3 /opt/telco_sync/server_health_check.py
+35 3 * * * /usr/bin/python3 /opt/telco_sync/server_health_check.py
 ```
 
 ### Manual Health Check
