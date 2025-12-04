@@ -2,6 +2,24 @@
 
 Create a focused debug package for diagnosing individual appointment booking problems (Physio/EP, not classes).
 
+## IMPORTANT: Diagnosis Only
+
+**This command is for DIAGNOSIS ONLY. DO NOT fix anything.**
+
+Your job is to:
+- Gather all evidence
+- Run diagnostics
+- Analyze the problem
+- Document findings
+
+Your job is NOT to:
+- Edit any agent files
+- Modify any workflows
+- Apply any fixes
+- Change any code
+
+Produce the evidence package and let the user decide what to do with it.
+
 ## Output Folder
 
 **IMPORTANT:** Create a NEW unique folder each time this command runs:
