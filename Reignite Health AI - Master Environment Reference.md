@@ -8,7 +8,7 @@
 
 **Status:** Production Environment
 
-**Server:** AWS EC2 (54.149.95.69)
+**Server:** AWS EC2 (52.13.124.171)
 
 **n8n Version:** 1.116.2 (updated 2025-11-27)
 
@@ -20,7 +20,7 @@
 cd C:\\Users\\peter\\Downloads; python n8n\_error\_analyzer.py
 
 \# 2\. Connect to Server (Windows PowerShell)  
-ssh \-i "C:\\Users\\peter\\.ssh\\metabase-aws" ubuntu@54.149.95.69
+ssh \-i "C:\\Users\\peter\\.ssh\\metabase-aws" ubuntu@52.13.124.171
 
 \# 3\. Check App Database (EC2)  
 docker exec \-it n8n-postgres-1 psql \-U n8n \-d retellai\_prod
@@ -46,7 +46,7 @@ docker exec \-it n8n-postgres-1 psql \-U n8n \-d retellai\_prod
 
 ### **AWS EC2 (Server)**
 
-* **Public IP:** 54.149.95.69  
+* **Public IP:** 52.13.124.171  
 * **Internal IP:** 172.31.0.243  
 * **User:** ubuntu  
 * **Host Prompt:** ubuntu@ip-172-31-0-243:\~$  
@@ -63,7 +63,7 @@ docker exec \-it n8n-postgres-1 psql \-U n8n \-d retellai\_prod
 
 **From Windows PowerShell:**
 
-ssh \-i "C:\\Users\\peter\\.ssh\\metabase-aws" ubuntu@54.149.95.69
+ssh \-i "C:\\Users\\peter\\.ssh\\metabase-aws" ubuntu@52.13.124.171
 
 ### **File Transfer (SCP)**
 
@@ -71,18 +71,18 @@ ssh \-i "C:\\Users\\peter\\.ssh\\metabase-aws" ubuntu@54.149.95.69
 
 scp \-i "C:\\Users\\peter\\.ssh\\metabase-aws" \`  
     "C:\\Users\\peter\\Downloads\\script.py" \`  
-    ubuntu@54.149.95.69:\~/script.py
+    ubuntu@52.13.124.171:\~/script.py
 
 **Download (EC2 → Windows):**
 
 \# Single File  
 scp \-i "C:\\Users\\peter\\.ssh\\metabase-aws" \`  
-    ubuntu@54.149.95.69:\~/error\_analysis.csv \`  
+    ubuntu@52.13.124.171:\~/error\_analysis.csv \`  
     "C:\\Users\\peter\\Downloads\\error\_analysis.csv"
 
 \# Entire Folder  
 scp \-i "C:\\Users\\peter\\.ssh\\metabase-aws" \-r \`  
-    ubuntu@54.149.95.69:/tmp/folder \`  
+    ubuntu@52.13.124.171:/tmp/folder \`  
     "C:\\Users\\peter\\Downloads\\folder"
 
 ## **3\. Tools: n8n Error Analyzer & Daily Error Report**
@@ -249,23 +249,23 @@ curl \-X POST \[https://auto.yr.com.au/webhook/reignite-retell/check-funding\](h
 
 ```bash
 # SSH command format for n8n operations
-ssh -i "C:/Users/peter/.ssh/metabase-aws" ubuntu@54.149.95.69 "COMMAND"
+ssh -i "C:/Users/peter/.ssh/metabase-aws" ubuntu@52.13.124.171 "COMMAND"
 ```
 
 **Update n8n:**
 
 ```bash
 # 1. Manual backup first
-ssh -i "C:/Users/peter/.ssh/metabase-aws" ubuntu@54.149.95.69 "sudo /usr/local/bin/backup-full.sh"
+ssh -i "C:/Users/peter/.ssh/metabase-aws" ubuntu@52.13.124.171 "sudo /usr/local/bin/backup-full.sh"
 
 # 2. Pull latest image
-ssh -i "C:/Users/peter/.ssh/metabase-aws" ubuntu@54.149.95.69 "docker pull n8nio/n8n:latest"
+ssh -i "C:/Users/peter/.ssh/metabase-aws" ubuntu@52.13.124.171 "docker pull n8nio/n8n:latest"
 
 # 3. Restart containers
-ssh -i "C:/Users/peter/.ssh/metabase-aws" ubuntu@54.149.95.69 "cd /opt/n8n && docker compose down && docker compose up -d"
+ssh -i "C:/Users/peter/.ssh/metabase-aws" ubuntu@52.13.124.171 "cd /opt/n8n && docker compose down && docker compose up -d"
 
 # 4. Verify
-ssh -i "C:/Users/peter/.ssh/metabase-aws" ubuntu@54.149.95.69 "docker ps && docker logs n8n-n8n-1 --tail 20"
+ssh -i "C:/Users/peter/.ssh/metabase-aws" ubuntu@52.13.124.171 "docker ps && docker logs n8n-n8n-1 --tail 20"
 ```
 
 ### **Workflow Cleanup Procedure**
@@ -345,10 +345,10 @@ Current webhook manifest: `n8n/JSON/EXPORT_MANIFEST_2025_11_27.json`
 
 ```bash
 # Correct (works from Windows)
-ssh -i "C:/Users/peter/.ssh/metabase-aws" ubuntu@54.149.95.69
+ssh -i "C:/Users/peter/.ssh/metabase-aws" ubuntu@52.13.124.171
 
 # Incorrect (path parsing issues)
-ssh -i "C:\Users\peter\.ssh\metabase-aws" ubuntu@54.149.95.69
+ssh -i "C:\Users\peter\.ssh\metabase-aws" ubuntu@52.13.124.171
 ```
 
 This applies to all SSH and SCP commands run programmatically.

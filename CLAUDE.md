@@ -97,7 +97,7 @@ cd C:\Users\peter\Downloads\CC\n8n\Python
 python CC-Made-n8n_api_download_workflows.py --retell
 
 # Execute SQL on n8n Postgres (via SSH)
-ssh -i "C:\Users\peter\.ssh\metabase-aws" ubuntu@54.149.95.69 \
+ssh -i "C:\Users\peter\.ssh\metabase-aws" ubuntu@52.13.124.171 \
   "docker exec -i n8n-postgres-1 psql -U n8n -d retellai_prod -c \"SELECT * FROM patients LIMIT 5;\""
 ```
 
@@ -106,11 +106,11 @@ ssh -i "C:\Users\peter\.ssh\metabase-aws" ubuntu@54.149.95.69 \
 **SSH + Docker exec** to run SQL on n8n's Postgres:
 ```bash
 # Interactive psql session
-ssh -i "C:\Users\peter\.ssh\metabase-aws" ubuntu@54.149.95.69
+ssh -i "C:\Users\peter\.ssh\metabase-aws" ubuntu@52.13.124.171
 docker exec -it n8n-postgres-1 psql -U n8n -d retellai_prod
 
 # One-liner SQL query
-ssh -i "C:\Users\peter\.ssh\metabase-aws" ubuntu@54.149.95.69 \
+ssh -i "C:\Users\peter\.ssh\metabase-aws" ubuntu@52.13.124.171 \
   "docker exec -i n8n-postgres-1 psql -U n8n -d retellai_prod -c \"YOUR SQL HERE;\""
 ```
 
