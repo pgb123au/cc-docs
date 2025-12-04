@@ -31,7 +31,7 @@ CONFIG = {
     "smtp_host": "localhost",
     "smtp_port": 25,
     # n8n webhook for sending emails (uses Gmail OAuth)
-    "n8n_email_webhook": "https://auto.yr.com.au/webhook/send-system-email",
+    "n8n_email_webhook": "https://auto.yr.com.au/webhook/lTSZxat0xt2EfObW/webhook/send-system-email",
 }
 
 # API Credentials (loaded from environment or .credentials file)

@@ -99,8 +99,13 @@ cd {REMOTE_DIR}
 
         sftp.close()
 
-        # Make executable
-        run_ssh_command(ssh, f"chmod +x {REMOTE_DIR}/run_sync.sh")
+        # Set secure permissions (only root can access)
+        print("\n[2b] Setting secure permissions...")
+        run_ssh_command(ssh, f"chmod 700 {REMOTE_DIR}")
+        run_ssh_command(ssh, f"chmod 600 {REMOTE_DIR}/.credentials")
+        run_ssh_command(ssh, f"chmod 700 {REMOTE_DIR}/run_sync.sh")
+        run_ssh_command(ssh, f"chmod 600 {REMOTE_DIR}/sync_expanded.py")
+        print("    [OK] Credentials secured (root-only access)")
 
         # Update the sync script to look for credentials in the same directory
         print("\n[3] Patching script for server paths...")

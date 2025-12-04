@@ -692,7 +692,7 @@ def sync_telnyx(conn):
                         profile_name = EXCLUDED.profile_name, is_enabled = EXCLUDED.is_enabled,
                         last_synced = NOW()
                 """, (provider_id, p.get('id', ''), p.get('name', ''),
-                      p.get('enabled', True), p.get('number_pool_settings', {}).get('enabled', False),
+                      p.get('enabled', True), (p.get('number_pool_settings') or {}).get('enabled', False),
                       p.get('webhook_url', ''), Json(p)))
             count += 1
         conn.commit()
