@@ -84,7 +84,25 @@ If any curl test fails:
 3. Fix and re-upload workflow
 4. Re-test until all pass
 
+**For cache-related issues**, read these docs first:
+- `n8n/Webhooks Docs/N8N_CACHE_ISSUES_COMPLETE_FIX_GUIDE.md` - Master cache troubleshooting
+- `n8n/Webhooks Docs/GET_DIRECTIONS_CACHE_IMPLEMENTATION.md` - Directions cache specifics
+- `n8n/Webhooks Docs/get-class-schedule-cache-implementation.md` - Class schedule cache
+
 **Loop until all tests pass - do not stop on first error!**
+
+### Step 9: Document Learnings
+After successful deployment:
+1. **If you discovered new issues or fixes**, document them:
+   - Add to relevant troubleshooting docs
+   - Update `n8n/Webhooks Docs/N8N_WEBHOOK_TROUBLESHOOTING.md` if applicable
+
+2. **If webhook parameters/responses changed**, update:
+   - `n8n/Webhooks Docs/RETELLAI_WEBHOOKS_CURRENT.md` (REQUIRED - single source of truth)
+
+3. **If cache behavior changed**, update the relevant cache docs
+
+4. **Commit documentation updates** with the deployment
 
 ## Final Report
 
