@@ -1,0 +1,233 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 8px 8px 0 0; }
+        .header h1 { margin: 0; font-size: 24px; }
+        .header p { margin: 10px 0 0; opacity: 0.9; }
+        .content { padding: 30px; }
+        .section { margin-bottom: 30px; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #eee; }
+        .section-title { font-size: 18px; font-weight: 600; color: #333; margin: 0; }
+        .section-badge { background: #667eea; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { background: #f8f9fa; padding: 12px 8px; text-align: left; font-weight: 600; color: #555; border-bottom: 2px solid #dee2e6; }
+        td { padding: 10px 8px; border-bottom: 1px solid #eee; color: #333; }
+        tr:hover td { background: #f8f9fa; }
+        .status-active { color: #28a745; font-weight: 500; }
+        .status-inactive { color: #dc3545; }
+        .number { font-family: monospace; font-weight: 500; }
+        .summary-box { background: #f8f9fa; border-radius: 6px; padding: 15px; margin-top: 20px; }
+        .summary-row { display: flex; justify-content: space-between; padding: 5px 0; }
+        .summary-label { color: #666; }
+        .summary-value { font-weight: 600; color: #333; }
+        .footer { text-align: center; padding: 20px; color: #999; font-size: 12px; border-top: 1px solid #eee; }
+        .alert { background: #fff3cd; border: 1px solid #ffc107; border-radius: 6px; padding: 12px; margin-bottom: 20px; }
+        .alert-danger { background: #f8d7da; border-color: #dc3545; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Monthly Phone Numbers Report</h1>
+            <p>Generated on Thursday, 04 December 2025 at 12:47</p>
+        </div>
+        <div class="content">
+<div class="alert alert-danger"><strong>Numbers Expiring Soon:</strong><br>+61 3 9999 7398 (Melbourne) - <strong>22 days</strong><br>+61 2 8880 0208 (Sydney) - <strong>23 days</strong><br></div>
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Telnyx</h2>
+                    <span class="section-badge">1 numbers</span>
+                </div>
+                <table>
+                    <tr>
+                        <th>Number</th>
+                        <th>Status</th>
+                        <th>Type</th>
+                        <th>Connection</th>
+                        <th>Region</th>
+                        <th>Codecs</th>
+                        <th>Cost/mo</th>
+                    </tr>
+
+                    <tr>
+                        <td class="number">+61 2 4062 0999</td>
+                        <td class="status-active">active</td>
+                        <td>local</td>
+                        <td>RetellAI_Reignite_AU</td>
+                        <td>Australia</td>
+                        <td>OPUS, G722, G729</td>
+                        <td>$2.00 USD</td>
+                    </tr>
+
+                </table>
+                <div class="summary-box">
+                    <div class="summary-row">
+                        <span class="summary-label">Total Monthly Cost:</span>
+                        <span class="summary-value">$2.00 USD</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Zadarma</h2>
+                    <span class="section-badge">7 numbers</span>
+                </div>
+                <table>
+                    <tr>
+                        <th>Number</th>
+                        <th>City</th>
+                        <th>Status</th>
+                        <th>SIP Destination</th>
+                        <th>Channels</th>
+                        <th>Cost/mo</th>
+                        <th>Expiry</th>
+                        <th>Renew</th>
+                    </tr>
+
+                    <tr>
+                        <td class="number">+61 3 9999 7398</td>
+                        <td>Melbourne</td>
+                        <td class="status-active">active</td>
+                        <td>RetellAI (LiveKit)</td>
+                        <td>3</td>
+                        <td>$3.00 USD</td>
+                        <td>2025-12-26 <span style="background:#ffc107;color:black;padding:2px 6px;border-radius:3px;font-size:11px;">22d</span></td>
+                        <td>month</td>
+                    </tr>
+
+                    <tr>
+                        <td class="number">+61 2 8880 0208</td>
+                        <td>Sydney</td>
+                        <td class="status-active">active</td>
+                        <td>RetellAI (LiveKit)</td>
+                        <td>3</td>
+                        <td>$3.00 USD</td>
+                        <td>2025-12-27 <span style="background:#ffc107;color:black;padding:2px 6px;border-radius:3px;font-size:11px;">23d</span></td>
+                        <td>month</td>
+                    </tr>
+
+                    <tr>
+                        <td class="number">+61 3 9998 0489</td>
+                        <td>Melbourne</td>
+                        <td class="status-active">active</td>
+                        <td>Zadarma SIP (818506)</td>
+                        <td>3</td>
+                        <td>$3.00 USD</td>
+                        <td>2026-06-14 <span style="color:#6c757d;font-size:11px;">191d</span></td>
+                        <td>year</td>
+                    </tr>
+
+                    <tr>
+                        <td class="number">+61 7 3106 8880</td>
+                        <td>Brisbane</td>
+                        <td class="status-active">active</td>
+                        <td>RetellAI (LiveKit)</td>
+                        <td>3</td>
+                        <td>$3.00 USD</td>
+                        <td>2026-06-14 <span style="color:#6c757d;font-size:11px;">192d</span></td>
+                        <td>year</td>
+                    </tr>
+
+                    <tr>
+                        <td class="number">+61 3 9999 7351</td>
+                        <td>Melbourne</td>
+                        <td class="status-active">active</td>
+                        <td>RetellAI (LiveKit)</td>
+                        <td>3</td>
+                        <td>$3.00 USD</td>
+                        <td>2026-06-14 <span style="color:#6c757d;font-size:11px;">192d</span></td>
+                        <td>year</td>
+                    </tr>
+
+                    <tr>
+                        <td class="number">+61 2 8880 5883</td>
+                        <td>Sydney</td>
+                        <td class="status-active">active</td>
+                        <td>Zadarma SIP (06557)</td>
+                        <td>3</td>
+                        <td>$3.00 USD</td>
+                        <td>2026-07-05 <span style="color:#6c757d;font-size:11px;">212d</span></td>
+                        <td>year</td>
+                    </tr>
+
+                    <tr>
+                        <td class="number">+61 2 8880 0226</td>
+                        <td>Sydney</td>
+                        <td class="status-active">active</td>
+                        <td>RetellAI (LiveKit)</td>
+                        <td>3</td>
+                        <td>$3.00 USD</td>
+                        <td>2026-09-18 <span style="color:#6c757d;font-size:11px;">288d</span></td>
+                        <td>year</td>
+                    </tr>
+
+                </table>
+                <div class="summary-box">
+                    <div class="summary-row">
+                        <span class="summary-label">Account Balance:</span>
+                        <span class="summary-value">$73.84 USD</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Total Monthly Cost:</span>
+                        <span class="summary-value">$21.00 USD</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Retell AI (Agent Assignments)</h2>
+                    <span class="section-badge">2 numbers</span>
+                </div>
+                <table>
+                    <tr>
+                        <th>Number</th>
+                        <th>Type</th>
+                        <th>Nickname</th>
+                        <th>Inbound Agent</th>
+                        <th>Outbound Agent</th>
+                    </tr>
+
+                    <tr>
+                        <td class="number">+61 2 4062 0999</td>
+                        <td>custom</td>
+                        <td>Reignite NSW Office</td>
+                        <td>Reignite_AI_Mega_Receptionist_v11.130_FI...</td>
+                        <td>None</td>
+                    </tr>
+
+                    <tr>
+                        <td class="number">+61 2 8880 0226</td>
+                        <td>custom</td>
+                        <td>Reignite-PBX-0261288800226</td>
+                        <td>Reignite_AI_Mega_Receptionist_v11.130_FI...</td>
+                        <td>None</td>
+                    </tr>
+
+                </table>
+            </div>
+
+            <div class="summary-box" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <div class="summary-row">
+                    <span style="font-size: 16px;">Total Monthly Phone Costs:</span>
+                    <span style="font-size: 20px; font-weight: 700;">$23.00 USD</span>
+                </div>
+                <div class="summary-row" style="opacity: 0.8; font-size: 12px;">
+                    <span>Telnyx: $2.00 USD | Zadarma: $21.00 USD</span>
+                    <span>Total Numbers: 8</span>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            This report was automatically generated by the Telco Manager system.<br>
+            View full details at: Telcos/SIP_OPTIMIZATION_GUIDE.md
+        </div>
+    </div>
+</body>
+</html>
