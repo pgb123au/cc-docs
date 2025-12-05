@@ -49,18 +49,28 @@ Example: `retell/Testing/2025-12-05-booking-debug-143052/`
 mkdir -p retell/Testing/[YYYY-MM-DD]-booking-debug-[HHMMSS]
 ```
 
-### Step 2: Download LIVE AGENT FIRST (determines versions for everything else)
+### Step 2: Download LIVE AGENT from RetellAI API
 
-**CRITICAL:** Fetch the agent FIRST. The agent version determines which workflow versions to fetch.
+**CRITICAL:** Always fetch the LIVE agent from the API - never use local files.
 
 ```python
 from retell import Retell
+from pathlib import Path
 import json
 
-client = Retell(api_key='key_8388afacb9ed29ccf0328d10e376')
+# Load API key
+with open(Path.home() / 'Downloads' / 'Retell_API_Key.txt') as f:
+    api_key = f.read().strip()
 
-# Get production agent ID from phone number
-agent_id = 'agent_4ed4bfb82acde1bc924c69d406'
+client = Retell(api_key=api_key)
+
+# Get production agent ID from phone numbers
+phones = client.phone_number.list()
+agent_id = None
+for phone in phones:
+    if hasattr(phone, 'inbound_agent_id') and phone.inbound_agent_id:
+        agent_id = phone.inbound_agent_id
+        break
 
 # Get agent details
 agent = client.agent.retrieve(agent_id=agent_id)
@@ -69,9 +79,9 @@ agent = client.agent.retrieve(agent_id=agent_id)
 cf_id = agent.response_engine.conversation_flow_id
 cf = client.conversation_flow.retrieve(cf_id)
 
-# Extract agent version from name (e.g., "v11.142")
+# Extract version from agent name
 agent_name = agent.agent_name
-agent_version = agent_name  # Store this for workflow matching
+# Store for later use in manifest
 
 # Combine into exportable format
 agent_export = {
@@ -90,15 +100,15 @@ agent_export = {
 
 **Verify file size is >200KB** (small files = missing conversation flow)
 
-Save as: `AGENT_[version].json` (e.g., `AGENT_v11.142.json`)
+Save as: `AGENT_[version].json` (extract version from agent_name)
 
-**STORE THE AGENT VERSION** - you need it for Step 4.
+**STORE THE AGENT VERSION** - you need it for the manifest.
 
 ### Step 3: Download call data (1 file)
 
 Use RetellAI SDK:
 ```python
-# Get most recent call (or specific call_id if provided)
+# Get most recent call (or specific call_id if provided by user)
 calls = client.call.list(limit=5)
 call_id = calls[0].call_id  # or use provided call_id
 
@@ -133,66 +143,89 @@ call_data = {
 
 Save `call_[id]_full.json` with complete call data.
 
-### Step 4: Download n8n workflows (4 files) - LATEST ACTIVE VERSIONS
+### Step 4: Download n8n workflows LIVE from API (4 files)
 
-**IMPORTANT:** Get the LATEST ACTIVE versions of each workflow from n8n. These must match what the agent is currently calling.
+**CRITICAL:** Always fetch workflows from the LIVE n8n API - never use local files.
 
-```bash
-# List ALL workflows to find the currently active versions
-curl -s "https://auto.yr.com.au/api/v1/workflows?limit=100" \
-  -H "X-N8N-API-KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwZmRmM2Y0Ni1iNGIxLTRlYjMtYTdlZS05MGYxZDczMzE3NDUiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzYzODg3NDQyfQ.nMvcYGkjKHMkGVXXVr8Pfh61wT4WgWgX5SOtDNBW-F4"
+```python
+import requests
+
+N8N_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwZmRmM2Y0Ni1iNGIxLTRlYjMtYTdlZS05MGYxZDczMzE3NDUiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzYzODg3NDQyfQ.nMvcYGkjKHMkGVXXVr8Pfh61wT4WgWgX5SOtDNBW-F4'
+N8N_URL = 'https://auto.yr.com.au'
+
+headers = {'X-N8N-API-KEY': N8N_API_KEY}
+
+# List ALL workflows
+resp = requests.get(f'{N8N_URL}/api/v1/workflows?limit=250', headers=headers)
+all_workflows = resp.json().get('data', [])
+
+# Find ACTIVE workflows for each webhook path
+webhook_mapping = {
+    'book-appointment-compound': 'wf_book_appointment.json',
+    'get-availability': 'wf_get_availability.json',
+    'check-funding': 'wf_check_funding.json',
+    'lookup-caller-phone': 'wf_lookup_caller.json'
+}
+
+for wf in all_workflows:
+    if not wf.get('active'):
+        continue
+    wf_name = wf.get('name', '').lower()
+    wf_id = wf.get('id')
+
+    # Match by webhook path in workflow name
+    for webhook_key, save_as in webhook_mapping.items():
+        if webhook_key.replace('-', '') in wf_name.replace('-', '').replace('_', '').replace(' ', ''):
+            # Download full workflow
+            detail = requests.get(f'{N8N_URL}/api/v1/workflows/{wf_id}', headers=headers)
+            # Save to output folder
+            # Record: workflow_id, name, version for manifest
 ```
 
-**Find and download ONLY the ACTIVE workflows that handle these webhooks:**
-
-| Webhook Path | Save As |
-|--------------|---------|
-| `/webhook/reignite-retell/book-appointment-compound` | `wf_book_appointment.json` |
-| `/webhook/reignite-retell/get-availability` | `wf_get_availability.json` |
-| `/webhook/reignite-retell/check-funding` | `wf_check_funding.json` |
-| `/webhook/reignite-retell/lookup-caller-phone` | `wf_lookup_caller.json` |
-
-**To identify the correct workflow:**
-1. List all workflows
-2. For each webhook path above, find the workflow that:
-   - Is ACTIVE (not disabled)
-   - Has the matching webhook trigger node
-   - Has the HIGHEST version number if multiple exist
-
-Download each workflow by ID:
-```bash
-curl -s "https://auto.yr.com.au/api/v1/workflows/[WORKFLOW_ID]" \
-  -H "X-N8N-API-KEY: [API_KEY]"
-```
+**For each workflow, record:**
+- Workflow ID
+- Full name (includes version)
+- Node count
+- Whether it has the expected webhook path
 
 ### Step 5: Generate N8N_WORKFLOW_MANIFEST.md (1 file)
 
-Create a manifest listing ALL active RetellAI workflows:
+Create a manifest listing ALL active RetellAI workflows **fetched live from the API**:
 
 ```markdown
 # n8n Workflow Manifest
 Generated: [timestamp]
 Agent Version: [from Step 2]
 
-## Active Workflows for This Agent
+## Active Booking Workflows (Downloaded)
 
-| Workflow ID | Name | Webhook Path | Status |
-|-------------|------|--------------|--------|
-| [id] | [name] | /webhook/reignite-retell/book-appointment-compound | Active |
-| [id] | [name] | /webhook/reignite-retell/get-availability | Active |
-| [id] | [name] | /webhook/reignite-retell/check-funding | Active |
-| [id] | [name] | /webhook/reignite-retell/lookup-caller-phone | Active |
+| Workflow ID | Name | Node Count | Webhook Path |
+|-------------|------|------------|--------------|
+| [id] | [full name with version] | [count] | /webhook/reignite-retell/book-appointment-compound |
+| [id] | [full name with version] | [count] | /webhook/reignite-retell/get-availability |
+| [id] | [full name with version] | [count] | /webhook/reignite-retell/check-funding |
+| [id] | [full name with version] | [count] | /webhook/reignite-retell/lookup-caller-phone |
 
-## All RetellAI Workflows (for reference)
+## All Active RetellAI Workflows
 
-| Workflow ID | Name | Active | Last Updated |
-|-------------|------|--------|--------------|
-[List all workflows containing "RetellAI" or "reignite-retell"]
+| Workflow ID | Name | Active | Updated At |
+|-------------|------|--------|------------|
+[List ALL workflows containing "RetellAI" or "reignite-retell" - from API]
 
-## Version Alignment Check
-- Agent Version: [version from Step 2]
-- Workflows downloaded: [list IDs]
-- Any version mismatches: [yes/no + details]
+## Workflow Health Checks
+
+For each downloaded workflow, verify:
+- [ ] Has webhook trigger node with correct path
+- [ ] Has response node (respondToWebhook)
+- [ ] PostgreSQL nodes have `alwaysOutputData: true`
+- [ ] No obvious missing connections
+
+## Version Summary
+- Agent: [version from agent_name]
+- book-appointment: [version from workflow name]
+- get-availability: [version from workflow name]
+- check-funding: [version from workflow name]
+- lookup-caller: [version from workflow name]
 ```
 
 ### Step 6: Generate Live Diagnostics (1 file)
@@ -201,7 +234,8 @@ Create `LIVE_DIAGNOSTICS.txt` with results from database queries and webhook hea
 
 #### 6a. Database Queries (via SSH to n8n Postgres)
 
-Connect and run against `retellai_prod` database:
+**Get server IP dynamically or use current:** `52.13.124.171`
+
 ```bash
 ssh -i "C:\Users\peter\.ssh\metabase-aws" ubuntu@52.13.124.171 \
   "docker exec -i n8n-postgres-1 psql -U n8n -d retellai_prod -c \"[QUERY];\""
@@ -240,64 +274,62 @@ WHERE call_id = '[CALL_ID]'
 ORDER BY created_at ASC;
 ```
 
-**Query 5: Error log entries (last 24h)**
+**Query 5: Available slots cache state**
 ```sql
-SELECT call_id, error_type, error_message, severity, context, created_at
-FROM error_log
-WHERE created_at > NOW() - INTERVAL '24 hours'
-ORDER BY created_at DESC LIMIT 10;
-```
-
-**Query 6: Funding cache for test patient**
-```sql
-SELECT patient_id, funding_type, is_eligible, remaining_appointments,
-       needs_referral, gap_fee_amount, cached_at
-FROM patient_funding_cache
-WHERE patient_id = '1805465202989210063';
-```
-
-**Query 7: Available slots for test village**
-```sql
-SELECT practitioner_name, village, service_category, starts_at, is_available
+SELECT village, service_category, COUNT(*) as slot_count,
+       MIN(starts_at) as earliest, MAX(starts_at) as latest
 FROM individual_slots_cache
-WHERE village = 'The Baytree' AND is_available = true
-  AND starts_at > NOW()
-ORDER BY starts_at
-LIMIT 10;
+WHERE is_available = true AND starts_at > NOW()
+GROUP BY village, service_category
+ORDER BY village;
+```
+
+**Query 6: Safety tables state** (holidays, protected slots)
+```sql
+SELECT 'holidays' as table_name, COUNT(*) as count FROM safety_holidays
+UNION ALL
+SELECT 'protected_slots', COUNT(*) FROM safety_protected_slots WHERE is_active = true;
 ```
 
 #### 6b. Webhook Health Checks (test patient ONLY)
 
 **USE ONLY:** Peter Ball / patient_id: `1805465202989210063` / phone: `0412111000`
 
-**Test 1: Lookup caller by phone**
-```bash
-curl -s -X POST "https://auto.yr.com.au/webhook/reignite-retell/lookup-caller-phone" \
-  -H "Content-Type: application/json" \
-  -d '{"args": {"phone_number": "+61412111000", "call_id": "debug-[timestamp]"}}'
+Use Python requests (not curl) for reliable Windows execution:
+
+```python
+import requests
+from datetime import datetime, timedelta
+
+base_url = 'https://auto.yr.com.au/webhook/reignite-retell'
+test_date = (datetime.now() + timedelta(days=14)).strftime('%Y-%m-%d')
+
+# Test 1: Lookup caller by phone
+resp1 = requests.post(f'{base_url}/lookup-caller-phone',
+    json={'args': {'phone': '0412111000', 'call_id': 'debug-test'}})
+
+# Test 2: Get availability WITHOUT date (baseline)
+resp2a = requests.post(f'{base_url}/get-availability',
+    json={'args': {'village': 'The Baytree', 'service_category': 'physio',
+                   'call_id': 'debug-test-no-date'}})
+
+# Test 3: Get availability WITH date (verify date filtering works)
+resp2b = requests.post(f'{base_url}/get-availability',
+    json={'args': {'village': 'The Baytree', 'service_category': 'physio',
+                   'date': test_date, 'call_id': 'debug-test-with-date'}})
+
+# Test 4: Check funding
+resp3 = requests.post(f'{base_url}/check-funding',
+    json={'args': {'patient_id': '1805465202989210063', 'funding_type': 'HCP',
+                   'call_id': 'debug-test'}})
+
+# Record response times, status codes, and key response fields
 ```
 
-**Test 2: Get availability** (date 14+ days out)
-```bash
-curl -s -X POST "https://auto.yr.com.au/webhook/reignite-retell/get-availability" \
-  -H "Content-Type: application/json" \
-  -d '{"args": {"village": "The Baytree", "service_category": "physio", "date": "[YYYY-MM-DD]", "appointment_type": "Standard Consultation", "patient_id": "1805465202989210063", "call_id": "debug-[timestamp]"}}'
-```
-
-**Test 3: Check funding**
-```bash
-curl -s -X POST "https://auto.yr.com.au/webhook/reignite-retell/check-funding" \
-  -H "Content-Type: application/json" \
-  -d '{"args": {"patient_id": "1805465202989210063", "funding_type": "HCP", "call_id": "debug-[timestamp]"}}'
-```
-
-**Test 4: Book appointment compound** (DO NOT RUN unless explicitly testing - uses real data)
-```bash
-# SKIPPED by default - only run with explicit instruction
-# curl -s -X POST "https://auto.yr.com.au/webhook/reignite-retell/book-appointment-compound" \
-#   -H "Content-Type: application/json" \
-#   -d '{"args": {"patient_id": "1805465202989210063", ...}}'
-```
+**For get-availability tests, specifically check:**
+- Does response include `requested_date` field? (date filtering working)
+- Do returned slots respect the date if provided?
+- Response time (latency reduction working if <800ms)
 
 #### 6c. Format LIVE_DIAGNOSTICS.txt
 ```
@@ -320,98 +352,107 @@ Agent Version: [from step 2]
 [Query 4: This Call's Webhook Logs]
 [results or "No webhook logs for this call"]
 
-[Query 5: Error Log Entries]
-[results or "No errors"]
+[Query 5: Slots Cache Summary]
+[results - shows slot availability by village]
 
-[Query 6: Funding Cache for Test Patient]
-[results]
-
-[Query 7: Available Slots]
-[results]
+[Query 6: Safety Tables State]
+[results - holidays and protected slots counts]
 
 --- WEBHOOK HEALTH CHECKS ---
 
 [1. Lookup Caller by Phone]
 Endpoint: lookup-caller-phone
-Request: {"phone_number": "+61412111000", ...}
-Response: [JSON]
+Response Time: [X]ms
 Status: OK / FAIL
+Response: [key fields]
 
-[2. Get Availability]
+[2a. Get Availability (no date)]
 Endpoint: get-availability
-Request: {"village": "The Baytree", "service_category": "physio", ...}
-Response: [JSON]
+Response Time: [X]ms
 Status: OK / FAIL
+Slots returned: [count]
+Has requested_date field: [Yes/No]
+
+[2b. Get Availability (with date)]
+Endpoint: get-availability
+Date requested: [YYYY-MM-DD]
+Response Time: [X]ms
+Status: OK / FAIL
+Slots returned: [count]
+requested_date in response: [value or MISSING]
+First slot date: [date] - [PASS if >= requested date, FAIL otherwise]
 
 [3. Check Funding]
 Endpoint: check-funding
-Request: {"patient_id": "...", "funding_type": "...", ...}
-Response: [JSON]
+Response Time: [X]ms
 Status: OK / FAIL
+Response: [key fields]
 
 [4. Book Appointment Compound]
 Status: SKIPPED (destructive test)
 
 --- HEALTH SUMMARY ---
 Webhooks responding: X/3
-DB errors in last 24h: X
-Webhook failures in last 24h: X
-Individual slots available: X
-Likely issue area: [webhooks/database/agent logic/funding/practitioner_id/slot_unavailable/unknown]
+Average response time: [X]ms
+Date filtering working: [Yes/No]
+DB errors in last 24h: [count]
+Webhook failures in last 24h: [count]
+Individual slots available: [total count]
+Likely issue area: [webhooks/database/agent logic/funding/practitioner_id/slot_unavailable/date_filtering/unknown]
 ```
 
 ### Step 7: Concatenate Reference Docs (1 file)
 
 **IMPORTANT:** Combine all reference documentation into a SINGLE file called `REFERENCE_DOCS.md`.
 
-```bash
-# Create concatenated reference file with clear section headers
-```
+Read these files and concatenate with section headers:
 
-The file should have this structure:
+1. `retell/RETELLAI_JSON_SCHEMAS.md`
+2. `retell/AGENT_DEVELOPMENT_GUIDE.md`
+3. `retell/guides/BOOKING_FLOW_TROUBLESHOOTING.md`
+4. `n8n/Webhooks Docs/RETELLAI_WEBHOOKS_CURRENT.md`
 
+Structure:
 ```markdown
 # Reference Documentation
 Generated: [timestamp]
 Agent Version: [from Step 2]
 
-This file contains all reference documentation needed for debugging booking issues.
-
 ---
 
 ## TABLE OF CONTENTS
-1. [RetellAI JSON Schemas](#retellai-json-schemas)
-2. [Agent Development Guide](#agent-development-guide)
-3. [Booking Flow Troubleshooting](#booking-flow-troubleshooting)
-4. [Webhook API Reference](#webhook-api-reference)
+1. RetellAI JSON Schemas
+2. Agent Development Guide
+3. Booking Flow Troubleshooting
+4. Webhook API Reference
 
 ---
 
 # SECTION 1: RetellAI JSON Schemas
 Source: retell/RETELLAI_JSON_SCHEMAS.md
 
-[FULL CONTENTS OF RETELLAI_JSON_SCHEMAS.md]
+[FULL CONTENTS]
 
 ---
 
 # SECTION 2: Agent Development Guide
 Source: retell/AGENT_DEVELOPMENT_GUIDE.md
 
-[FULL CONTENTS OF AGENT_DEVELOPMENT_GUIDE.md]
+[FULL CONTENTS]
 
 ---
 
 # SECTION 3: Booking Flow Troubleshooting
 Source: retell/guides/BOOKING_FLOW_TROUBLESHOOTING.md
 
-[FULL CONTENTS OF BOOKING_FLOW_TROUBLESHOOTING.md]
+[FULL CONTENTS]
 
 ---
 
 # SECTION 4: Webhook API Reference
 Source: n8n/Webhooks Docs/RETELLAI_WEBHOOKS_CURRENT.md
 
-[FULL CONTENTS OF RETELLAI_WEBHOOKS_CURRENT.md]
+[FULL CONTENTS]
 
 ---
 END OF REFERENCE DOCUMENTATION
@@ -419,7 +460,7 @@ END OF REFERENCE DOCUMENTATION
 
 ### Step 8: Generate and SAVE diagnostic report (1 file)
 
-Create `DIAGNOSTIC_REPORT.md` in the output folder containing:
+Create `DIAGNOSTIC_REPORT.md` in the output folder:
 
 ```markdown
 # Diagnostic Report: [Call ID]
@@ -427,52 +468,37 @@ Generated: [timestamp]
 
 ## File Manifest
 
-This debug package contains 10 files. Here's what each one is for:
-
 | # | File | What It Contains | When To Use It |
 |---|------|------------------|----------------|
-| 1 | `call_[id]_full.json` | Complete call data: transcript, tool calls, timestamps, collected variables | Start here - shows exactly what happened |
-| 2 | `AGENT_[version].json` | Live agent: all nodes, tools, prompts, conversation flow logic | Check agent logic, node transitions, variable bindings |
-| 3 | `LIVE_DIAGNOSTICS.txt` | Database query results + webhook health check responses | Verify system health, find DB errors, check endpoints |
-| 4 | `REFERENCE_DOCS.md` | Combined docs: JSON schemas, dev guide, troubleshooting, webhook specs | Look up correct patterns, validation rules, API contracts |
-| 5 | `wf_book_appointment.json` | n8n workflow that creates appointments in Cliniko | Debug booking failures, check parameter handling |
-| 6 | `wf_get_availability.json` | n8n workflow that finds available slots | Debug slot lookup issues, practitioner_id problems |
-| 7 | `wf_check_funding.json` | n8n workflow that verifies patient eligibility | Debug funding check failures |
-| 8 | `wf_lookup_caller.json` | n8n workflow that identifies patient from phone | Debug patient identification issues |
-| 9 | `N8N_WORKFLOW_MANIFEST.md` | List of all active workflows with IDs and webhook paths | Verify correct workflows are active, check version alignment |
-| 10 | `DIAGNOSTIC_REPORT.md` | This file - analysis, root cause, recommendations | Summary and action items |
+| 1 | `call_[id]_full.json` | Complete call data | Start here - what happened |
+| 2 | `AGENT_[version].json` | Live agent with flow | Check agent logic |
+| 3 | `LIVE_DIAGNOSTICS.txt` | DB + webhook tests | System health |
+| 4 | `REFERENCE_DOCS.md` | Combined docs | Look up patterns |
+| 5 | `wf_book_appointment.json` | Booking workflow | Debug booking failures |
+| 6 | `wf_get_availability.json` | Availability workflow | Debug slot issues |
+| 7 | `wf_check_funding.json` | Funding workflow | Debug funding issues |
+| 8 | `wf_lookup_caller.json` | Caller lookup | Debug identification |
+| 9 | `N8N_WORKFLOW_MANIFEST.md` | Workflow inventory | Version alignment |
+| 10 | `DIAGNOSTIC_REPORT.md` | This file | Summary |
 
 ---
 
 ## Call Summary
 - **Call ID:** [id]
-- **Agent Version:** [agent_name from Step 2]
+- **Agent Version:** [from live API]
 - **Duration:** [X seconds]
 - **Outcome:** [call_analysis.call_summary]
 - **Disconnection Reason:** [reason]
-- **User Sentiment:** [sentiment]
 
 ## Collected Variables (at call end)
 ```json
-[collected_dynamic_variables from call data]
+[collected_dynamic_variables]
 ```
 
-## Booking Flow Analysis
-- **Patient identified:** Yes/No (patient_id: [id])
-- **Service type:** Physio/EP
-- **Village:** [village from variables]
-- **Practitioner requested:** [from variables or "none"]
-- **Funding type:** [funding_type from variables]
-- **Slot offered:** [from spoken_text or slots variable]
-- **Error received:** [error_code and error_message if present]
-
 ## Tool Calls Made
-| # | Tool | Latency (ms) | Success | Key Request Data | Key Response Data |
-|---|------|--------------|---------|------------------|-------------------|
-| 1 | lookup_caller_by_phone | X | OK/FAIL | phone_number | patient_id, village |
-| 2 | get_availability | X | OK/FAIL | village, date | practitioner_id, slots |
-| 3 | check_funding | X | OK/FAIL | patient_id, funding_type | eligible |
-| 4 | book_appointment_compound | X | OK/FAIL | all params | error_code/success |
+| # | Tool | Latency (ms) | Success | Key Data |
+|---|------|--------------|---------|----------|
+[Extract from transcript_with_tool_calls]
 
 ## Critical Variables at Failure Point
 ```json
@@ -482,154 +508,110 @@ This debug package contains 10 files. Here's what each one is for:
   "practitioner_id": "[value or MISSING]",
   "starts_at": "[value or MISSING]",
   "funding_type": "[value or MISSING]",
-  "appointment_type": "[value]",
-  "error_code": "[value if present]",
-  "error_message": "[value if present]"
+  "error_code": "[value if present]"
 }
 ```
 
 ## Live System Health
 - Webhooks: [X/3 responding]
-- DB errors last 24h: [count]
-- Webhook failures last 24h: [count]
-- Available slots in system: [count]
+- Date filtering: [Working/Not working]
+- Avg response time: [X]ms
+- DB errors 24h: [count]
 
-## Version Alignment
-- **Agent version:** [from Step 2]
-- **Workflows match agent:** [Yes/No]
-- **Any stale workflows:** [list or "None"]
+## Version Alignment (from live APIs)
+- **Agent:** [version from RetellAI API]
+- **book-appointment:** [version from n8n API]
+- **get-availability:** [version from n8n API]
+- **check-funding:** [version from n8n API]
+- **lookup-caller:** [version from n8n API]
+
+## Workflow Structure Check
+| Workflow | Node Count | Has Webhook | Has Response | Issues |
+|----------|------------|-------------|--------------|--------|
+| book-appointment | [X] | Yes/No | Yes/No | [any issues] |
+| get-availability | [X] | Yes/No | Yes/No | [any issues] |
 
 ## Issues Found
-1. **[Issue Name]**: [Description with evidence from call/DB]
+1. **[Issue Name]**: [Description with evidence]
 2. ...
 
-## Common Individual Booking Failure Patterns
-
-Check these first:
-- [ ] `practitioner_id` missing or null in book-appointment-compound call
-- [ ] `starts_at` timestamp malformed or doesn't match available slot
-- [ ] `SLOT_UNAVAILABLE` error (slot was booked between availability check and booking)
+## Common Failure Patterns Checklist
+- [ ] `practitioner_id` missing in book-appointment-compound
+- [ ] `starts_at` malformed or doesn't match available slot
+- [ ] `SLOT_UNAVAILABLE` error (race condition)
 - [ ] `funding_type` not extracted from conversation
-- [ ] `appointment_type` mismatch between get-availability and book-appointment
-- [ ] Edge loop: agent cycling between get-slots and present-slots
-- [ ] Webhook timeout or failure
+- [ ] Date not being respected (deaf agent loop)
+- [ ] Webhook timeout or 5xx error
+- [ ] Edge loop between nodes
 
 ## Root Cause
-[Why the booking failed - be specific. Reference the tool call that failed and why.]
+[Specific analysis based on evidence]
 
 ## Fix Recommendations
-1. **[File to change]**: [What to change and why]
+1. **[Location]**: [What to change]
 2. ...
 ```
 
-**IMPORTANT:** Write the diagnostic report to the output folder, not just display it.
+### Step 9: Final Validation (MANDATORY)
 
-## Step 9: Final Validation (MANDATORY)
-
-### 9a: Verify agent file size (>200KB)
+#### 9a: Verify agent file size (>200KB)
 ```bash
 ls -la [output]/AGENT_v*.json
 ```
+**If <200KB:** DELETE and re-download with conversation flow.
 
-**If agent file is <200KB:** DELETE and re-download with conversation flow.
-
-### 9b: Verify exactly 10 files
+#### 9b: Verify exactly 10 files
 ```bash
 ls -1 [output] | wc -l
-# Must be exactly 10
 ```
 
-Expected files:
-1. `call_[id]_full.json`
-2. `AGENT_[version].json`
-3. `LIVE_DIAGNOSTICS.txt`
-4. `REFERENCE_DOCS.md`
-5. `wf_book_appointment.json`
-6. `wf_get_availability.json`
-7. `wf_check_funding.json`
-8. `wf_lookup_caller.json`
-9. `N8N_WORKFLOW_MANIFEST.md`
-10. `DIAGNOSTIC_REPORT.md`
-
-### 9c: Final checklist
+#### 9c: Final checklist
 - [ ] Exactly 10 files
 - [ ] Agent file >200KB
-- [ ] `LIVE_DIAGNOSTICS.txt` exists with DB + curl results
-- [ ] `REFERENCE_DOCS.md` contains all 4 concatenated docs
-- [ ] `DIAGNOSTIC_REPORT.md` saved to folder with file manifest
-- [ ] `N8N_WORKFLOW_MANIFEST.md` lists active workflows
+- [ ] All workflows downloaded from LIVE n8n API
+- [ ] `LIVE_DIAGNOSTICS.txt` has both date-filtered and non-date-filtered availability tests
+- [ ] `N8N_WORKFLOW_MANIFEST.md` shows versions from live API
 - [ ] No Python scripts in folder
 - [ ] No subfolders
 
-**If any check fails, fix it before completing.**
-
-## Final Folder Structure
-
-```
-[YYYY-MM-DD]-booking-debug-[HHMMSS]/
-├── call_abc123_full.json         # 1. The problem call - what happened
-├── AGENT_v11.142.json            # 2. Live agent (>200KB) - the logic
-├── LIVE_DIAGNOSTICS.txt          # 3. System health - DB + webhooks
-├── REFERENCE_DOCS.md             # 4. Combined docs - schemas, guides, APIs
-├── wf_book_appointment.json      # 5. Booking workflow
-├── wf_get_availability.json      # 6. Availability workflow
-├── wf_check_funding.json         # 7. Funding workflow
-├── wf_lookup_caller.json         # 8. Caller lookup workflow
-├── N8N_WORKFLOW_MANIFEST.md      # 9. Workflow inventory
-└── DIAGNOSTIC_REPORT.md          # 10. Analysis + file manifest + fixes
-```
-
-**Total: 10 files, no scripts, no subfolders**
-
-## Step 10: Final Output (MANDATORY)
-
-After all steps complete successfully, print EXACTLY this to the screen:
+### Step 10: Final Output (MANDATORY)
 
 ```
 [FULL_ABSOLUTE_PATH_TO_OUTPUT_FOLDER]
 DONE DONE DONE
 ```
 
-Example:
-```
-C:\Users\peter\Downloads\CC\retell\Testing\2025-12-05-booking-debug-143052
-DONE DONE DONE
-```
-
-**This MUST be the last thing printed.** No additional text after "DONE DONE DONE".
-
 ---
 
 ## Quick Reference
 
-### Production Info
-- **Phone Numbers:** +61288800226, +61240620999
-- **Agent ID:** agent_4ed4bfb82acde1bc924c69d406
-- **Server IP:** 52.13.124.171
+### API Endpoints
+- **RetellAI:** Use SDK with key from `~/Downloads/Retell_API_Key.txt`
+- **n8n API:** `https://auto.yr.com.au/api/v1/workflows`
+- **n8n Webhooks:** `https://auto.yr.com.au/webhook/reignite-retell/[endpoint]`
+- **PostgreSQL:** SSH to `52.13.124.171` → docker exec n8n-postgres-1
 
 ### Test Patient (SAFE TO USE)
 - **Name:** Peter Ball
 - **Patient ID:** 1805465202989210063
 - **Phone:** 0412111000
 
-### Key Tables
+### Key Webhook Endpoints
+| Endpoint | Tool ID |
+|----------|---------|
+| lookup-caller-phone | tool-lookup-caller-phone |
+| get-availability | tool-get-availability |
+| check-funding | tool-check-funding |
+| book-appointment-compound | tool-book-appointment-compound |
+
+### Key Database Tables
 | Table | Purpose |
 |-------|---------|
 | `webhook_log` | All webhook calls with request/response |
-| `call_log` | Call metadata (intent, outcome) |
-| `appointment_log` | Created appointments |
-| `error_log` | System errors |
-| `patient_funding_cache` | Funding eligibility |
 | `individual_slots_cache` | Available appointment slots |
-
-### Key Tools in Agent
-| Tool ID | Purpose |
-|---------|---------|
-| `tool-lookup-caller-phone` | Identify caller |
-| `tool-get-availability` | Find available slots |
-| `tool-check-funding` | Verify funding eligibility |
-| `tool-book-appointment-compound` | Create appointment |
+| `safety_holidays` | Blocked dates |
+| `safety_protected_slots` | Protected time ranges |
 
 ---
 
-*Last Updated: 2025-12-05*
+*This command always fetches live data from RetellAI and n8n APIs to ensure version accuracy.*
