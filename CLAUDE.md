@@ -77,6 +77,15 @@ python CC-Made-generate-workflow-docs.py
 - `+61288800226` - Main Sydney number
 - `+61240620999` - Secondary number
 
+### API Keys & Credentials
+
+| Service | Location | Notes |
+|---------|----------|-------|
+| **Retell API** | `C:\Users\peter\Downloads\Retell_API_Key.txt` | Used by deploy scripts automatically |
+| **n8n API** | Hardcoded in approved commands | `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwZmRmM2Y0Ni1iNGIxLTRlYjMtYTdlZS05MGYxZDczMzE3NDUiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzYzODg3NDQyfQ.nMvcYGkjKHMkGVXXVr8Pfh61wT4WgWgX5SOtDNBW-F4` |
+| **SSH Key** | `C:\Users\peter\.ssh\metabase-aws` | For n8n server access |
+| **n8n Server** | `ubuntu@52.13.124.171` | ⚠️ NOT 54.149.95.69 |
+
 ### Key Commands
 ```bash
 # Deploy agent to production
@@ -95,6 +104,13 @@ cd C:\Users\peter\Downloads\CC\Telcos && python telco.py
 # n8n webhook tools
 cd C:\Users\peter\Downloads\CC\n8n\Python
 python CC-Made-n8n_api_download_workflows.py --retell
+
+# Upload/update n8n workflow (filter to required fields only)
+# API rejects: active (read-only), id, updatedAt, createdAt, shared, tags, etc.
+# Keep only: name, nodes, connections, settings
+curl -X PUT "https://auto.yr.com.au/api/v1/workflows/WORKFLOW_ID" \
+  -H "X-N8N-API-KEY: <key>" -H "Content-Type: application/json" \
+  -d @filtered_workflow.json
 
 # Execute SQL on n8n Postgres (via SSH)
 ssh -i "C:\Users\peter\.ssh\metabase-aws" ubuntu@52.13.124.171 \
@@ -216,8 +232,8 @@ python run.py
 
 **System:** AI receptionist using RetellAI + n8n automation
 **Stack:** RetellAI, n8n, AWS EC2, Docker, PostgreSQL, Cliniko
-**Version:** Reignite AI Mega Receptionist v11.109
+**Version:** Reignite AI Mega Receptionist v11.154
 
 ---
 
-**Last Updated:** 2025-12-04
+**Last Updated:** 2025-12-06

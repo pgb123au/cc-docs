@@ -73,7 +73,7 @@ curl -s -X POST "https://auto.yr.com.au/webhook/reignite-retell/get-availability
 ### Step 7: SQL Health Check
 Run quick database verification:
 ```bash
-ssh -i "C:\Users\peter\.ssh\metabase-aws" ubuntu@54.149.95.69 \
+ssh -i "C:\Users\peter\.ssh\metabase-aws" ubuntu@52.13.124.171 \
   "docker exec -i n8n-postgres-1 psql -U n8n -d retellai_prod -c \"SELECT COUNT(*) as total_patients FROM patients; SELECT COUNT(*) as recent_calls FROM retell_calls WHERE created_at > NOW() - INTERVAL '24 hours';\""
 ```
 
