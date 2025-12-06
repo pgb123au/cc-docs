@@ -147,7 +147,7 @@ ssh -i "C:\Users\peter\.ssh\metabase-aws" ubuntu@52.13.124.171 \
 |----------|------|-----|
 | 1 | `retell/RETELLAI_REFERENCE.md` | API, Events, Variables |
 | 2 | `retell/RETELLAI_JSON_SCHEMAS.md` | Valid JSON, node types, validation rules |
-| 3 | `retell/AGENT_DEVELOPMENT_GUIDE.md` | **v2.0:** 6 critical rules, equation transitions, IPA pronunciation, variable binding |
+| 3 | `retell/AGENT_DEVELOPMENT_GUIDE.md` | **v2.2:** 6 critical rules, equation transitions, IPA pronunciation, `does not exists` syntax |
 | 4 | `retell/guides/BOOKING_FLOW_TROUBLESHOOTING.md` | Booking failures, edge loops, practitioner_id |
 
 **Read BEFORE working on n8n:**
