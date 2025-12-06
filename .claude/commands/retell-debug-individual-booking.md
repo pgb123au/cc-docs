@@ -34,7 +34,7 @@ Example: `retell/Testing/2025-12-05-booking-debug-143052/`
 | 1 | `call_[id]_full.json` | The problem call - transcript, tool calls, variables, what actually happened |
 | 2 | `AGENT_[version].json` | Live production agent - conversation flow nodes, tools, prompts, logic |
 | 3 | `LIVE_DIAGNOSTICS.txt` | Real-time system health - DB queries + webhook endpoint tests |
-| 4 | `REFERENCE_DOCS.md` | Concatenated reference: JSON schemas + dev guide + troubleshooting + webhooks |
+| 4 | `REFERENCE_DOCS.md` | All 5 essential docs: platform ref + JSON schemas + dev guide + whitelist + webhooks |
 | 5 | `wf_book_appointment.json` | n8n booking workflow - creates appointments in Cliniko |
 | 6 | `wf_get_availability.json` | n8n availability workflow - finds open slots |
 | 7 | `wf_check_funding.json` | n8n funding workflow - verifies patient eligibility |
@@ -403,53 +403,62 @@ Likely issue area: [webhooks/database/agent logic/funding/practitioner_id/slot_u
 
 ### Step 7: Concatenate Reference Docs (1 file)
 
-**IMPORTANT:** Combine all reference documentation into a SINGLE file called `REFERENCE_DOCS.md`.
+**IMPORTANT:** Combine ALL 5 ESSENTIAL reference documents into a SINGLE file called `REFERENCE_DOCS.md`.
 
-Read these files and concatenate with section headers:
+Read these files IN ORDER and concatenate with section headers:
 
-1. `retell/RETELLAI_JSON_SCHEMAS.md`
-2. `retell/AGENT_DEVELOPMENT_GUIDE.md`
-3. `retell/guides/BOOKING_FLOW_TROUBLESHOOTING.md`
-4. `n8n/Webhooks Docs/RETELLAI_WEBHOOKS_CURRENT.md`
+1. `retell/RETELLAI_REFERENCE.md` - Platform reference (API, events, variables)
+2. `retell/RETELLAI_JSON_SCHEMAS.md` - JSON validation rules
+3. `retell/AGENT_DEVELOPMENT_GUIDE.md` - Development rules & patterns
+4. `retell/WHITELISTED_PATTERNS.md` - Intentional patterns (DO NOT "fix")
+5. `n8n/Webhooks Docs/RETELLAI_WEBHOOKS_CURRENT.md` - Webhook endpoints
 
 Structure:
 ```markdown
-# Reference Documentation
+# Reference Documentation (5 Essential Docs)
 Generated: [timestamp]
 Agent Version: [from Step 2]
 
 ---
 
 ## TABLE OF CONTENTS
-1. RetellAI JSON Schemas
-2. Agent Development Guide
-3. Booking Flow Troubleshooting
-4. Webhook API Reference
+1. RetellAI Platform Reference
+2. RetellAI JSON Schemas
+3. Agent Development Guide
+4. Whitelisted Patterns (Do Not Fix)
+5. Webhook API Reference
 
 ---
 
-# SECTION 1: RetellAI JSON Schemas
+# SECTION 1: RetellAI Platform Reference
+Source: retell/RETELLAI_REFERENCE.md
+
+[FULL CONTENTS]
+
+---
+
+# SECTION 2: RetellAI JSON Schemas
 Source: retell/RETELLAI_JSON_SCHEMAS.md
 
 [FULL CONTENTS]
 
 ---
 
-# SECTION 2: Agent Development Guide
+# SECTION 3: Agent Development Guide
 Source: retell/AGENT_DEVELOPMENT_GUIDE.md
 
 [FULL CONTENTS]
 
 ---
 
-# SECTION 3: Booking Flow Troubleshooting
-Source: retell/guides/BOOKING_FLOW_TROUBLESHOOTING.md
+# SECTION 4: Whitelisted Patterns (Do Not Fix)
+Source: retell/WHITELISTED_PATTERNS.md
 
 [FULL CONTENTS]
 
 ---
 
-# SECTION 4: Webhook API Reference
+# SECTION 5: Webhook API Reference
 Source: n8n/Webhooks Docs/RETELLAI_WEBHOOKS_CURRENT.md
 
 [FULL CONTENTS]

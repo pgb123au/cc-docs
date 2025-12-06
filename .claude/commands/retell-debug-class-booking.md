@@ -34,7 +34,7 @@ Example: `retell/Testing/2025-12-05-class-debug-143052/`
 | 1 | `call_[id]_full.json` | The problem call - transcript, tool calls, variables, what actually happened |
 | 2 | `AGENT_[version].json` | Live production agent - conversation flow nodes, tools, prompts, logic |
 | 3 | `LIVE_DIAGNOSTICS.txt` | Real-time system health - DB queries + webhook endpoint tests |
-| 4 | `REFERENCE_DOCS.md` | Concatenated reference: JSON schemas + dev guide + common errors + webhooks |
+| 4 | `REFERENCE_DOCS.md` | All 5 essential docs: platform ref + JSON schemas + dev guide + whitelist + webhooks |
 | 5 | `wf_enroll_class.json` | n8n class enrollment workflow - books patient into class |
 | 6 | `wf_get_class_schedule.json` | n8n class schedule workflow - finds available classes |
 | 7 | `wf_lookup_caller.json` | n8n caller lookup workflow - identifies patient from phone |
@@ -372,52 +372,65 @@ Likely issue area: [webhooks/database/agent logic/funding/class_not_found/unknow
 
 ### Step 7: Concatenate Reference Docs (1 file)
 
-**IMPORTANT:** Combine all reference documentation into a SINGLE file called `REFERENCE_DOCS.md`.
+**IMPORTANT:** Combine ALL 5 ESSENTIAL reference documents into a SINGLE file called `REFERENCE_DOCS.md`.
 
-The file should have this structure:
+Read these files IN ORDER and concatenate with section headers:
 
+1. `retell/RETELLAI_REFERENCE.md` - Platform reference (API, events, variables)
+2. `retell/RETELLAI_JSON_SCHEMAS.md` - JSON validation rules
+3. `retell/AGENT_DEVELOPMENT_GUIDE.md` - Development rules & patterns
+4. `retell/WHITELISTED_PATTERNS.md` - Intentional patterns (DO NOT "fix")
+5. `n8n/Webhooks Docs/RETELLAI_WEBHOOKS_CURRENT.md` - Webhook endpoints
+
+Structure:
 ```markdown
-# Reference Documentation
+# Reference Documentation (5 Essential Docs)
 Generated: [timestamp]
 Agent Version: [from Step 2]
-
-This file contains all reference documentation needed for debugging class booking issues.
 
 ---
 
 ## TABLE OF CONTENTS
-1. [RetellAI JSON Schemas](#retellai-json-schemas)
-2. [Agent Development Guide](#agent-development-guide)
-3. [JSON Common Errors](#json-common-errors)
-4. [Webhook API Reference](#webhook-api-reference)
+1. RetellAI Platform Reference
+2. RetellAI JSON Schemas
+3. Agent Development Guide
+4. Whitelisted Patterns (Do Not Fix)
+5. Webhook API Reference
 
 ---
 
-# SECTION 1: RetellAI JSON Schemas
+# SECTION 1: RetellAI Platform Reference
+Source: retell/RETELLAI_REFERENCE.md
+
+[FULL CONTENTS]
+
+---
+
+# SECTION 2: RetellAI JSON Schemas
 Source: retell/RETELLAI_JSON_SCHEMAS.md
 
-[FULL CONTENTS OF RETELLAI_JSON_SCHEMAS.md]
+[FULL CONTENTS]
 
 ---
 
-# SECTION 2: Agent Development Guide
+# SECTION 3: Agent Development Guide
 Source: retell/AGENT_DEVELOPMENT_GUIDE.md
 
-[FULL CONTENTS OF AGENT_DEVELOPMENT_GUIDE.md]
+[FULL CONTENTS]
 
 ---
 
-# SECTION 3: JSON Common Errors
-Source: retell/guides/RetellAI_JSON_Common_Errors_and_Fixes.md
+# SECTION 4: Whitelisted Patterns (Do Not Fix)
+Source: retell/WHITELISTED_PATTERNS.md
 
-[FULL CONTENTS OF RetellAI_JSON_Common_Errors_and_Fixes.md]
+[FULL CONTENTS]
 
 ---
 
-# SECTION 4: Webhook API Reference
+# SECTION 5: Webhook API Reference
 Source: n8n/Webhooks Docs/RETELLAI_WEBHOOKS_CURRENT.md
 
-[FULL CONTENTS OF RETELLAI_WEBHOOKS_CURRENT.md]
+[FULL CONTENTS]
 
 ---
 END OF REFERENCE DOCUMENTATION
