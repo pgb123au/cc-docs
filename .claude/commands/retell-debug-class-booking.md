@@ -145,12 +145,12 @@ curl -s "https://auto.yr.com.au/api/v1/workflows?limit=100" \
 
 **Find and download ONLY the ACTIVE workflows that handle these webhooks:**
 
-| Webhook Path | Save As |
+| Webhook Path | Purpose |
 |--------------|---------|
-| `/webhook/reignite-retell/enroll-class-single` | `wf_enroll_class.json` |
-| `/webhook/reignite-retell/get-class-schedule` | `wf_get_class_schedule.json` |
-| `/webhook/reignite-retell/lookup-caller-phone` | `wf_lookup_caller.json` |
-| `/webhook/reignite-retell/check-funding` | `wf_check_funding.json` |
+| `/webhook/reignite-retell/enroll-class-single` | Class enrollment |
+| `/webhook/reignite-retell/get-class-schedule` | Class schedule lookup |
+| `/webhook/reignite-retell/lookup-caller-phone` | Caller identification |
+| `/webhook/reignite-retell/check-funding` | Funding verification |
 
 **To identify the correct workflow:**
 1. List all workflows
@@ -159,11 +159,24 @@ curl -s "https://auto.yr.com.au/api/v1/workflows?limit=100" \
    - Has the matching webhook trigger node
    - Has the HIGHEST version number if multiple exist
 
-Download each workflow by ID:
+**Download each workflow by ID - KEEP ORIGINAL FILENAME:**
+
+**IMPORTANT:** Save workflows with their ORIGINAL name from n8n. Do NOT rename files.
+
 ```bash
+# Get workflow name from the JSON response, then save with that name
 curl -s "https://auto.yr.com.au/api/v1/workflows/[WORKFLOW_ID]" \
-  -H "X-N8N-API-KEY: [API_KEY]"
+  -H "X-N8N-API-KEY: [API_KEY]" \
+  > "[output]/{WORKFLOW_NAME}.json"
 ```
+
+**Example filenames (keep as-is from n8n):**
+- `RetellAI_-_Enroll_Class_Single_v1.1_FIXED.json`
+- `RetellAI_-_Get_Class_Schedule_v2.6_SMART_YEAR_TZ.json`
+- `RetellAI_-_Lookup_Caller_by_Phone_v2.6_CACHE_NORMALIZE.json`
+- `RetellAI_-_Check_Funding_Eligibility_v2.9_HCP_FIX.json`
+
+**Why keep original names:** Version numbers and descriptors in the filename help identify exactly which workflow version was captured.
 
 ### Step 5: Generate N8N_WORKFLOW_MANIFEST.md (1 file)
 
@@ -544,14 +557,13 @@ Expected files:
 10. `DIAGNOSTIC_REPORT.md`
 
 ### 9c: Final checklist
-- [ ] Exactly 10 files
 - [ ] Agent file >200KB
 - [ ] `LIVE_DIAGNOSTICS.txt` exists with DB + curl results
 - [ ] `REFERENCE_DOCS.md` contains all 4 concatenated docs
 - [ ] `DIAGNOSTIC_REPORT.md` saved to folder with file manifest
 - [ ] `N8N_WORKFLOW_MANIFEST.md` lists active workflows
 - [ ] No Python scripts in folder
-- [ ] No subfolders
+- [ ] GEMINI subfolder exists
 
 **If any check fails, fix it before completing.**
 
@@ -559,36 +571,43 @@ Expected files:
 
 ```
 [YYYY-MM-DD]-class-debug-[HHMMSS]/
-├── call_abc123_full.json         # 1. The problem call - what happened
-├── AGENT_v11.142.json            # 2. Live agent (>200KB) - the logic
-├── LIVE_DIAGNOSTICS.txt          # 3. System health - DB + webhooks
-├── REFERENCE_DOCS.md             # 4. Combined docs - schemas, guides, APIs
-├── wf_enroll_class.json          # 5. Class enrollment workflow
-├── wf_get_class_schedule.json    # 6. Class schedule workflow
-├── wf_lookup_caller.json         # 7. Caller lookup workflow
-├── wf_check_funding.json         # 8. Funding check workflow
-├── N8N_WORKFLOW_MANIFEST.md      # 9. Workflow inventory
-└── DIAGNOSTIC_REPORT.md          # 10. Analysis + file manifest + fixes
+├── call_abc123_full.json                                    # The problem call
+├── AGENT_v11.142.json                                       # Live agent (>200KB)
+├── LIVE_DIAGNOSTICS.txt                                     # System health
+├── REFERENCE_DOCS.md                                        # Combined docs
+├── RetellAI_-_Enroll_Class_Single_v1.1_FIXED.json          # (original name)
+├── RetellAI_-_Get_Class_Schedule_v2.6_SMART_YEAR_TZ.json   # (original name)
+├── RetellAI_-_Lookup_Caller_by_Phone_v2.6_CACHE_NORMALIZE.json
+├── RetellAI_-_Check_Funding_Eligibility_v2.9_HCP_FIX.json
+├── N8N_WORKFLOW_MANIFEST.md                                 # Workflow inventory
+├── DIAGNOSTIC_REPORT.md                                     # Analysis + fixes
+└── GEMINI/                                                  # Empty subfolder
 ```
 
-**Total: 10 files, no scripts, no subfolders**
+## Step 10: Create GEMINI subfolder
 
-## Step 10: Final Output (MANDATORY)
+Create an empty `GEMINI` subfolder for Gemini analysis outputs:
 
-After all steps complete successfully, print EXACTLY this to the screen:
+```bash
+mkdir -p [output]/GEMINI
+```
+
+## Step 11: Final Output (MANDATORY)
+
+**Print ONLY this single text block - nothing else before or after:**
 
 ```
 [FULL_ABSOLUTE_PATH_TO_OUTPUT_FOLDER]
-DONE DONE DONE
+[FULL_ABSOLUTE_PATH_TO_OUTPUT_FOLDER]/GEMINI
 ```
 
-Example:
+**Example (copy-paste ready):**
 ```
 C:\Users\peter\Downloads\CC\retell\Testing\2025-12-05-class-debug-143052
-DONE DONE DONE
+C:\Users\peter\Downloads\CC\retell\Testing\2025-12-05-class-debug-143052\GEMINI
 ```
 
-**This MUST be the last thing printed.** No additional text after "DONE DONE DONE".
+**IMPORTANT:** This must be the ONLY output at the end. No "DONE DONE DONE", no file lists, no extra text. Just the two folder paths.
 
 ---
 
