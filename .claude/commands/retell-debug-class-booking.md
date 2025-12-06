@@ -562,10 +562,10 @@ Expected files:
 2. `AGENT_[version].json`
 3. `LIVE_DIAGNOSTICS.txt`
 4. `REFERENCE_DOCS.md`
-5. `wf_enroll_class.json`
-6. `wf_get_class_schedule.json`
-7. `wf_lookup_caller.json`
-8. `wf_check_funding.json`
+5. `RetellAI_-_Enroll_Class_Single_*.json` (original name)
+6. `RetellAI_-_Get_Class_Schedule_*.json` (original name)
+7. `RetellAI_-_Lookup_Caller_by_Phone_*.json` (original name)
+8. `RetellAI_-_Check_Funding_Eligibility_*.json` (original name)
 9. `N8N_WORKFLOW_MANIFEST.md`
 10. `DIAGNOSTIC_REPORT.md`
 
