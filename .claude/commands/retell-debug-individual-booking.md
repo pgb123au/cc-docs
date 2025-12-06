@@ -35,10 +35,10 @@ Example: `retell/Testing/2025-12-05-booking-debug-143052/`
 | 2 | `AGENT_[version].json` | Live production agent - conversation flow nodes, tools, prompts, logic |
 | 3 | `LIVE_DIAGNOSTICS.txt` | Real-time system health - DB queries + webhook endpoint tests |
 | 4 | `REFERENCE_DOCS.md` | All 5 essential docs: platform ref + JSON schemas + dev guide + whitelist + webhooks |
-| 5 | `wf_book_appointment.json` | n8n booking workflow - creates appointments in Cliniko |
-| 6 | `wf_get_availability.json` | n8n availability workflow - finds open slots |
-| 7 | `wf_check_funding.json` | n8n funding workflow - verifies patient eligibility |
-| 8 | `wf_lookup_caller.json` | n8n caller lookup workflow - identifies patient from phone |
+| 5 | `RetellAI_-_Book_Appointment_Compound_*.json` | n8n booking workflow (original name) |
+| 6 | `RetellAI_-_Get_Practitioner_Availability_*.json` | n8n availability workflow (original name) |
+| 7 | `RetellAI_-_Check_Funding_Eligibility_*.json` | n8n funding workflow (original name) |
+| 8 | `RetellAI_-_Lookup_Caller_by_Phone_*.json` | n8n caller lookup workflow (original name) |
 | 9 | `N8N_WORKFLOW_MANIFEST.md` | List of all active n8n workflows with IDs and webhook paths |
 | 10 | `DIAGNOSTIC_REPORT.md` | Analysis: root cause, evidence, fix recommendations |
 
@@ -160,25 +160,27 @@ resp = requests.get(f'{N8N_URL}/api/v1/workflows?limit=250', headers=headers)
 all_workflows = resp.json().get('data', [])
 
 # Find ACTIVE workflows for each webhook path
-webhook_mapping = {
-    'book-appointment-compound': 'wf_book_appointment.json',
-    'get-availability': 'wf_get_availability.json',
-    'check-funding': 'wf_check_funding.json',
-    'lookup-caller-phone': 'wf_lookup_caller.json'
-}
+# Webhook paths to match (these are the endpoints the agent calls)
+required_webhooks = [
+    'book-appointment-compound',
+    'get-availability',
+    'check-funding',
+    'lookup-caller-phone'
+]
 
 for wf in all_workflows:
     if not wf.get('active'):
         continue
-    wf_name = wf.get('name', '').lower()
+    wf_name = wf.get('name', '')
     wf_id = wf.get('id')
 
     # Match by webhook path in workflow name
-    for webhook_key, save_as in webhook_mapping.items():
-        if webhook_key.replace('-', '') in wf_name.replace('-', '').replace('_', '').replace(' ', ''):
+    for webhook_key in required_webhooks:
+        if webhook_key.replace('-', '') in wf_name.lower().replace('-', '').replace('_', '').replace(' ', ''):
             # Download full workflow
             detail = requests.get(f'{N8N_URL}/api/v1/workflows/{wf_id}', headers=headers)
-            # Save to output folder
+            # Save with ORIGINAL name from n8n (do NOT rename)
+            # Example: "RetellAI_-_Book_Appointment_Compound_v1.4_MERGE_FIX.json"
             # Record: workflow_id, name, version for manifest
 ```
 
@@ -483,10 +485,10 @@ Generated: [timestamp]
 | 2 | `AGENT_[version].json` | Live agent with flow | Check agent logic |
 | 3 | `LIVE_DIAGNOSTICS.txt` | DB + webhook tests | System health |
 | 4 | `REFERENCE_DOCS.md` | Combined docs | Look up patterns |
-| 5 | `wf_book_appointment.json` | Booking workflow | Debug booking failures |
-| 6 | `wf_get_availability.json` | Availability workflow | Debug slot issues |
-| 7 | `wf_check_funding.json` | Funding workflow | Debug funding issues |
-| 8 | `wf_lookup_caller.json` | Caller lookup | Debug identification |
+| 5 | `RetellAI_-_Book_Appointment_Compound_*.json` | Booking workflow (original name) | Debug booking failures |
+| 6 | `RetellAI_-_Get_Practitioner_Availability_*.json` | Availability workflow (original name) | Debug slot issues |
+| 7 | `RetellAI_-_Check_Funding_Eligibility_*.json` | Funding workflow (original name) | Debug funding issues |
+| 8 | `RetellAI_-_Lookup_Caller_by_Phone_*.json` | Caller lookup (original name) | Debug identification |
 | 9 | `N8N_WORKFLOW_MANIFEST.md` | Workflow inventory | Version alignment |
 | 10 | `DIAGNOSTIC_REPORT.md` | This file | Summary |
 

@@ -35,10 +35,10 @@ Example: `retell/Testing/2025-12-05-class-debug-143052/`
 | 2 | `AGENT_[version].json` | Live production agent - conversation flow nodes, tools, prompts, logic |
 | 3 | `LIVE_DIAGNOSTICS.txt` | Real-time system health - DB queries + webhook endpoint tests |
 | 4 | `REFERENCE_DOCS.md` | All 5 essential docs: platform ref + JSON schemas + dev guide + whitelist + webhooks |
-| 5 | `wf_enroll_class.json` | n8n class enrollment workflow - books patient into class |
-| 6 | `wf_get_class_schedule.json` | n8n class schedule workflow - finds available classes |
-| 7 | `wf_lookup_caller.json` | n8n caller lookup workflow - identifies patient from phone |
-| 8 | `wf_check_funding.json` | n8n funding workflow - verifies patient eligibility |
+| 5 | `RetellAI_-_Enroll_Class_Single_*.json` | n8n class enrollment workflow (original name) |
+| 6 | `RetellAI_-_Get_Class_Schedule_*.json` | n8n class schedule workflow (original name) |
+| 7 | `RetellAI_-_Lookup_Caller_by_Phone_*.json` | n8n caller lookup workflow (original name) |
+| 8 | `RetellAI_-_Check_Funding_Eligibility_*.json` | n8n funding workflow (original name) |
 | 9 | `N8N_WORKFLOW_MANIFEST.md` | List of all active n8n workflows with IDs and webhook paths |
 | 10 | `DIAGNOSTIC_REPORT.md` | Analysis: root cause, evidence, fix recommendations |
 
@@ -454,10 +454,10 @@ This debug package contains 10 files. Here's what each one is for:
 | 2 | `AGENT_[version].json` | Live agent: all nodes, tools, prompts, conversation flow logic | Check agent logic, node transitions, variable bindings |
 | 3 | `LIVE_DIAGNOSTICS.txt` | Database query results + webhook health check responses | Verify system health, find DB errors, check endpoints |
 | 4 | `REFERENCE_DOCS.md` | Combined docs: JSON schemas, dev guide, common errors, webhook specs | Look up correct patterns, validation rules, API contracts |
-| 5 | `wf_enroll_class.json` | n8n workflow that enrolls patients in classes | Debug enrollment failures, check parameter handling |
-| 6 | `wf_get_class_schedule.json` | n8n workflow that finds available classes | Debug class lookup issues, schedule problems |
-| 7 | `wf_lookup_caller.json` | n8n workflow that identifies patient from phone | Debug patient identification issues |
-| 8 | `wf_check_funding.json` | n8n workflow that verifies patient eligibility | Debug funding check failures |
+| 5 | `RetellAI_-_Enroll_Class_Single_*.json` | n8n workflow that enrolls patients in classes (original name) | Debug enrollment failures |
+| 6 | `RetellAI_-_Get_Class_Schedule_*.json` | n8n workflow that finds available classes (original name) | Debug class lookup issues |
+| 7 | `RetellAI_-_Lookup_Caller_by_Phone_*.json` | n8n workflow that identifies patient (original name) | Debug patient identification |
+| 8 | `RetellAI_-_Check_Funding_Eligibility_*.json` | n8n workflow that verifies eligibility (original name) | Debug funding check failures |
 | 9 | `N8N_WORKFLOW_MANIFEST.md` | List of all active workflows with IDs and webhook paths | Verify correct workflows are active, check version alignment |
 | 10 | `DIAGNOSTIC_REPORT.md` | This file - analysis, root cause, recommendations | Summary and action items |
 
