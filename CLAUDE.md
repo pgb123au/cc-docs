@@ -1,5 +1,18 @@
 # AI Voice Agent & Automation Knowledge Base
 
+## ⛔ NO AUTONOMOUS FIXES
+
+**Claude MUST NOT fix, modify, or change ANY code/files without EXPRESS USER APPROVAL.**
+
+- **INVESTIGATE ONLY** - Research, analyze, and report findings
+- **PROPOSE solutions** - Explain what you would change and why
+- **WAIT for approval** - Only proceed after user says "yes", "do it", "go ahead", etc.
+- **ASK if unclear** - When in doubt, ask before touching anything
+
+**This applies to:** Bug fixes, code improvements, "obvious" fixes, cleanup, refactoring, and ANY file modifications.
+
+---
+
 ## MANDATORY COMPLETION FORMAT
 
 **After EVERY completed task**, end your response with:
