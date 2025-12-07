@@ -37,6 +37,7 @@ def get_script_categories() -> Dict[str, List[Tuple[str, str, str]]]:
         "Launcher Scripts": [],
         "n8n - Core Scripts": [],
         "n8n - Diagnostics": [],
+        "RetellAI - Scripts": [],
         "RetellAI - API Scripts": [],
         "RetellAI - Testing & Fixes": [],
         "RetellAI - Audit": [],
@@ -70,7 +71,13 @@ def get_script_categories() -> Dict[str, List[Tuple[str, str, str]]]:
         for script in sorted(n8n_diag.glob("*.py")):
             scripts["n8n - Diagnostics"].append((script.name, str(script), get_rel_path(script)))
 
-    # RetellAI API Scripts - key upload/download scripts
+    # RetellAI Scripts (main scripts folder)
+    retell_scripts = base_dir / "retell" / "scripts"
+    if retell_scripts.exists():
+        for script in sorted(retell_scripts.glob("*.py")):
+            scripts["RetellAI - Scripts"].append((script.name, str(script), get_rel_path(script)))
+
+    # RetellAI API Scripts - key upload/download scripts (legacy)
     retell_api_scripts = base_dir / "retell" / "archive" / "agent-history" / "testing-root-old"
     if retell_api_scripts.exists():
         # Add specific key API scripts
