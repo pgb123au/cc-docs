@@ -1,33 +1,49 @@
-# Custom Slash Commands for RetellAI Agent Development
+# Custom Slash Commands for RetellAI & n8n Development
 
 Quick reference for all custom slash commands.
 
-## Available Commands (10 total)
+## Available Commands
 
-### Validation & Checking
-
-| Command | Purpose |
-|---------|---------|
-| `/validate-agent` | Comprehensive validation of agent JSON |
-| `/check-webhooks` | Verify tool_ids exist in n8n |
-| `/quick-test` | Fast validation suite with summary |
-
-### Agent Management
+### RetellAI Agent - Validation & Checking
 
 | Command | Purpose |
 |---------|---------|
-| `/increment-version` | Auto-increment version and sync fields |
-| `/new-agent` | Create new agent from latest template |
-| `/fix-agent` | Auto-fix common agent issues |
-| `/deploy-stable` | Copy tested agent to production folder |
+| `/retell-validate-agent` | Comprehensive validation of agent JSON |
+| `/retell-check-webhooks` | Verify tool_ids exist in n8n |
+| `/retell-quick-test` | Fast validation suite with summary |
 
-### Analysis & Session
+### RetellAI Agent - Management
 
 | Command | Purpose |
 |---------|---------|
-| `/compare-agents` | Show differences between versions |
-| `/agent-status` | Overview of all agents in Testing |
-| `/session-start` | Initialize new dev session with context |
+| `/retell-increment-version` | Auto-increment version and sync fields |
+| `/retell-new-agent` | Create new agent from latest template |
+| `/retell-fix-agent` | Auto-fix common agent issues |
+| `/retell-deploy-stable` | Copy tested agent to production folder |
+| `/retell-agent-status` | Overview of all agents in Testing |
+| `/retell-compare-agents` | Show differences between versions |
+
+### RetellAI Agent - Debugging
+
+| Command | Purpose |
+|---------|---------|
+| `/retell-debug-sim-calls` | Run simulation calls and analyze results |
+| `/retell-debug-package` | Create external audit package |
+| `/retell-debug-geminis-input` | Evaluate Gemini suggestions against plan |
+
+### RetellAI Agent - Deployment
+
+| Command | Purpose |
+|---------|---------|
+| `/retell-deploy-live-with-webhooks-test` | Full deployment: agent + n8n + phone lines + testing |
+| `/retell-verify-n8n-database` | Verify webhooks and database after deployment |
+
+### n8n Workflows
+
+| Command | Purpose |
+|---------|---------|
+| `/n8n-deploy-workflow-fix` | **NEW** Deploy fixed workflow, test, verify SQL, update docs |
+| `/n8n-doc-check` | Check which docs need updating after workflow changes |
 
 ---
 
@@ -88,5 +104,5 @@ Quick reference for all custom slash commands.
 
 ---
 
-Updated: 2025-11-29
-Total commands: 10
+Updated: 2025-12-09
+Total commands: 17+
