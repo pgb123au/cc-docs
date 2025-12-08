@@ -164,6 +164,22 @@ ssh -i "C:\Users\peter\.ssh\metabase-aws" ubuntu@52.13.124.171 \
 
 ---
 
+## Yes AI Branding (for Audit Reports)
+
+**Always use these assets when generating website audit reports/PDFs:**
+
+| Asset | Location |
+|-------|----------|
+| **Logo (PNG)** | `C:\Users\peter\Downloads\CC\Yes AI Assets\YesAI_colors_punched_transparent6.png` |
+| **Logo colors** | Red "Yes", Blue "AI", Blue swoosh |
+
+**Contact details to include:**
+- Phone: `(03) 9999 7398`
+- Email: `hello@yesai.au`
+- Website: `www.yesai.au`
+
+---
+
 ## MANDATORY READS
 
 **Read BEFORE working on RetellAI agents:**
