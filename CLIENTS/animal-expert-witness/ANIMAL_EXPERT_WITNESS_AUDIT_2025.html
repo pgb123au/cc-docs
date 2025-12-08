@@ -44,24 +44,48 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            font-size: 11pt;
-            line-height: 1.6;
+            font-size: 10pt;
+            line-height: 1.5;
             color: var(--gray-800);
             background: white;
         }
 
+        /* Page container - fixed A4 size */
         .page {
             width: 210mm;
-            min-height: 297mm;
-            padding: 20mm;
+            height: 297mm;
+            padding: 15mm 18mm 20mm 18mm;
             margin: 0 auto;
             background: white;
             page-break-after: always;
             position: relative;
+            overflow: hidden;
         }
 
         .page:last-child {
             page-break-after: auto;
+        }
+
+        /* Critical: Prevent orphans and widows */
+        p, li, tr {
+            orphans: 3;
+            widows: 3;
+        }
+
+        /* Keep elements together */
+        .keep-together {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+        }
+
+        table, .info-box, .score-card, .rec-card, .score-grid, .rec-grid, .aeo-highlight {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+        }
+
+        h2, h3 {
+            page-break-after: avoid;
+            break-after: avoid;
         }
 
         /* Yes AI Logo Styling */
@@ -71,19 +95,19 @@
         }
 
         .cover-logo .yesai-logo img {
-            max-height: 80px;
+            max-height: 70px;
         }
 
         .page-header .yesai-logo img {
-            max-height: 35px;
+            max-height: 30px;
         }
 
         .page-footer .yesai-logo img {
-            max-height: 25px;
+            max-height: 22px;
         }
 
         .back-cover .yesai-logo img {
-            max-height: 120px;
+            max-height: 100px;
         }
 
         /* Cover Page */
@@ -93,7 +117,7 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 30mm;
+            padding: 25mm;
             position: relative;
             overflow: hidden;
         }
@@ -134,66 +158,66 @@
             display: inline-block;
             background: var(--accent);
             color: white;
-            padding: 8px 20px;
+            padding: 6px 18px;
             border-radius: 30px;
-            font-size: 12px;
+            font-size: 10px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1.5px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .cover-title {
             font-family: 'Playfair Display', serif;
-            font-size: 38pt;
+            font-size: 34pt;
             font-weight: 700;
             line-height: 1.1;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .cover-subtitle {
-            font-size: 16pt;
+            font-size: 14pt;
             font-weight: 300;
             opacity: 0.9;
-            margin-bottom: 40px;
-            max-width: 450px;
+            margin-bottom: 35px;
+            max-width: 420px;
         }
 
         .cover-client {
             background: rgba(255,255,255,0.1);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 16px;
-            padding: 25px 30px;
+            border-radius: 14px;
+            padding: 20px 25px;
             display: inline-block;
         }
 
         .cover-client-label {
-            font-size: 11px;
+            font-size: 10px;
             text-transform: uppercase;
             letter-spacing: 2px;
             opacity: 0.7;
-            margin-bottom: 12px;
-        }
-
-        .cover-client-logo {
             margin-bottom: 10px;
         }
 
+        .cover-client-logo {
+            margin-bottom: 8px;
+        }
+
         .cover-client-logo img {
-            max-height: 50px;
-            max-width: 200px;
+            max-height: 45px;
+            max-width: 180px;
         }
 
         .cover-client-name {
-            font-size: 18pt;
+            font-size: 16pt;
             font-weight: 600;
         }
 
         .cover-client-url {
-            font-size: 12pt;
+            font-size: 11pt;
             opacity: 0.8;
-            margin-top: 5px;
+            margin-top: 4px;
         }
 
         .cover-footer {
@@ -205,17 +229,17 @@
         }
 
         .cover-meta {
-            font-size: 11pt;
+            font-size: 10pt;
             opacity: 0.8;
         }
 
         .cover-meta-item {
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
 
         .cover-confidential {
             text-align: right;
-            font-size: 10pt;
+            font-size: 9pt;
             opacity: 0.6;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -226,13 +250,13 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-bottom: 15px;
+            padding-bottom: 10px;
             border-bottom: 2px solid var(--gray-200);
-            margin-bottom: 25px;
+            margin-bottom: 15px;
         }
 
         .header-title {
-            font-size: 10pt;
+            font-size: 9pt;
             color: var(--gray-500);
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -241,15 +265,15 @@
         /* Page Footer */
         .page-footer {
             position: absolute;
-            bottom: 15mm;
-            left: 20mm;
-            right: 20mm;
+            bottom: 12mm;
+            left: 18mm;
+            right: 18mm;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-top: 10px;
+            padding-top: 8px;
             border-top: 1px solid var(--gray-200);
-            font-size: 9pt;
+            font-size: 8pt;
             color: var(--gray-400);
         }
 
@@ -258,49 +282,50 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             background: var(--primary);
             color: white;
-            border-radius: 10px;
-            font-size: 16pt;
+            border-radius: 8px;
+            font-size: 14pt;
             font-weight: 700;
-            margin-right: 15px;
+            margin-right: 12px;
+            flex-shrink: 0;
         }
 
         .section-header {
             display: flex;
             align-items: center;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
+            margin-bottom: 18px;
+            padding-bottom: 12px;
             border-bottom: 3px solid var(--primary-light);
         }
 
         .section-title {
             font-family: 'Playfair Display', serif;
-            font-size: 22pt;
+            font-size: 20pt;
             font-weight: 700;
             color: var(--secondary);
         }
 
         h2 {
-            font-size: 16pt;
+            font-size: 13pt;
             font-weight: 700;
             color: var(--secondary);
-            margin: 25px 0 15px 0;
-            padding-left: 15px;
-            border-left: 4px solid var(--primary);
+            margin: 18px 0 10px 0;
+            padding-left: 12px;
+            border-left: 3px solid var(--primary);
         }
 
         h3 {
-            font-size: 13pt;
+            font-size: 11pt;
             font-weight: 600;
             color: var(--gray-700);
-            margin: 20px 0 12px 0;
+            margin: 14px 0 8px 0;
         }
 
         p {
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             text-align: justify;
         }
 
@@ -308,36 +333,35 @@
         .score-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            margin: 25px 0;
+            gap: 10px;
+            margin: 15px 0;
         }
 
         .score-card {
             background: white;
-            border-radius: 12px;
-            padding: 20px;
+            border-radius: 10px;
+            padding: 14px 10px;
             text-align: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
             border: 1px solid var(--gray-200);
-            page-break-inside: avoid;
         }
 
         .score-card-label {
-            font-size: 9pt;
+            font-size: 8pt;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             color: var(--gray-500);
-            margin-bottom: 8px;
+            margin-bottom: 5px;
         }
 
         .score-card-value {
-            font-size: 28pt;
+            font-size: 24pt;
             font-weight: 800;
             line-height: 1;
         }
 
         .score-card-max {
-            font-size: 14pt;
+            font-size: 12pt;
             font-weight: 400;
             color: var(--gray-400);
         }
@@ -346,13 +370,12 @@
         .score-warning { color: #F59E0B; }
         .score-good { color: #10B981; }
 
-        /* Tables */
+        /* Tables - Compact */
         table {
             width: 100%;
             border-collapse: collapse;
-            margin: 20px 0;
-            font-size: 10pt;
-            page-break-inside: avoid;
+            margin: 12px 0;
+            font-size: 9pt;
         }
 
         thead {
@@ -361,31 +384,30 @@
         }
 
         th {
-            padding: 12px 15px;
+            padding: 8px 10px;
             text-align: left;
             font-weight: 600;
-            font-size: 9pt;
+            font-size: 8pt;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
-        th:first-child { border-radius: 8px 0 0 0; }
-        th:last-child { border-radius: 0 8px 0 0; }
+        th:first-child { border-radius: 6px 0 0 0; }
+        th:last-child { border-radius: 0 6px 0 0; }
 
         td {
-            padding: 12px 15px;
+            padding: 8px 10px;
             border-bottom: 1px solid var(--gray-200);
         }
 
         tr:nth-child(even) { background: var(--gray-50); }
-        tr:hover { background: var(--primary-light); }
 
-        /* Badges */
+        /* Badges - Smaller */
         .badge {
             display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 9pt;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 7pt;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.3px;
@@ -396,13 +418,12 @@
         .badge-medium { background: #DBEAFE; color: #2563EB; }
         .badge-low { background: #D1FAE5; color: #059669; }
 
-        /* Info Boxes */
+        /* Info Boxes - Compact */
         .info-box {
-            border-radius: 12px;
-            padding: 20px 25px;
-            margin: 20px 0;
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin: 12px 0;
             border-left: 4px solid;
-            page-break-inside: avoid;
         }
 
         .info-box-critical { background: #FEF2F2; border-color: #DC2626; }
@@ -412,186 +433,194 @@
 
         .info-box-title {
             font-weight: 700;
-            font-size: 11pt;
-            margin-bottom: 8px;
+            font-size: 10pt;
+            margin-bottom: 5px;
         }
 
-        /* AEO Highlight Box */
+        .info-box p {
+            font-size: 9pt;
+            margin-bottom: 0;
+        }
+
+        /* AEO Highlight Box - Compact */
         .aeo-highlight {
             background: linear-gradient(135deg, #1A1A2E 0%, #16213E 100%);
             color: white;
-            border-radius: 20px;
-            padding: 35px;
-            margin: 30px 0;
+            border-radius: 16px;
+            padding: 25px;
+            margin: 15px 0;
             position: relative;
             overflow: hidden;
-            page-break-inside: avoid;
         }
 
         .aeo-highlight::before {
             content: 'AI';
             position: absolute;
-            right: 30px;
+            right: 20px;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 100pt;
+            font-size: 80pt;
             font-weight: 800;
             opacity: 0.05;
         }
 
-        .aeo-highlight h3 { color: var(--accent); margin-top: 0; }
-        .aeo-highlight p { opacity: 0.9; }
+        .aeo-highlight h3 { color: var(--accent); margin-top: 0; font-size: 12pt; }
+        .aeo-highlight p { opacity: 0.9; font-size: 9pt; margin-bottom: 0; }
 
         .aeo-stats {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin-top: 25px;
+            gap: 15px;
+            margin-top: 18px;
         }
 
         .aeo-stat { text-align: center; }
-        .aeo-stat-value { font-size: 28pt; font-weight: 800; color: var(--accent); }
-        .aeo-stat-label { font-size: 9pt; opacity: 0.7; text-transform: uppercase; letter-spacing: 1px; }
+        .aeo-stat-value { font-size: 22pt; font-weight: 800; color: var(--accent); }
+        .aeo-stat-label { font-size: 7pt; opacity: 0.7; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* Recommendation Cards */
+        /* Recommendation Cards - Compact */
         .rec-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            margin: 25px 0;
+            gap: 12px;
+            margin: 15px 0;
         }
 
         .rec-card {
             background: white;
-            border-radius: 16px;
-            padding: 25px;
+            border-radius: 12px;
+            padding: 16px;
             border: 1px solid var(--gray-200);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-            page-break-inside: avoid;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
 
         .rec-card-header {
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 15px;
+            gap: 10px;
+            margin-bottom: 10px;
         }
 
         .rec-card-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 14px;
+            flex-shrink: 0;
         }
 
         .rec-card-title {
             font-weight: 700;
-            font-size: 12pt;
+            font-size: 10pt;
             color: var(--secondary);
         }
 
         .rec-card-desc {
-            font-size: 10pt;
+            font-size: 8pt;
             color: var(--gray-600);
-            line-height: 1.5;
+            line-height: 1.4;
         }
 
-        /* Checklist */
+        /* Checklist - Compact */
         .checklist {
             list-style: none;
-            margin-left: 0;
-            padding-left: 0;
+            margin: 0;
+            padding: 0;
+            columns: 2;
+            column-gap: 15px;
         }
 
         .checklist li {
-            padding: 10px 15px;
+            padding: 6px 10px;
             background: var(--gray-50);
-            border-radius: 8px;
-            margin-bottom: 8px;
+            border-radius: 6px;
+            margin-bottom: 5px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
+            font-size: 8pt;
+            break-inside: avoid;
         }
 
         .checklist li::before {
             content: '';
-            width: 20px;
-            height: 20px;
+            width: 14px;
+            height: 14px;
             border: 2px solid var(--gray-300);
-            border-radius: 4px;
+            border-radius: 3px;
             flex-shrink: 0;
         }
 
-        /* Code Block */
-        .code-block {
-            background: var(--gray-900);
-            color: #E5E7EB;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
-            font-family: 'Monaco', 'Consolas', monospace;
-            font-size: 9pt;
-            line-height: 1.5;
-            overflow-x: auto;
-            page-break-inside: avoid;
+        .checklist.single-col {
+            columns: 1;
         }
 
-        .code-block .comment { color: #6B7280; }
-        .code-block .string { color: #34D399; }
-        .code-block .keyword { color: #60A5FA; }
+        .checklist.single-col li {
+            font-size: 9pt;
+            padding: 8px 12px;
+        }
 
-        /* Timeline */
+        /* Timeline - Compact */
         .timeline {
             position: relative;
-            padding-left: 30px;
-            margin: 25px 0;
+            padding-left: 25px;
+            margin: 15px 0;
         }
 
         .timeline::before {
             content: '';
             position: absolute;
-            left: 10px;
+            left: 8px;
             top: 0;
             bottom: 0;
-            width: 3px;
+            width: 2px;
             background: var(--primary-light);
         }
 
         .timeline-item {
             position: relative;
-            padding-bottom: 25px;
+            padding-bottom: 15px;
+        }
+
+        .timeline-item:last-child {
+            padding-bottom: 0;
         }
 
         .timeline-item::before {
             content: '';
             position: absolute;
-            left: -24px;
-            top: 5px;
-            width: 14px;
-            height: 14px;
+            left: -20px;
+            top: 4px;
+            width: 10px;
+            height: 10px;
             background: var(--primary);
             border-radius: 50%;
-            border: 3px solid white;
-            box-shadow: 0 0 0 3px var(--primary-light);
+            border: 2px solid white;
+            box-shadow: 0 0 0 2px var(--primary-light);
         }
 
         .timeline-phase {
             font-weight: 700;
             color: var(--primary);
-            font-size: 9pt;
+            font-size: 8pt;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
         }
 
         .timeline-title {
-            font-size: 13pt;
+            font-size: 11pt;
             font-weight: 600;
             color: var(--secondary);
-            margin-bottom: 10px;
+            margin-bottom: 5px;
+        }
+
+        .timeline-item p {
+            font-size: 9pt;
+            margin-bottom: 0;
         }
 
         /* Back Cover */
@@ -603,27 +632,27 @@
             justify-content: center;
             align-items: center;
             text-align: center;
-            padding: 40mm;
+            padding: 35mm;
         }
 
         .back-cover-tagline {
-            font-size: 18pt;
+            font-size: 16pt;
             font-weight: 300;
             opacity: 0.8;
-            margin-top: 30px;
-            margin-bottom: 50px;
+            margin-top: 25px;
+            margin-bottom: 40px;
         }
 
         .back-cover-contact {
             background: rgba(255,255,255,0.1);
             border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 16px;
-            padding: 30px 50px;
+            border-radius: 14px;
+            padding: 25px 45px;
         }
 
         .back-cover-contact-item {
-            margin: 10px 0;
-            font-size: 14pt;
+            margin: 8px 0;
+            font-size: 13pt;
         }
 
         .back-cover-contact-item strong {
@@ -638,11 +667,18 @@
 
         /* Lists */
         ul, ol {
-            margin: 15px 0 15px 25px;
+            margin: 10px 0 10px 20px;
+            font-size: 9pt;
         }
 
         li {
-            margin-bottom: 8px;
+            margin-bottom: 4px;
+        }
+
+        /* Compact content area to avoid footer overlap */
+        .page-content {
+            max-height: 240mm;
+            overflow: hidden;
         }
     </style>
 </head>
@@ -681,7 +717,7 @@
     </div>
 </div>
 
-<!-- EXECUTIVE SUMMARY -->
+<!-- PAGE 2: EXECUTIVE SUMMARY -->
 <div class="page">
     <div class="page-header">
         <div class="yesai-logo">
@@ -695,14 +731,14 @@
         <h1 class="section-title">Executive Summary</h1>
     </div>
 
-    <div class="info-box info-box-info">
+    <div class="info-box info-box-info keep-together">
         <div class="info-box-title">Key Findings Overview</div>
-        <p style="margin-bottom: 0;">Animal Expert Witness Service has a solid foundation as <strong>Australia's only dedicated animal expert witness service</strong>, established in 1987. However, significant opportunities exist to improve visibility in both traditional search engines and emerging AI answer engines.</p>
+        <p>Animal Expert Witness Service has a solid foundation as <strong>Australia's only dedicated animal expert witness service</strong>, established in 1987. However, significant opportunities exist to improve visibility in both traditional search engines and emerging AI answer engines.</p>
     </div>
 
-    <h2>Overall Scores</h2>
+    <h2>Overall Audit Scores</h2>
 
-    <div class="score-grid">
+    <div class="score-grid keep-together">
         <div class="score-card">
             <div class="score-card-label">UX/UI Design</div>
             <div class="score-card-value score-warning">6<span class="score-card-max">/10</span></div>
@@ -723,13 +759,13 @@
 
     <h2>Priority Action Matrix</h2>
 
-    <table>
+    <table class="keep-together">
         <thead>
             <tr>
-                <th>Area</th>
-                <th>Issue</th>
-                <th>Priority</th>
-                <th>Impact</th>
+                <th style="width: 15%;">Area</th>
+                <th style="width: 50%;">Issue</th>
+                <th style="width: 15%;">Priority</th>
+                <th style="width: 20%;">Impact</th>
             </tr>
         </thead>
         <tbody>
@@ -772,9 +808,9 @@
         </tbody>
     </table>
 
-    <div class="info-box info-box-critical">
+    <div class="info-box info-box-critical keep-together">
         <div class="info-box-title">Immediate Action Required</div>
-        <p style="margin-bottom: 0;">The missing schema markup and incomplete FAQ section are severely limiting your visibility in both Google search results and AI answer engines. These should be addressed within the first two weeks.</p>
+        <p>The missing schema markup and incomplete FAQ section are severely limiting your visibility in both Google search results and AI answer engines. These should be addressed within the first two weeks.</p>
     </div>
 
     <div class="page-footer">
@@ -785,7 +821,7 @@
     </div>
 </div>
 
-<!-- AI SEARCH OPPORTUNITY -->
+<!-- PAGE 3: AI OPPORTUNITY & ADVANTAGES -->
 <div class="page">
     <div class="page-header">
         <div class="yesai-logo">
@@ -796,7 +832,7 @@
 
     <h2>The AI Search Opportunity</h2>
 
-    <div class="aeo-highlight">
+    <div class="aeo-highlight keep-together">
         <h3>Why AI Search Optimization Matters Now</h3>
         <p>With 400+ million weekly ChatGPT users and AI Overviews appearing in 16% of Google searches, the way people find expert services is fundamentally changing. Your potential clients are increasingly asking AI assistants questions like "How do I find an animal expert witness in Australia?"</p>
 
@@ -818,7 +854,7 @@
 
     <h2>Your Competitive Advantages</h2>
 
-    <div class="rec-grid">
+    <div class="rec-grid keep-together">
         <div class="rec-card">
             <div class="rec-card-header">
                 <div class="rec-card-icon" style="background: #D1FAE5;">&#127942;</div>
@@ -851,7 +887,7 @@
 
     <h2>Investment Summary</h2>
 
-    <table>
+    <table class="keep-together">
         <thead>
             <tr>
                 <th>Phase</th>
@@ -862,25 +898,25 @@
         </thead>
         <tbody>
             <tr>
-                <td><strong>Phase 1:</strong> Critical Fixes</td>
+                <td><strong>Phase 1</strong></td>
                 <td>Weeks 1-2</td>
                 <td>404 fixes, FAQ, Schema, Email</td>
                 <td>Foundation for all improvements</td>
             </tr>
             <tr>
-                <td><strong>Phase 2:</strong> Foundation</td>
+                <td><strong>Phase 2</strong></td>
                 <td>Weeks 3-6</td>
                 <td>Expert profiles, Content, Local SEO</td>
                 <td>+30% organic traffic</td>
             </tr>
             <tr>
-                <td><strong>Phase 3:</strong> Content</td>
+                <td><strong>Phase 3</strong></td>
                 <td>Weeks 7-12</td>
                 <td>Landing pages, Guides, Video</td>
                 <td>+75% organic traffic</td>
             </tr>
             <tr>
-                <td><strong>Phase 4:</strong> Authority</td>
+                <td><strong>Phase 4</strong></td>
                 <td>Ongoing</td>
                 <td>Reddit, Quora, Wikipedia, PR</td>
                 <td>AI visibility + citations</td>
@@ -896,7 +932,7 @@
     </div>
 </div>
 
-<!-- UX AUDIT -->
+<!-- PAGE 4: UX AUDIT -->
 <div class="page">
     <div class="page-header">
         <div class="yesai-logo">
@@ -912,7 +948,7 @@
 
     <h2>2.1 Navigation Issues Identified</h2>
 
-    <table>
+    <table class="keep-together">
         <thead>
             <tr>
                 <th>Issue</th>
@@ -923,31 +959,31 @@
         </thead>
         <tbody>
             <tr>
-                <td>Deep navigation structure (3+ clicks)</td>
+                <td>Deep navigation (3+ clicks)</td>
                 <td>High bounce rate</td>
                 <td><span class="badge badge-high">High</span></td>
                 <td>Flatten to 2 clicks max</td>
             </tr>
             <tr>
-                <td>Resources section gated behind login</td>
+                <td>Resources section gated</td>
                 <td>SEO value loss</td>
                 <td><span class="badge badge-medium">Medium</span></td>
-                <td>Make educational content public</td>
+                <td>Make content public</td>
             </tr>
             <tr>
-                <td>FAQ section has placeholder text</td>
-                <td>Poor user experience</td>
+                <td>FAQ has placeholder text</td>
+                <td>Poor UX</td>
                 <td><span class="badge badge-critical">Critical</span></td>
                 <td>Complete with real Q&As</td>
             </tr>
             <tr>
-                <td>Recent Cases page returns 404</td>
-                <td>Trust signal loss</td>
+                <td>Recent Cases returns 404</td>
+                <td>Trust loss</td>
                 <td><span class="badge badge-critical">Critical</span></td>
-                <td>Fix or remove from navigation</td>
+                <td>Fix or remove</td>
             </tr>
             <tr>
-                <td>Costs & Help page returns 404</td>
+                <td>Costs & Help returns 404</td>
                 <td>Conversion friction</td>
                 <td><span class="badge badge-critical">Critical</span></td>
                 <td>Fix immediately</td>
@@ -957,46 +993,46 @@
 
     <h2>2.2 Target Audience Analysis</h2>
 
-    <table>
+    <table class="keep-together">
         <thead>
             <tr>
                 <th>Segment</th>
                 <th>Primary Goal</th>
-                <th>Current Pain Point</th>
+                <th>Pain Point</th>
                 <th>Solution</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td><strong>Solicitors/Lawyers</strong></td>
-                <td>Find qualified expert quickly</td>
-                <td>No search/filter functionality</td>
+                <td><strong>Solicitors</strong></td>
+                <td>Find expert quickly</td>
+                <td>No search/filter</td>
                 <td>Implement expert search</td>
             </tr>
             <tr>
-                <td><strong>Insurance Companies</strong></td>
-                <td>Validate claims with expert</td>
-                <td>Pricing not transparent</td>
-                <td>Add pricing guide page</td>
+                <td><strong>Insurance</strong></td>
+                <td>Validate claims</td>
+                <td>Pricing unclear</td>
+                <td>Add pricing guide</td>
             </tr>
             <tr>
-                <td><strong>Government Bodies</strong></td>
-                <td>Source credible witnesses</td>
-                <td>Credentials not prominent</td>
-                <td>Dedicated credentials section</td>
+                <td><strong>Government</strong></td>
+                <td>Credible witnesses</td>
+                <td>Credentials hidden</td>
+                <td>Credentials section</td>
             </tr>
             <tr>
-                <td><strong>Potential Experts</strong></td>
-                <td>Join the panel</td>
+                <td><strong>Experts</strong></td>
+                <td>Join panel</td>
                 <td>Process unclear</td>
-                <td>Clearer onboarding flow</td>
+                <td>Clear onboarding</td>
             </tr>
         </tbody>
     </table>
 
     <h2>2.3 Call-to-Action Optimization</h2>
 
-    <table>
+    <table class="keep-together">
         <thead>
             <tr>
                 <th>Location</th>
@@ -1011,7 +1047,7 @@
                 <td>"Call 1300 732 022"</td>
             </tr>
             <tr>
-                <td>Expert Profile Pages</td>
+                <td>Expert Profiles</td>
                 <td>"Request This Expert"</td>
                 <td>"Download CV"</td>
             </tr>
@@ -1023,7 +1059,7 @@
             <tr>
                 <td>Blog/Resources</td>
                 <td>"Find the Right Expert"</td>
-                <td>"Subscribe for Updates"</td>
+                <td>"Subscribe"</td>
             </tr>
         </tbody>
     </table>
@@ -1036,7 +1072,7 @@
     </div>
 </div>
 
-<!-- TECHNICAL SEO -->
+<!-- PAGE 5: TECHNICAL SEO -->
 <div class="page">
     <div class="page-header">
         <div class="yesai-logo">
@@ -1050,14 +1086,14 @@
         <h1 class="section-title">Technical SEO Audit</h1>
     </div>
 
-    <div class="info-box info-box-critical">
+    <div class="info-box info-box-critical keep-together">
         <div class="info-box-title">Schema Markup: Not Implemented</div>
-        <p style="margin-bottom: 0;">No structured data was detected on any page. This is severely limiting visibility in Google's rich results and AI answer engines. Schema markup is essential for expert witness services.</p>
+        <p>No structured data was detected on any page. This is severely limiting visibility in Google's rich results and AI answer engines. Schema markup is essential for expert witness services.</p>
     </div>
 
     <h2>3.1 Critical Technical Issues</h2>
 
-    <table>
+    <table class="keep-together">
         <thead>
             <tr>
                 <th>Issue</th>
@@ -1102,27 +1138,27 @@
 
     <h2>3.2 Required Schema Markup Types</h2>
 
-    <div class="rec-grid">
+    <div class="rec-grid keep-together">
         <div class="rec-card">
             <div class="rec-card-header">
                 <div class="rec-card-icon" style="background: #FEE2E2;">&#128188;</div>
                 <div class="rec-card-title">ProfessionalService</div>
             </div>
-            <div class="rec-card-desc">Defines your organization as a professional service provider with expertise in animal expert witness services.</div>
+            <div class="rec-card-desc">Defines your organization as a professional service provider with animal expert witness expertise.</div>
         </div>
         <div class="rec-card">
             <div class="rec-card-header">
                 <div class="rec-card-icon" style="background: #FEF3C7;">&#128100;</div>
                 <div class="rec-card-title">Person Schema</div>
             </div>
-            <div class="rec-card-desc">Required for each expert profile to display credentials, qualifications, and expertise areas.</div>
+            <div class="rec-card-desc">Required for each expert profile to display credentials and qualifications.</div>
         </div>
         <div class="rec-card">
             <div class="rec-card-header">
                 <div class="rec-card-icon" style="background: #FEF3C7;">&#10067;</div>
                 <div class="rec-card-title">FAQPage Schema</div>
             </div>
-            <div class="rec-card-desc">Critical for AI extraction - enables direct answers in search results and AI responses.</div>
+            <div class="rec-card-desc">Critical for AI extraction - enables direct answers in search and AI responses.</div>
         </div>
         <div class="rec-card">
             <div class="rec-card-header">
@@ -1141,7 +1177,7 @@
     </div>
 </div>
 
-<!-- E-E-A-T -->
+<!-- PAGE 6: E-E-A-T & CONTENT -->
 <div class="page">
     <div class="page-header">
         <div class="yesai-logo">
@@ -1155,11 +1191,11 @@
         <h1 class="section-title">Content Strategy & E-E-A-T</h1>
     </div>
 
-    <p>Google's <strong>E-E-A-T</strong> framework (Experience, Expertise, Authoritativeness, Trustworthiness) is critical for YMYL (Your Money or Your Life) content. Expert witness services fall squarely in this category.</p>
+    <p>Google's <strong>E-E-A-T</strong> framework (Experience, Expertise, Authoritativeness, Trustworthiness) is critical for YMYL content. Expert witness services require the highest standards of demonstrated expertise.</p>
 
     <h2>4.1 E-E-A-T Gap Analysis</h2>
 
-    <table>
+    <table class="keep-together">
         <thead>
             <tr>
                 <th>Signal</th>
@@ -1169,9 +1205,9 @@
             </tr>
         </thead>
         <tbody>
-            <tr><td colspan="4" style="background: var(--gray-100); font-weight: 700;">Experience</td></tr>
+            <tr><td colspan="4" style="background: var(--gray-100); font-weight: 700; font-size: 8pt;">EXPERIENCE</td></tr>
             <tr>
-                <td>Case studies with outcomes</td>
+                <td>Case studies</td>
                 <td>Missing</td>
                 <td>10+ detailed cases</td>
                 <td><span class="badge badge-critical">Critical</span></td>
@@ -1182,7 +1218,7 @@
                 <td>Prominently featured</td>
                 <td><span class="badge badge-low">Minor</span></td>
             </tr>
-            <tr><td colspan="4" style="background: var(--gray-100); font-weight: 700;">Expertise</td></tr>
+            <tr><td colspan="4" style="background: var(--gray-100); font-weight: 700; font-size: 8pt;">EXPERTISE</td></tr>
             <tr>
                 <td>Expert credentials</td>
                 <td>Partial display</td>
@@ -1195,9 +1231,9 @@
                 <td>Publications section</td>
                 <td><span class="badge badge-high">High</span></td>
             </tr>
-            <tr><td colspan="4" style="background: var(--gray-100); font-weight: 700;">Trustworthiness</td></tr>
+            <tr><td colspan="4" style="background: var(--gray-100); font-weight: 700; font-size: 8pt;">TRUSTWORTHINESS</td></tr>
             <tr>
-                <td>Client testimonials</td>
+                <td>Testimonials</td>
                 <td>3 testimonials</td>
                 <td>10+ with photos</td>
                 <td><span class="badge badge-medium">Medium</span></td>
@@ -1213,21 +1249,21 @@
 
     <h2>4.2 Recommended Content Calendar</h2>
 
-    <div class="timeline">
+    <div class="timeline keep-together">
         <div class="timeline-item">
             <div class="timeline-phase">Month 1</div>
             <div class="timeline-title">Foundation Content</div>
-            <p>Complete FAQ section with 20+ real questions. Create 5 detailed expert profiles. Write "Ultimate Guide to Animal Expert Witnesses".</p>
+            <p>Complete FAQ with 20+ questions. Create 5 expert profiles. Write "Ultimate Guide to Animal Expert Witnesses".</p>
         </div>
         <div class="timeline-item">
             <div class="timeline-phase">Month 2</div>
             <div class="timeline-title">Case Type Content</div>
-            <p>Personal injury case guide. Insurance dispute guide. Criminal case guide covering animal cruelty and dangerous dog matters.</p>
+            <p>Personal injury guide. Insurance dispute guide. Criminal case guide (animal cruelty, dangerous dogs).</p>
         </div>
         <div class="timeline-item">
             <div class="timeline-phase">Month 3</div>
             <div class="timeline-title">Animal-Specific Content</div>
-            <p>Equine expert witness guide. Dog bite litigation guide. Livestock dispute guide. Each targeting high-value keywords.</p>
+            <p>Equine expert guide. Dog bite litigation guide. Livestock dispute guide. Target high-value keywords.</p>
         </div>
     </div>
 
@@ -1239,7 +1275,7 @@
     </div>
 </div>
 
-<!-- AEO -->
+<!-- PAGE 7: AEO -->
 <div class="page">
     <div class="page-header">
         <div class="yesai-logo">
@@ -1255,9 +1291,9 @@
 
     <h2>5.1 Platform Presence Strategy</h2>
 
-    <p>AI systems source information from multiple platforms. Your current presence on these platforms directly impacts whether you get cited in AI responses.</p>
+    <p>AI systems source information from multiple platforms. Your presence on these platforms directly impacts whether you get cited in AI responses.</p>
 
-    <table>
+    <table class="keep-together">
         <thead>
             <tr>
                 <th>Platform</th>
@@ -1274,9 +1310,9 @@
                 <td><span class="badge badge-high">High</span></td>
             </tr>
             <tr>
-                <td>Reddit (r/AusLegal, r/Lawyers)</td>
+                <td>Reddit</td>
                 <td>Unknown</td>
-                <td>Active helpful participation</td>
+                <td>Active in r/AusLegal, r/Lawyers</td>
                 <td><span class="badge badge-high">High</span></td>
             </tr>
             <tr>
@@ -1292,34 +1328,49 @@
                 <td><span class="badge badge-medium">Medium</span></td>
             </tr>
             <tr>
-                <td>Industry directories</td>
+                <td>Directories</td>
                 <td>Limited</td>
-                <td>All relevant directories</td>
+                <td>All relevant legal directories</td>
                 <td><span class="badge badge-medium">Medium</span></td>
             </tr>
         </tbody>
     </table>
 
-    <h2>5.2 Priority Questions to Answer</h2>
+    <h2>5.2 Priority Questions to Answer on Your Website</h2>
 
-    <p>These questions should be answered comprehensively on your website for maximum AI citation potential:</p>
+    <p>These questions should be answered comprehensively for maximum AI citation potential:</p>
 
-    <h3>Finding an Expert (Critical)</h3>
-    <ol>
-        <li>How do I find an animal expert witness in Australia?</li>
-        <li>What qualifications should an animal expert witness have?</li>
-        <li>How much does an animal expert witness cost?</li>
-        <li>What types of cases need animal expert witnesses?</li>
-        <li>How long does it take to get an expert witness report?</li>
-    </ol>
+    <div class="rec-grid keep-together">
+        <div class="rec-card">
+            <div class="rec-card-header">
+                <div class="rec-card-icon" style="background: #FEE2E2;">&#128269;</div>
+                <div class="rec-card-title">Finding an Expert</div>
+            </div>
+            <div class="rec-card-desc">
+                1. How do I find an animal expert witness in Australia?<br>
+                2. What qualifications should an expert have?<br>
+                3. How much does an expert witness cost?<br>
+                4. What types of cases need expert witnesses?
+            </div>
+        </div>
+        <div class="rec-card">
+            <div class="rec-card-header">
+                <div class="rec-card-icon" style="background: #FEF3C7;">&#9878;</div>
+                <div class="rec-card-title">Case Types</div>
+            </div>
+            <div class="rec-card-desc">
+                5. Do I need an expert for a dog bite case?<br>
+                6. What expert for a horse injury claim?<br>
+                7. Can experts help with animal cruelty cases?<br>
+                8. How do experts help insurance claims?
+            </div>
+        </div>
+    </div>
 
-    <h3>Case Types (High Priority)</h3>
-    <ol start="6">
-        <li>Do I need an expert witness for a dog bite case?</li>
-        <li>What expert do I need for a horse injury claim?</li>
-        <li>Can an expert witness help with animal cruelty cases?</li>
-        <li>How do expert witnesses help insurance claims?</li>
-    </ol>
+    <div class="info-box info-box-info keep-together">
+        <div class="info-box-title">Content Structure for AI Citations</div>
+        <p><strong>Lead with answers:</strong> Put direct answers in first paragraph. <strong>Use definitive statements:</strong> "The best approach is..." not "might be". <strong>Include specific data:</strong> Numbers, percentages, dates. <strong>Structure with H2 &rarr; H3 &rarr; bullets:</strong> 40% more likely to be cited.</p>
+    </div>
 
     <div class="page-footer">
         <div class="yesai-logo">
@@ -1329,7 +1380,7 @@
     </div>
 </div>
 
-<!-- IMPLEMENTATION -->
+<!-- PAGE 8: IMPLEMENTATION -->
 <div class="page">
     <div class="page-header">
         <div class="yesai-logo">
@@ -1345,7 +1396,7 @@
 
     <h2>Phase 1: Critical Fixes (Weeks 1-2)</h2>
 
-    <table>
+    <table class="keep-together">
         <thead>
             <tr>
                 <th>Task</th>
@@ -1356,13 +1407,13 @@
         </thead>
         <tbody>
             <tr>
-                <td>Fix 404 error pages (Recent Cases, Costs)</td>
+                <td>Fix 404 error pages</td>
                 <td>Developer</td>
                 <td>2</td>
                 <td><span class="badge badge-critical">Critical</span></td>
             </tr>
             <tr>
-                <td>Complete FAQ section with real answers</td>
+                <td>Complete FAQ with real answers</td>
                 <td>Content</td>
                 <td>8</td>
                 <td><span class="badge badge-critical">Critical</span></td>
@@ -1380,7 +1431,7 @@
                 <td><span class="badge badge-critical">Critical</span></td>
             </tr>
             <tr>
-                <td>Update email to professional domain</td>
+                <td>Update to professional email domain</td>
                 <td>Admin</td>
                 <td>1</td>
                 <td><span class="badge badge-critical">Critical</span></td>
@@ -1396,7 +1447,7 @@
 
     <h2>Phase 2: Foundation Building (Weeks 3-6)</h2>
 
-    <table>
+    <table class="keep-together">
         <thead>
             <tr>
                 <th>Task</th>
@@ -1407,7 +1458,7 @@
         </thead>
         <tbody>
             <tr>
-                <td>Create 10 detailed expert profile pages</td>
+                <td>Create 10 detailed expert profiles</td>
                 <td>Content</td>
                 <td>20</td>
                 <td><span class="badge badge-high">High</span></td>
@@ -1425,7 +1476,7 @@
                 <td><span class="badge badge-high">High</span></td>
             </tr>
             <tr>
-                <td>Optimize all page titles and meta descriptions</td>
+                <td>Optimize all titles and meta descriptions</td>
                 <td>SEO</td>
                 <td>6</td>
                 <td><span class="badge badge-high">High</span></td>
@@ -1447,7 +1498,7 @@
     </div>
 </div>
 
-<!-- QUICK WINS -->
+<!-- PAGE 9: QUICK WINS -->
 <div class="page">
     <div class="page-header">
         <div class="yesai-logo">
@@ -1463,42 +1514,41 @@
 
     <h2>Immediate Actions (This Week)</h2>
 
-    <ul class="checklist">
+    <ul class="checklist single-col keep-together">
         <li>Fix all 404 error pages (Recent Cases, Costs & Help)</li>
         <li>Complete FAQ section with real, helpful answers</li>
         <li>Update business email from Gmail to professional domain</li>
         <li>Claim and optimize Google Business Profile</li>
         <li>Add click-to-call functionality on all phone numbers</li>
-        <li>Verify SSL certificate is properly configured</li>
     </ul>
 
     <h2>Short-Term Actions (This Month)</h2>
 
-    <ul class="checklist">
+    <ul class="checklist keep-together">
         <li>Implement Organization schema on homepage</li>
         <li>Add FAQPage schema to FAQ section</li>
-        <li>Create 5 detailed expert profile pages with Person schema</li>
-        <li>Write 2 comprehensive, anonymized case studies</li>
+        <li>Create 5 detailed expert profile pages</li>
+        <li>Write 2 comprehensive case studies</li>
         <li>Optimize all page titles and meta descriptions</li>
-        <li>Set up Google Search Console and submit sitemap</li>
-        <li>Create LinkedIn company page content strategy</li>
-        <li>Update robots.txt to allow AI crawlers</li>
+        <li>Set up Google Search Console</li>
+        <li>Create LinkedIn content strategy</li>
+        <li>Update robots.txt for AI crawlers</li>
     </ul>
 
     <h2>Medium-Term Actions (This Quarter)</h2>
 
-    <ul class="checklist">
+    <ul class="checklist keep-together">
         <li>Develop 6 animal-specific landing pages</li>
         <li>Build 3 case type guide pages</li>
-        <li>Implement full schema markup suite across all pages</li>
-        <li>Establish active presence on Reddit and Quora</li>
-        <li>Launch systematic client review solicitation program</li>
-        <li>Complete citation building across 10+ directories</li>
+        <li>Implement full schema markup suite</li>
+        <li>Establish presence on Reddit and Quora</li>
+        <li>Launch review solicitation program</li>
+        <li>Complete citation building (10+ directories)</li>
     </ul>
 
-    <div class="info-box info-box-info" style="margin-top: 30px;">
+    <div class="info-box info-box-success keep-together" style="margin-top: 20px;">
         <div class="info-box-title">Implementation Support Available</div>
-        <p style="margin-bottom: 0;">Yes AI offers full implementation services for all recommendations in this report. Contact us at <strong>hello@yesai.au</strong> or call <strong>(03) 9999 7398</strong> to discuss your project.</p>
+        <p>Yes AI offers full implementation services for all recommendations in this report. Contact us at <strong>hello@yesai.au</strong> or call <strong>(03) 9999 7398</strong> to discuss your project.</p>
     </div>
 
     <div class="page-footer">
@@ -1523,7 +1573,7 @@
         <div class="back-cover-contact-item">hello@yesai.au</div>
     </div>
 
-    <div style="margin-top: 60px; font-size: 10pt; opacity: 0.6;">
+    <div style="margin-top: 50px; font-size: 9pt; opacity: 0.6;">
         &copy; 2025 Yes AI. All rights reserved.<br>
         This document is confidential and intended solely for the named recipient.
     </div>
