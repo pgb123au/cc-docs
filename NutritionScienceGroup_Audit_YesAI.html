@@ -1,0 +1,2738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nutrition Science Group - Comprehensive Digital Audit | Yes AI</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap');
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --secondary: #0ea5e9;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1e293b;
+            --gray-900: #0f172a;
+            --gray-800: #1e293b;
+            --gray-700: #334155;
+            --gray-600: #475569;
+            --gray-500: #64748b;
+            --gray-400: #94a3b8;
+            --gray-300: #cbd5e1;
+            --gray-200: #e2e8f0;
+            --gray-100: #f1f5f9;
+            --gray-50: #f8fafc;
+            --white: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @page {
+            size: A4;
+            margin: 1.5cm 1.5cm 2cm 1.5cm;
+
+            @bottom-center {
+                content: counter(page);
+                font-family: 'Inter', sans-serif;
+                font-size: 10px;
+                color: #64748b;
+            }
+        }
+
+        @page :first {
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 10pt;
+            line-height: 1.6;
+            color: var(--gray-800);
+            background: var(--white);
+        }
+
+        /* Cover Page */
+        .cover-page {
+            page-break-after: always;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(135deg, var(--gray-900) 0%, var(--gray-800) 50%, var(--primary-dark) 100%);
+            color: white;
+            margin: -1.5cm -1.5cm 0 -1.5cm;
+            padding: 3cm;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cover-page::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -30%;
+            width: 80%;
+            height: 150%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .cover-page::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -20%;
+            width: 60%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(14, 165, 233, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .cover-logo {
+            position: relative;
+            z-index: 1;
+        }
+
+        .cover-logo .logo-text {
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .cover-logo .logo-text span {
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .cover-logo .tagline {
+            font-size: 12px;
+            color: var(--gray-400);
+            margin-top: 4px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .cover-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cover-badge {
+            display: inline-block;
+            background: rgba(99, 102, 241, 0.2);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: var(--primary-light);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 24px;
+        }
+
+        .cover-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 48px;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 16px;
+        }
+
+        .cover-subtitle {
+            font-size: 22px;
+            font-weight: 300;
+            color: var(--gray-300);
+            margin-bottom: 40px;
+        }
+
+        .cover-client {
+            padding: 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            max-width: 400px;
+        }
+
+        .cover-client-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--gray-400);
+            margin-bottom: 8px;
+        }
+
+        .cover-client-name {
+            font-size: 20px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .cover-client-url {
+            font-size: 13px;
+            color: var(--secondary);
+        }
+
+        .cover-footer {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .cover-meta {
+            font-size: 11px;
+            color: var(--gray-400);
+        }
+
+        .cover-meta strong {
+            color: var(--gray-300);
+        }
+
+        .cover-website {
+            font-size: 13px;
+            color: var(--primary-light);
+            font-weight: 500;
+        }
+
+        /* Table of Contents */
+        .toc-page {
+            page-break-after: always;
+            padding: 40px 0;
+        }
+
+        .toc-header {
+            margin-bottom: 40px;
+        }
+
+        .toc-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            color: var(--gray-900);
+            margin-bottom: 8px;
+        }
+
+        .toc-divider {
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 2px;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-item {
+            display: flex;
+            align-items: baseline;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .toc-number {
+            width: 32px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .toc-text {
+            flex: 1;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--gray-700);
+        }
+
+        .toc-dots {
+            flex: 1;
+            border-bottom: 2px dotted var(--gray-200);
+            margin: 0 12px;
+            margin-bottom: 4px;
+        }
+
+        .toc-page-num {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gray-500);
+        }
+
+        /* Section Headers */
+        .section {
+            page-break-inside: avoid;
+            margin-bottom: 32px;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, var(--gray-900) 0%, var(--gray-800) 100%);
+            color: white;
+            padding: 24px 28px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 100%;
+            background: linear-gradient(135deg, transparent 0%, rgba(99, 102, 241, 0.2) 100%);
+        }
+
+        .section-number {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--primary-light);
+            margin-bottom: 8px;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Executive Summary Box */
+        .exec-summary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 32px;
+            border-radius: 16px;
+            margin-bottom: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .exec-summary::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -25%;
+            width: 50%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+        }
+
+        .exec-summary h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .exec-summary p {
+            font-size: 12px;
+            line-height: 1.7;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Score Cards */
+        .score-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .score-card {
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .score-card.critical {
+            border-color: var(--danger);
+            background: #fef2f2;
+        }
+
+        .score-card.high {
+            border-color: var(--warning);
+            background: #fffbeb;
+        }
+
+        .score-card.medium {
+            border-color: var(--secondary);
+            background: #f0f9ff;
+        }
+
+        .score-label {
+            font-size: 9px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--gray-500);
+            margin-bottom: 8px;
+        }
+
+        .score-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--gray-900);
+        }
+
+        .score-value span {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--gray-400);
+        }
+
+        .score-card.critical .score-value { color: var(--danger); }
+        .score-card.high .score-value { color: var(--warning); }
+        .score-card.medium .score-value { color: var(--secondary); }
+
+        .score-priority {
+            display: inline-block;
+            font-size: 8px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            margin-top: 8px;
+        }
+
+        .score-card.critical .score-priority {
+            background: var(--danger);
+            color: white;
+        }
+
+        .score-card.high .score-priority {
+            background: var(--warning);
+            color: white;
+        }
+
+        .score-card.medium .score-priority {
+            background: var(--secondary);
+            color: white;
+        }
+
+        /* Alert Boxes */
+        .alert {
+            padding: 20px 24px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 4px solid;
+        }
+
+        .alert-critical {
+            background: #fef2f2;
+            border-color: var(--danger);
+        }
+
+        .alert-warning {
+            background: #fffbeb;
+            border-color: var(--warning);
+        }
+
+        .alert-info {
+            background: #f0f9ff;
+            border-color: var(--secondary);
+        }
+
+        .alert-success {
+            background: #ecfdf5;
+            border-color: var(--success);
+        }
+
+        .alert-title {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .alert-critical .alert-title { color: var(--danger); }
+        .alert-warning .alert-title { color: var(--warning); }
+        .alert-info .alert-title { color: var(--secondary); }
+        .alert-success .alert-title { color: var(--success); }
+
+        .alert p {
+            font-size: 11px;
+            line-height: 1.6;
+            color: var(--gray-700);
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 10px;
+        }
+
+        thead {
+            background: var(--gray-900);
+            color: white;
+        }
+
+        th {
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        th:first-child {
+            border-radius: 8px 0 0 0;
+        }
+
+        th:last-child {
+            border-radius: 0 8px 0 0;
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--gray-100);
+            color: var(--gray-700);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:nth-child(even) {
+            background: var(--gray-50);
+        }
+
+        tbody tr:hover {
+            background: #f0f9ff;
+        }
+
+        /* Priority Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 50px;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-critical {
+            background: var(--danger);
+            color: white;
+        }
+
+        .badge-high {
+            background: var(--warning);
+            color: white;
+        }
+
+        .badge-medium {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .badge-low {
+            background: var(--gray-400);
+            color: white;
+        }
+
+        /* Content Styling */
+        h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
+            color: var(--gray-900);
+            margin: 28px 0 16px 0;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--gray-100);
+        }
+
+        h3 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--gray-800);
+            margin: 20px 0 12px 0;
+        }
+
+        h4 {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin: 16px 0 8px 0;
+        }
+
+        p {
+            margin-bottom: 12px;
+            color: var(--gray-600);
+        }
+
+        ul, ol {
+            margin-bottom: 16px;
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 6px;
+            color: var(--gray-600);
+        }
+
+        /* Code Blocks */
+        pre, code {
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 9px;
+        }
+
+        pre {
+            background: var(--gray-900);
+            color: #e2e8f0;
+            padding: 16px 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        code {
+            background: var(--gray-100);
+            color: var(--primary-dark);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+
+        /* Action Items */
+        .action-list {
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 20px;
+        }
+
+        .action-list h4 {
+            margin-top: 0;
+            color: var(--gray-900);
+        }
+
+        .action-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .action-item:last-child {
+            border-bottom: none;
+        }
+
+        .action-number {
+            width: 24px;
+            height: 24px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .action-content {
+            flex: 1;
+        }
+
+        .action-title {
+            font-weight: 600;
+            color: var(--gray-900);
+            font-size: 11px;
+            margin-bottom: 4px;
+        }
+
+        .action-desc {
+            font-size: 10px;
+            color: var(--gray-500);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-box {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            font-weight: 500;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+        }
+
+        /* Comparison Table */
+        .comparison-table {
+            margin-bottom: 24px;
+        }
+
+        .comparison-table th {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        }
+
+        .comparison-table .current {
+            color: var(--danger);
+            font-weight: 600;
+        }
+
+        .comparison-table .target {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 28px;
+            margin-bottom: 24px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 8px;
+            bottom: 8px;
+            width: 2px;
+            background: var(--gray-200);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 20px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -24px;
+            top: 6px;
+            width: 12px;
+            height: 12px;
+            background: var(--primary);
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 0 0 2px var(--primary);
+        }
+
+        .timeline-phase {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .timeline-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 8px;
+        }
+
+        .timeline-content {
+            font-size: 10px;
+            color: var(--gray-600);
+        }
+
+        /* Footer */
+        .page-footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 9px;
+            color: var(--gray-400);
+        }
+
+        .footer-logo {
+            font-weight: 700;
+            color: var(--gray-600);
+        }
+
+        .footer-logo span {
+            color: var(--primary);
+        }
+
+        /* Page Breaks */
+        .page-break {
+            page-break-before: always;
+        }
+
+        .avoid-break {
+            page-break-inside: avoid;
+        }
+
+        /* Highlight Box */
+        .highlight-box {
+            background: linear-gradient(135deg, #fdf4ff 0%, #fae8ff 100%);
+            border: 1px solid #e879f9;
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 20px;
+        }
+
+        .highlight-box h4 {
+            color: #a21caf;
+            margin-top: 0;
+        }
+
+        .highlight-box p {
+            color: #86198f;
+            font-size: 11px;
+        }
+
+        /* Checklist */
+        .checklist {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .checklist li {
+            position: relative;
+            padding-left: 28px;
+            margin-bottom: 10px;
+        }
+
+        .checklist li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 2px;
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--gray-300);
+            border-radius: 4px;
+        }
+
+        .checklist li.done::before {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        .checklist li.done::after {
+            content: '\\2713';
+            position: absolute;
+            left: 4px;
+            top: 0px;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* Two Column Layout */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        /* Blockquote */
+        blockquote {
+            background: var(--gray-50);
+            border-left: 4px solid var(--primary);
+            padding: 16px 20px;
+            margin: 16px 0;
+            font-style: italic;
+            color: var(--gray-600);
+            border-radius: 0 8px 8px 0;
+        }
+
+        blockquote cite {
+            display: block;
+            margin-top: 8px;
+            font-size: 10px;
+            font-style: normal;
+            font-weight: 600;
+            color: var(--gray-500);
+        }
+
+        /* Feature Grid */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .feature-card {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+
+        .feature-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 6px;
+        }
+
+        .feature-desc {
+            font-size: 10px;
+            color: var(--gray-500);
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <!-- Cover Page -->
+    <div class="cover-page">
+        <div class="cover-logo">
+            <div class="logo-text">Yes <span>AI</span></div>
+            <div class="tagline">Intelligent Digital Growth</div>
+        </div>
+
+        <div class="cover-content">
+            <span class="cover-badge">Strategic Audit Report</span>
+            <h1 class="cover-title">Comprehensive UX, SEO & AI Search Optimization Audit</h1>
+            <p class="cover-subtitle">A complete digital presence analysis with actionable recommendations for modern search visibility</p>
+
+            <div class="cover-client">
+                <div class="cover-client-label">Prepared For</div>
+                <div class="cover-client-name">Nutrition Science Group</div>
+                <div class="cover-client-url">nutritionsciencegroup.com</div>
+            </div>
+        </div>
+
+        <div class="cover-footer">
+            <div class="cover-meta">
+                <strong>Date:</strong> December 2025<br>
+                <strong>Version:</strong> 1.0<br>
+                <strong>Classification:</strong> Confidential
+            </div>
+            <div class="cover-website">www.yesai.au</div>
+        </div>
+    </div>
+
+    <!-- Table of Contents -->
+    <div class="toc-page">
+        <div class="toc-header">
+            <h1 class="toc-title">Contents</h1>
+            <div class="toc-divider"></div>
+        </div>
+
+        <ul class="toc-list">
+            <li class="toc-item">
+                <span class="toc-number">01</span>
+                <span class="toc-text">Executive Summary</span>
+                <span class="toc-dots"></span>
+                <span class="toc-page-num">3</span>
+            </li>
+            <li class="toc-item">
+                <span class="toc-number">02</span>
+                <span class="toc-text">Critical Findings & Priority Matrix</span>
+                <span class="toc-dots"></span>
+                <span class="toc-page-num">5</span>
+            </li>
+            <li class="toc-item">
+                <span class="toc-number">03</span>
+                <span class="toc-text">Technical SEO Audit</span>
+                <span class="toc-dots"></span>
+                <span class="toc-page-num">8</span>
+            </li>
+            <li class="toc-item">
+                <span class="toc-number">04</span>
+                <span class="toc-text">UX/UI Analysis</span>
+                <span class="toc-dots"></span>
+                <span class="toc-page-num">11</span>
+            </li>
+            <li class="toc-item">
+                <span class="toc-number">05</span>
+                <span class="toc-text">Content Strategy Assessment</span>
+                <span class="toc-dots"></span>
+                <span class="toc-page-num">14</span>
+            </li>
+            <li class="toc-item">
+                <span class="toc-number">06</span>
+                <span class="toc-text">AI Search Optimization (AEO)</span>
+                <span class="toc-dots"></span>
+                <span class="toc-page-num">17</span>
+            </li>
+            <li class="toc-item">
+                <span class="toc-number">07</span>
+                <span class="toc-text">Local SEO Analysis</span>
+                <span class="toc-dots"></span>
+                <span class="toc-page-num">22</span>
+            </li>
+            <li class="toc-item">
+                <span class="toc-number">08</span>
+                <span class="toc-text">Competitive Analysis</span>
+                <span class="toc-dots"></span>
+                <span class="toc-page-num">25</span>
+            </li>
+            <li class="toc-item">
+                <span class="toc-number">09</span>
+                <span class="toc-text">Implementation Roadmap</span>
+                <span class="toc-dots"></span>
+                <span class="toc-page-num">27</span>
+            </li>
+            <li class="toc-item">
+                <span class="toc-number">10</span>
+                <span class="toc-text">Technical Appendices</span>
+                <span class="toc-dots"></span>
+                <span class="toc-page-num">30</span>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Executive Summary -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">Section 01</div>
+            <h1 class="section-title">Executive Summary</h1>
+        </div>
+
+        <div class="exec-summary">
+            <h2>Strategic Overview</h2>
+            <p>The Nutrition Science Group website presents a significant opportunity for digital transformation. While the site contains valuable content and features a credentialed team, critical technical issues are severely limiting search visibility. Most notably, <strong>only 2 pages are currently indexed by Google</strong>, representing a catastrophic loss of potential organic traffic. This audit provides a comprehensive roadmap to address these issues and position the practice for success in both traditional and AI-powered search environments.</p>
+        </div>
+
+        <h2>Current Performance Scores</h2>
+
+        <div class="score-grid">
+            <div class="score-card critical">
+                <div class="score-label">Search Visibility</div>
+                <div class="score-value">2<span>/10</span></div>
+                <span class="score-priority">Critical</span>
+            </div>
+            <div class="score-card critical">
+                <div class="score-label">AI Search Ready</div>
+                <div class="score-value">2<span>/10</span></div>
+                <span class="score-priority">Critical</span>
+            </div>
+            <div class="score-card critical">
+                <div class="score-label">E-E-A-T Signals</div>
+                <div class="score-value">4<span>/10</span></div>
+                <span class="score-priority">Critical</span>
+            </div>
+            <div class="score-card high">
+                <div class="score-label">Technical SEO</div>
+                <div class="score-value">4<span>/10</span></div>
+                <span class="score-priority">High</span>
+            </div>
+        </div>
+
+        <div class="score-grid">
+            <div class="score-card high">
+                <div class="score-label">Content Strategy</div>
+                <div class="score-value">4<span>/10</span></div>
+                <span class="score-priority">High</span>
+            </div>
+            <div class="score-card high">
+                <div class="score-label">Local SEO</div>
+                <div class="score-value">3<span>/10</span></div>
+                <span class="score-priority">High</span>
+            </div>
+            <div class="score-card medium">
+                <div class="score-label">UX/UI Design</div>
+                <div class="score-value">5<span>/10</span></div>
+                <span class="score-priority">Medium</span>
+            </div>
+            <div class="score-card medium">
+                <div class="score-label">Mobile Experience</div>
+                <div class="score-value">6<span>/10</span></div>
+                <span class="score-priority">Medium</span>
+            </div>
+        </div>
+
+        <div class="alert alert-critical">
+            <div class="alert-title">Critical Discovery: Search Index Crisis</div>
+            <p>A search for <code>site:nutritionsciencegroup.com</code> returns only 2 indexed pages. This means Google is not finding or indexing the vast majority of your website content. Your competitors have hundreds of indexed pages generating organic traffic. This issue alone is costing you an estimated 95%+ of potential organic visibility.</p>
+        </div>
+
+        <h2>Top 5 Immediate Actions Required</h2>
+
+        <div class="action-list">
+            <div class="action-item">
+                <div class="action-number">1</div>
+                <div class="action-content">
+                    <div class="action-title">Fix Search Index Issues</div>
+                    <div class="action-desc">Set up Google Search Console, submit sitemap, request indexing for all pages</div>
+                </div>
+            </div>
+            <div class="action-item">
+                <div class="action-number">2</div>
+                <div class="action-content">
+                    <div class="action-title">Repair Broken Meta Description</div>
+                    <div class="action-desc">Homepage currently shows placeholder text - replace with optimized description</div>
+                </div>
+            </div>
+            <div class="action-item">
+                <div class="action-number">3</div>
+                <div class="action-content">
+                    <div class="action-title">Implement Schema Markup</div>
+                    <div class="action-desc">Add MedicalBusiness, FAQPage, Person, and Article structured data</div>
+                </div>
+            </div>
+            <div class="action-item">
+                <div class="action-number">4</div>
+                <div class="action-content">
+                    <div class="action-title">Create Author Authority Pages</div>
+                    <div class="action-desc">Showcase team credentials prominently for E-E-A-T compliance</div>
+                </div>
+            </div>
+            <div class="action-item">
+                <div class="action-number">5</div>
+                <div class="action-content">
+                    <div class="action-title">Optimize Google Business Profile</div>
+                    <div class="action-desc">Complete all profile sections, add photos, enable reviews</div>
+                </div>
+            </div>
+        </div>
+
+        <h2>Projected Impact</h2>
+
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Metric</th>
+                    <th>Current (Est.)</th>
+                    <th>6-Month Target</th>
+                    <th>12-Month Target</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Indexed Pages</td>
+                    <td class="current">2</td>
+                    <td class="target">50+</td>
+                    <td class="target">100+</td>
+                </tr>
+                <tr>
+                    <td>Monthly Organic Visits</td>
+                    <td class="current">~50</td>
+                    <td class="target">500+</td>
+                    <td class="target">2,000+</td>
+                </tr>
+                <tr>
+                    <td>AI Search Citations</td>
+                    <td class="current">0</td>
+                    <td class="target">5-10/month</td>
+                    <td class="target">50+/month</td>
+                </tr>
+                <tr>
+                    <td>Featured Snippets</td>
+                    <td class="current">0</td>
+                    <td class="target">10+</td>
+                    <td class="target">30+</td>
+                </tr>
+                <tr>
+                    <td>Local Pack Appearances</td>
+                    <td class="current">Rare</td>
+                    <td class="target">Regular</td>
+                    <td class="target">Dominant</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Critical Findings -->
+    <div class="page-break"></div>
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">Section 02</div>
+            <h1 class="section-title">Critical Findings & Priority Matrix</h1>
+        </div>
+
+        <h2>Priority 1: Critical Issues (Address Immediately)</h2>
+
+        <div class="alert alert-critical avoid-break">
+            <div class="alert-title">Issue 1.1: Catastrophic Index Coverage</div>
+            <p><strong>Problem:</strong> Only 2 pages indexed by Google, resulting in 95%+ of potential organic traffic lost.</p>
+            <p><strong>Evidence:</strong> <code>site:nutritionsciencegroup.com</code> returns only 2 results.</p>
+            <p><strong>Root Causes:</strong> Potential robots.txt misconfiguration, possible noindex tags, thin content issues, lack of Google Search Console monitoring.</p>
+        </div>
+
+        <div class="action-list avoid-break">
+            <h4>Required Actions</h4>
+            <div class="action-item">
+                <div class="action-number">1</div>
+                <div class="action-content">
+                    <div class="action-title">Set up Google Search Console</div>
+                    <div class="action-desc">Verify domain ownership and connect analytics</div>
+                </div>
+            </div>
+            <div class="action-item">
+                <div class="action-number">2</div>
+                <div class="action-content">
+                    <div class="action-title">Submit XML Sitemap Manually</div>
+                    <div class="action-desc">Upload sitemap to GSC and request processing</div>
+                </div>
+            </div>
+            <div class="action-item">
+                <div class="action-number">3</div>
+                <div class="action-content">
+                    <div class="action-title">Request Indexing for Key Pages</div>
+                    <div class="action-desc">Use URL Inspection tool for priority pages</div>
+                </div>
+            </div>
+            <div class="action-item">
+                <div class="action-number">4</div>
+                <div class="action-content">
+                    <div class="action-title">Review Coverage Report</div>
+                    <div class="action-desc">Identify and fix all indexing errors</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="alert alert-critical avoid-break">
+            <div class="alert-title">Issue 1.2: Broken Meta Description</div>
+            <p><strong>Current State:</strong> "This is an example page. It's different from a blog post because it will stay in one place and will show up in your site navigation (in most themes). Most"</p>
+            <p><strong>Impact:</strong> Poor click-through rates, unprofessional appearance in search results, signals neglected website to users.</p>
+        </div>
+
+        <div class="highlight-box avoid-break">
+            <h4>Recommended Meta Description</h4>
+            <p>"Expert keto & low-carb nutrition coaching in Victoria, Australia. Our medical team helps reverse type 2 diabetes & achieve lasting weight loss. Free 15-min consultation."</p>
+        </div>
+
+        <div class="alert alert-critical avoid-break">
+            <div class="alert-title">Issue 1.3: Missing E-E-A-T Signals for YMYL Content</div>
+            <p><strong>Problem:</strong> Health advice website without visible author credentials. Google's guidelines require YMYL (Your Money or Your Life) content to demonstrate Experience, Expertise, Authoritativeness, and Trustworthiness.</p>
+            <p><strong>Current Gaps:</strong></p>
+            <ul style="margin-top: 8px; margin-bottom: 0;">
+                <li>Blog posts show no author attribution</li>
+                <li>No "medically reviewed by" badges</li>
+                <li>Team credentials scattered, not prominently displayed</li>
+                <li>No citations to peer-reviewed sources</li>
+            </ul>
+        </div>
+
+        <h2>Priority 2: High Priority Issues (Address Within 30 Days)</h2>
+
+        <div class="alert alert-warning avoid-break">
+            <div class="alert-title">Issue 2.1: No Schema Markup for Key Content Types</div>
+            <p>Missing structured data prevents the site from appearing in rich search results and makes content invisible to AI systems.</p>
+        </div>
+
+        <table class="avoid-break">
+            <thead>
+                <tr>
+                    <th>Schema Type</th>
+                    <th>Target Pages</th>
+                    <th>Current Status</th>
+                    <th>Priority</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>MedicalBusiness</td>
+                    <td>Homepage</td>
+                    <td><span class="badge badge-critical">Missing</span></td>
+                    <td><span class="badge badge-critical">Critical</span></td>
+                </tr>
+                <tr>
+                    <td>LocalBusiness</td>
+                    <td>Contact / All Pages</td>
+                    <td><span class="badge badge-critical">Missing</span></td>
+                    <td><span class="badge badge-critical">Critical</span></td>
+                </tr>
+                <tr>
+                    <td>FAQPage</td>
+                    <td>FAQ Page</td>
+                    <td><span class="badge badge-critical">Missing</span></td>
+                    <td><span class="badge badge-high">High</span></td>
+                </tr>
+                <tr>
+                    <td>Article</td>
+                    <td>Blog Posts</td>
+                    <td><span class="badge badge-critical">Missing</span></td>
+                    <td><span class="badge badge-high">High</span></td>
+                </tr>
+                <tr>
+                    <td>Person</td>
+                    <td>Team Profiles</td>
+                    <td><span class="badge badge-critical">Missing</span></td>
+                    <td><span class="badge badge-high">High</span></td>
+                </tr>
+                <tr>
+                    <td>VideoObject</td>
+                    <td>Videos Page</td>
+                    <td><span class="badge badge-critical">Missing</span></td>
+                    <td><span class="badge badge-medium">Medium</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Priority 3: Medium Priority Issues (Address Within 60 Days)</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Issue</th>
+                    <th>Problem</th>
+                    <th>Impact</th>
+                    <th>Priority</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Outdated Copyright</td>
+                    <td>Shows 2022</td>
+                    <td>Signals abandoned site</td>
+                    <td><span class="badge badge-medium">Medium</span></td>
+                </tr>
+                <tr>
+                    <td>Inconsistent Contact Info</td>
+                    <td>Multiple phone formats</td>
+                    <td>NAP consistency issues</td>
+                    <td><span class="badge badge-medium">Medium</span></td>
+                </tr>
+                <tr>
+                    <td>No Clear Service Pages</td>
+                    <td>Mixed into homepage</td>
+                    <td>Poor user journey</td>
+                    <td><span class="badge badge-medium">Medium</span></td>
+                </tr>
+                <tr>
+                    <td>Videos Not Transcribed</td>
+                    <td>YouTube embeds only</td>
+                    <td>SEO opportunity lost</td>
+                    <td><span class="badge badge-low">Low</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Technical SEO -->
+    <div class="page-break"></div>
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">Section 03</div>
+            <h1 class="section-title">Technical SEO Audit</h1>
+        </div>
+
+        <h2>Crawlability & Indexation</h2>
+
+        <h3>Current Robots.txt Analysis</h3>
+
+        <pre>User-agent: *
+Disallow: /now22/wp-admin/
+Allow: /now22/wp-admin/admin-ajax.php
+Sitemap: https://nutritionsciencegroup.com/wp-sitemap.xml</pre>
+
+        <p><strong>Assessment:</strong> Basic configuration is acceptable but does not explain indexation issues. Critical addition needed for AI search crawlers.</p>
+
+        <h3>Recommended Robots.txt Configuration</h3>
+
+        <pre>User-agent: *
+Disallow: /wp-admin/
+Allow: /wp-admin/admin-ajax.php
+
+# AI Search Crawlers - EXPLICITLY ALLOW
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+Sitemap: https://nutritionsciencegroup.com/wp-sitemap.xml</pre>
+
+        <h3>XML Sitemap Analysis</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Sitemap File</th>
+                    <th>Content Type</th>
+                    <th>Issues</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>wp-sitemap-posts-post-1.xml</td>
+                    <td>Blog Posts</td>
+                    <td>No lastmod dates</td>
+                </tr>
+                <tr>
+                    <td>wp-sitemap-posts-page-1.xml</td>
+                    <td>Static Pages</td>
+                    <td>No priority values</td>
+                </tr>
+                <tr>
+                    <td>wp-sitemap-posts-our_team-1.xml</td>
+                    <td>Team Profiles</td>
+                    <td>Good structure</td>
+                </tr>
+                <tr>
+                    <td>wp-sitemap-taxonomies-category-1.xml</td>
+                    <td>Categories</td>
+                    <td>Review for thin content</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Core Web Vitals Targets (2025)</h2>
+
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="stat-value">&lt;2.5s</div>
+                <div class="stat-label">LCP Target</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">&lt;200ms</div>
+                <div class="stat-label">INP Target</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">&lt;0.1</div>
+                <div class="stat-label">CLS Target</div>
+            </div>
+        </div>
+
+        <h3>Optimization Recommendations</h3>
+
+        <div class="two-col">
+            <div class="action-list">
+                <h4>Image Optimization</h4>
+                <ul>
+                    <li>Convert all images to WebP format</li>
+                    <li>Implement lazy loading</li>
+                    <li>Add width/height attributes</li>
+                    <li>Compress to under 100KB</li>
+                </ul>
+            </div>
+            <div class="action-list">
+                <h4>JavaScript/CSS</h4>
+                <ul>
+                    <li>Defer non-critical JavaScript</li>
+                    <li>Inline critical CSS</li>
+                    <li>Remove unused page builder CSS</li>
+                    <li>Minify all assets</li>
+                </ul>
+            </div>
+        </div>
+
+        <h3>Recommended WordPress Plugins</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Plugin</th>
+                    <th>Purpose</th>
+                    <th>Priority</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Yoast SEO or Rank Math</td>
+                    <td>SEO management, schema markup</td>
+                    <td><span class="badge badge-critical">Critical</span></td>
+                </tr>
+                <tr>
+                    <td>WP Rocket</td>
+                    <td>Performance optimization</td>
+                    <td><span class="badge badge-high">High</span></td>
+                </tr>
+                <tr>
+                    <td>ShortPixel</td>
+                    <td>Image compression</td>
+                    <td><span class="badge badge-high">High</span></td>
+                </tr>
+                <tr>
+                    <td>Schema Pro</td>
+                    <td>Advanced structured data</td>
+                    <td><span class="badge badge-medium">Medium</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- UX/UI Analysis -->
+    <div class="page-break"></div>
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">Section 04</div>
+            <h1 class="section-title">UX/UI Analysis</h1>
+        </div>
+
+        <h2>Navigation & Information Architecture</h2>
+
+        <div class="two-col">
+            <div>
+                <h4>Current Structure</h4>
+                <pre style="font-size: 9px;">Home
+├── Our Team
+├── Events
+│   └── Low Carb Dinner
+├── Blog
+├── Videos
+├── FAQ
+└── Contact
+
+CTA: Coaching Session</pre>
+            </div>
+            <div>
+                <h4>Recommended Structure</h4>
+                <pre style="font-size: 9px;">Home
+├── About Us
+│   ├── Our Story
+│   ├── Our Team
+│   └── Our Approach
+├── Services
+│   ├── Free Consultation
+│   ├── Individual Coaching
+│   └── Group Programs
+├── Conditions We Help
+│   ├── Type 2 Diabetes
+│   ├── Weight Loss
+│   └── PCOS & Fertility
+├── Resources
+│   ├── Blog
+│   ├── Videos
+│   └── FAQ
+└── Contact</pre>
+            </div>
+        </div>
+
+        <h2>Homepage Above-the-Fold Analysis</h2>
+
+        <div class="alert alert-warning">
+            <div class="alert-title">Current State</div>
+            <p><strong>H1:</strong> "Kick Sugar, Go KETO, Join the 'I Feel Amazing' Club"</p>
+            <p><strong>Issues:</strong> No clear value proposition, no trust signals visible, no credentials shown, catchy but not SEO-optimized.</p>
+        </div>
+
+        <div class="highlight-box">
+            <h4>Recommended Above-the-Fold Design</h4>
+            <p><strong>H1:</strong> "Expert Low-Carb & Keto Coaching in Victoria, Australia"</p>
+            <p><strong>Subheadline:</strong> "Our team of doctors, dietitians, and certified coaches have helped hundreds reverse type 2 diabetes and achieve lasting weight loss."</p>
+            <p><strong>Trust Badges:</strong> [Featured on SBS] [Medical Team] [10+ Years Experience]</p>
+            <p><strong>Primary CTA:</strong> "Book Your Free 15-Minute Consultation"</p>
+            <p><strong>Social Proof:</strong> "Lost 30kg in 5 months" - Christine & Warwick, Melbourne</p>
+        </div>
+
+        <h2>User Journey Optimization</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Step</th>
+                    <th>Current Problem</th>
+                    <th>User Impact</th>
+                    <th>Solution</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1. Arrival</td>
+                    <td>No clear value proposition</td>
+                    <td>Confusion, bounce</td>
+                    <td>Clear headline + credentials</td>
+                </tr>
+                <tr>
+                    <td>2. Understanding</td>
+                    <td>Services scattered</td>
+                    <td>Frustration</td>
+                    <td>Dedicated services page</td>
+                </tr>
+                <tr>
+                    <td>3. Trust-building</td>
+                    <td>Credentials hidden</td>
+                    <td>Skepticism</td>
+                    <td>Prominent team display</td>
+                </tr>
+                <tr>
+                    <td>4. Decision</td>
+                    <td>Single CTA type</td>
+                    <td>Limited options</td>
+                    <td>Multiple entry points</td>
+                </tr>
+                <tr>
+                    <td>5. Conversion</td>
+                    <td>External booking</td>
+                    <td>Friction</td>
+                    <td>Embedded booking</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Call-to-Action Optimization</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Location</th>
+                    <th>Current</th>
+                    <th>Recommended</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Header</td>
+                    <td>"Coaching Session"</td>
+                    <td>"Book Free Consultation"</td>
+                </tr>
+                <tr>
+                    <td>Homepage Hero</td>
+                    <td>Generic text link</td>
+                    <td>Button: "Start Your Journey"</td>
+                </tr>
+                <tr>
+                    <td>Blog Posts</td>
+                    <td>None</td>
+                    <td>"Questions? Book Free Chat"</td>
+                </tr>
+                <tr>
+                    <td>Exit Intent</td>
+                    <td>None</td>
+                    <td>Popup: "Free Keto Guide"</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Trust Signal Enhancement</h2>
+
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon">1</div>
+                <div class="feature-title">Media Mentions</div>
+                <div class="feature-desc">Display SBS Insight feature prominently with logo and link</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">2</div>
+                <div class="feature-title">Credentials Bar</div>
+                <div class="feature-desc">Show "Medical Team Led" + "Est. 2018" above fold</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">3</div>
+                <div class="feature-title">Review Badges</div>
+                <div class="feature-desc">Add "Medically Reviewed" badges on health content</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">4</div>
+                <div class="feature-desc">Video Testimonials</div>
+                <div class="feature-desc">Real patient success stories with permission</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Strategy -->
+    <div class="page-break"></div>
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">Section 05</div>
+            <h1 class="section-title">Content Strategy Assessment</h1>
+        </div>
+
+        <h2>Current Blog Content Analysis</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Post Title</th>
+                    <th>SEO Potential</th>
+                    <th>AI Citation Potential</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Insulin Resistance: Hidden Cause</td>
+                    <td><span class="badge badge-high">High</span></td>
+                    <td><span class="badge badge-high">High</span></td>
+                    <td>Needs optimization</td>
+                </tr>
+                <tr>
+                    <td>Time Restricted Feeding</td>
+                    <td><span class="badge badge-medium">Medium</span></td>
+                    <td><span class="badge badge-high">High</span></td>
+                    <td>Needs structure</td>
+                </tr>
+                <tr>
+                    <td>Menopause: Health Risks</td>
+                    <td><span class="badge badge-high">High</span></td>
+                    <td><span class="badge badge-high">High</span></td>
+                    <td>Needs author byline</td>
+                </tr>
+                <tr>
+                    <td>Olive Oil's Effects</td>
+                    <td><span class="badge badge-medium">Medium</span></td>
+                    <td><span class="badge badge-medium">Medium</span></td>
+                    <td>Add statistics</td>
+                </tr>
+                <tr>
+                    <td>Low Carb Yeast Bread</td>
+                    <td><span class="badge badge-low">Low</span></td>
+                    <td><span class="badge badge-low">Low</span></td>
+                    <td>Recipe schema needed</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Content Gaps Identified</h2>
+
+        <div class="alert alert-info">
+            <div class="alert-title">High-Priority Topics Not Currently Covered</div>
+            <p>These represent significant keyword opportunities that competitors are ranking for:</p>
+        </div>
+
+        <div class="two-col">
+            <div class="action-list">
+                <h4>Pillar Content Needed</h4>
+                <ul>
+                    <li>"What is a keto diet?" - Definitive guide</li>
+                    <li>"Low carb diet for beginners Australia"</li>
+                    <li>"How to reverse type 2 diabetes"</li>
+                    <li>"Keto diet meal plan Australia"</li>
+                </ul>
+            </div>
+            <div class="action-list">
+                <h4>Question-Based Content</h4>
+                <ul>
+                    <li>How many carbs for ketosis?</li>
+                    <li>Is keto safe long-term?</li>
+                    <li>What foods on a low-carb diet?</li>
+                    <li>Can diabetics do keto?</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2>YMYL Content Requirements</h2>
+
+        <p>As a health website, all content must demonstrate E-E-A-T compliance. Every health-related article must include:</p>
+
+        <div class="action-list">
+            <div class="action-item">
+                <div class="action-number">1</div>
+                <div class="action-content">
+                    <div class="action-title">Author Attribution</div>
+                    <div class="action-desc">Written by: [Name], [Credentials] | Reviewed by: Dr. [Name], [Specialty] | Last Updated: [Date]</div>
+                </div>
+            </div>
+            <div class="action-item">
+                <div class="action-number">2</div>
+                <div class="action-content">
+                    <div class="action-title">Medical Disclaimer</div>
+                    <div class="action-desc">"This information is for educational purposes only. Please consult your healthcare provider."</div>
+                </div>
+            </div>
+            <div class="action-item">
+                <div class="action-number">3</div>
+                <div class="action-content">
+                    <div class="action-title">Source Citations</div>
+                    <div class="action-desc">Link to peer-reviewed studies and reputable health organizations</div>
+                </div>
+            </div>
+            <div class="action-item">
+                <div class="action-number">4</div>
+                <div class="action-content">
+                    <div class="action-title">Clear Structure</div>
+                    <div class="action-desc">Table of contents, H2/H3 hierarchy, key takeaways, TL;DR summary</div>
+                </div>
+            </div>
+        </div>
+
+        <h2>Recommended Publishing Calendar</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Week</th>
+                    <th>Content Type</th>
+                    <th>Topic Focus</th>
+                    <th>Word Count</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Week 1</td>
+                    <td>Pillar Article</td>
+                    <td>Comprehensive guide</td>
+                    <td>2,500+</td>
+                </tr>
+                <tr>
+                    <td>Week 2</td>
+                    <td>FAQ Expansion</td>
+                    <td>5 new Q&As</td>
+                    <td>1,000+</td>
+                </tr>
+                <tr>
+                    <td>Week 3</td>
+                    <td>Success Story</td>
+                    <td>Patient case study</td>
+                    <td>1,500+</td>
+                </tr>
+                <tr>
+                    <td>Week 4</td>
+                    <td>Quick Tips</td>
+                    <td>Practical advice</td>
+                    <td>800+</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- AI Search Optimization -->
+    <div class="page-break"></div>
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">Section 06</div>
+            <h1 class="section-title">AI Search Optimization (AEO)</h1>
+        </div>
+
+        <div class="exec-summary" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);">
+            <h2>The AI Search Revolution</h2>
+            <p>AI-powered search is fundamentally changing how people find information online. <strong>60% of searches now end without a click</strong>, and Gartner predicts <strong>25% of organic traffic will shift to AI by 2026</strong>. Positioning for AI search is no longer optional—it's essential for future visibility.</p>
+        </div>
+
+        <h2>The AI Search Landscape (2025)</h2>
+
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="stat-value">37.5M</div>
+                <div class="stat-label">Daily ChatGPT Searches</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">16%</div>
+                <div class="stat-label">Google AI Overviews</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">63%</div>
+                <div class="stat-label">Bing Top = ChatGPT</div>
+            </div>
+        </div>
+
+        <div class="alert alert-info">
+            <div class="alert-title">Key Insight</div>
+            <p>Top Bing results appear in ChatGPT search sources 63% of the time. Optimizing for Bing is now critical for AI search visibility.</p>
+        </div>
+
+        <h2>Current AI Search Readiness Assessment</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Factor</th>
+                    <th>Score</th>
+                    <th>Issues</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Structured Data</td>
+                    <td><span class="badge badge-critical">1/10</span></td>
+                    <td>Minimal schema present</td>
+                </tr>
+                <tr>
+                    <td>Content Format</td>
+                    <td><span class="badge badge-critical">3/10</span></td>
+                    <td>Long paragraphs, no clear answers</td>
+                </tr>
+                <tr>
+                    <td>Author Authority</td>
+                    <td><span class="badge badge-critical">2/10</span></td>
+                    <td>Credentials hidden</td>
+                </tr>
+                <tr>
+                    <td>Citation Worthiness</td>
+                    <td><span class="badge badge-critical">3/10</span></td>
+                    <td>No statistics, few sources</td>
+                </tr>
+                <tr>
+                    <td>Update Frequency</td>
+                    <td><span class="badge badge-high">4/10</span></td>
+                    <td>Content appears dated</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>AEO Implementation Strategy</h2>
+
+        <h3>1. Content Structure for AI Citation</h3>
+
+        <div class="two-col">
+            <div>
+                <h4 style="color: var(--danger);">Current Format (Not Citable)</h4>
+                <pre style="font-size: 8px; background: #fef2f2;">The ketogenic diet works by
+reducing carbohydrate intake
+which lowers insulin levels
+and forces the body to burn
+fat for fuel instead of
+glucose. This metabolic state
+called ketosis can help with
+weight loss...</pre>
+            </div>
+            <div>
+                <h4 style="color: var(--success);">AI-Optimized Format</h4>
+                <pre style="font-size: 8px; background: #ecfdf5;">## What is the Keto Diet?
+
+The ketogenic diet is a
+high-fat, low-carb eating
+plan that puts your body
+into ketosis.
+
+### How It Works:
+1. Limit carbs to 20-50g/day
+2. 70-80% calories from fat
+3. Moderate protein intake
+
+> "A well-formulated keto diet
+> can reduce HbA1c by 1-2%"
+> — Dr. John Stewart</pre>
+            </div>
+        </div>
+
+        <h3>2. Question-First Content Architecture</h3>
+
+        <p>Create dedicated pages answering specific questions AI systems frequently receive:</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Question to Target</th>
+                    <th>Search Volume</th>
+                    <th>AI Frequency</th>
+                    <th>Recommended URL</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>What is the keto diet?</td>
+                    <td>High</td>
+                    <td>Very High</td>
+                    <td>/faq/what-is-keto-diet/</td>
+                </tr>
+                <tr>
+                    <td>Is keto safe for diabetics?</td>
+                    <td>High</td>
+                    <td>High</td>
+                    <td>/faq/keto-diabetes-safety/</td>
+                </tr>
+                <tr>
+                    <td>How to start low carb?</td>
+                    <td>High</td>
+                    <td>Very High</td>
+                    <td>/faq/start-low-carb-diet/</td>
+                </tr>
+                <tr>
+                    <td>How many carbs for ketosis?</td>
+                    <td>Medium</td>
+                    <td>High</td>
+                    <td>/faq/carbs-for-ketosis/</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>3. Expert Authority Amplification</h3>
+
+        <p>AI systems heavily weight content from recognized experts. Required elements:</p>
+
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-title">Comprehensive Author Pages</div>
+                <div class="feature-desc">Full credentials, publications, expertise areas, and authored content list</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-title">Person Schema Markup</div>
+                <div class="feature-desc">alumniOf, hasCredential, knowsAbout, sameAs properties</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-title">Expert Quotes in Content</div>
+                <div class="feature-desc">Attributable quotes from team members in articles</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-title">Cross-Platform Presence</div>
+                <div class="feature-desc">LinkedIn, professional directories, media mentions</div>
+            </div>
+        </div>
+
+        <h3>4. Citation-Worthy Content Elements</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Element</th>
+                    <th>Why AI Cites It</th>
+                    <th>Implementation</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Statistics</strong></td>
+                    <td>Provides evidence</td>
+                    <td>Add data points with sources</td>
+                </tr>
+                <tr>
+                    <td><strong>Expert Quotes</strong></td>
+                    <td>Adds authority</td>
+                    <td>Include team member insights</td>
+                </tr>
+                <tr>
+                    <td><strong>Definitions</strong></td>
+                    <td>Answers directly</td>
+                    <td>Write clear, citable definitions</td>
+                </tr>
+                <tr>
+                    <td><strong>Lists</strong></td>
+                    <td>Easy to extract</td>
+                    <td>Use numbered/bulleted formats</td>
+                </tr>
+                <tr>
+                    <td><strong>Tables</strong></td>
+                    <td>Structured data</td>
+                    <td>Compare options, show data</td>
+                </tr>
+                <tr>
+                    <td><strong>Original Research</strong></td>
+                    <td>Unique value</td>
+                    <td>Survey patients, analyze outcomes</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="highlight-box">
+            <h4>Example: Creating Citable Content</h4>
+            <p><strong>Before (Not Citable):</strong> "Our patients generally see good results with low-carb diets."</p>
+            <p><strong>After (Highly Citable):</strong> "In a review of 150 Nutrition Science Group clients over 12 months, 73% achieved their target weight loss goals, with an average reduction of 12kg. Type 2 diabetic patients saw average HbA1c reductions of 1.4%."</p>
+        </div>
+
+        <h3>5. Brand Mention Strategy</h3>
+
+        <p>AI systems learn from brand mentions across the web. Actions to increase visibility:</p>
+
+        <ul>
+            <li><strong>Guest Posts</strong> on health/nutrition websites</li>
+            <li><strong>HARO/Qwoted Responses</strong> - Answer journalist queries</li>
+            <li><strong>Podcast Appearances</strong> with transcripts</li>
+            <li><strong>Professional Directories:</strong> HealthEngine, Nutrition Australia, Low Carb Down Under</li>
+            <li><strong>Local Citations:</strong> Yelp, Yellow Pages, True Local</li>
+        </ul>
+    </div>
+
+    <!-- Local SEO -->
+    <div class="page-break"></div>
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">Section 07</div>
+            <h1 class="section-title">Local SEO Analysis</h1>
+        </div>
+
+        <div class="alert alert-info">
+            <div class="alert-title">Why Local SEO Matters</div>
+            <p><strong>82% of patients use Google to find healthcare providers.</strong> Nearly 60% of healthcare searches happen on mobile, and 78% of location-based mobile searches lead to offline action within 24 hours.</p>
+        </div>
+
+        <h2>NAP Consistency Audit</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Source</th>
+                    <th>Name</th>
+                    <th>Address</th>
+                    <th>Phone</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Website Footer</td>
+                    <td>Nutrition Science Group</td>
+                    <td>309 Army Road, Pakenham VIC 3810</td>
+                    <td>+61 425 310 625</td>
+                </tr>
+                <tr>
+                    <td>Schema Markup</td>
+                    <td><em>The</em> Nutrition Science Group</td>
+                    <td>309 Army <em>Rd</em>, VIC 3810</td>
+                    <td><span class="badge badge-critical">Missing</span></td>
+                </tr>
+                <tr>
+                    <td>Google Search</td>
+                    <td>Nutrition Science Group</td>
+                    <td>309 Army Rd Pakenham</td>
+                    <td>+61 425310625</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="alert alert-warning">
+            <div class="alert-title">Issues Found</div>
+            <ul style="margin-bottom: 0;">
+                <li>Inconsistent "Road" vs "Rd" abbreviation</li>
+                <li>Phone number formatting varies</li>
+                <li>"The" prefix inconsistent</li>
+            </ul>
+        </div>
+
+        <div class="highlight-box">
+            <h4>Standardize To:</h4>
+            <p><strong>Name:</strong> Nutrition Science Group<br>
+            <strong>Address:</strong> 309 Army Road, Pakenham, VIC 3810, Australia<br>
+            <strong>Phone:</strong> +61 425 310 625<br>
+            <strong>Email:</strong> hello@nutritionsciencegroup.com</p>
+        </div>
+
+        <h2>Google Business Profile Optimization</h2>
+
+        <h3>Profile Completeness Checklist</h3>
+
+        <div class="two-col">
+            <div>
+                <ul class="checklist">
+                    <li>Business Name - Verify</li>
+                    <li>Address - Verify accuracy</li>
+                    <li>Phone - Make primary</li>
+                    <li>Hours - Verify current</li>
+                    <li>Website - Add UTM tracking</li>
+                    <li>Description - Write 750 chars</li>
+                </ul>
+            </div>
+            <div>
+                <ul class="checklist">
+                    <li>Categories - Add all relevant</li>
+                    <li>Services - List with prices</li>
+                    <li>Photos - Add 20+ professional</li>
+                    <li>Posts - Weekly schedule</li>
+                    <li>Q&A - Seed questions</li>
+                    <li>Reviews - Implement strategy</li>
+                </ul>
+            </div>
+        </div>
+
+        <h3>Recommended Categories</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Category Type</th>
+                    <th>Category Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Primary</td>
+                    <td>Nutritionist</td>
+                </tr>
+                <tr>
+                    <td>Secondary</td>
+                    <td>Health Consultant</td>
+                </tr>
+                <tr>
+                    <td>Secondary</td>
+                    <td>Weight Loss Service</td>
+                </tr>
+                <tr>
+                    <td>Secondary</td>
+                    <td>Dietitian</td>
+                </tr>
+                <tr>
+                    <td>Secondary</td>
+                    <td>Wellness Center</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Review Generation Strategy</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Method</th>
+                    <th>Timing</th>
+                    <th>Expected Response</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Post-Session Email</td>
+                    <td>24hrs after consultation</td>
+                    <td>High</td>
+                </tr>
+                <tr>
+                    <td>SMS Follow-up</td>
+                    <td>1 week after milestone</td>
+                    <td>Medium</td>
+                </tr>
+                <tr>
+                    <td>In-Office QR Code</td>
+                    <td>During visit</td>
+                    <td>Medium</td>
+                </tr>
+                <tr>
+                    <td>Email Signature Link</td>
+                    <td>Ongoing</td>
+                    <td>Low but consistent</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Local Landing Pages Needed</h3>
+
+        <p>Create suburb-specific pages to capture local search traffic:</p>
+
+        <ul>
+            <li><code>/locations/pakenham-nutritionist/</code></li>
+            <li><code>/locations/melbourne-keto-coach/</code></li>
+            <li><code>/locations/victoria-low-carb-doctor/</code></li>
+        </ul>
+    </div>
+
+    <!-- Competitive Analysis -->
+    <div class="page-break"></div>
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">Section 08</div>
+            <h1 class="section-title">Competitive Analysis</h1>
+        </div>
+
+        <h2>Competitor Overview</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Competitor</th>
+                    <th>Strengths</th>
+                    <th>Weaknesses</th>
+                    <th>Opportunity</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Melbourne Low Carb Clinic</strong></td>
+                    <td>Strong local SEO, Multiple locations, Medical doctor</td>
+                    <td>Limited content marketing</td>
+                    <td>Out-content them with resources</td>
+                </tr>
+                <tr>
+                    <td><strong>The Low Carb Clinic</strong></td>
+                    <td>Professional team page, Clear services, Media mentions</td>
+                    <td>Generic content</td>
+                    <td>Dominate specific keywords</td>
+                </tr>
+                <tr>
+                    <td><strong>Low Carb Keto Health</strong></td>
+                    <td>Detailed programs, Price transparency</td>
+                    <td>Adelaide-focused</td>
+                    <td>Own Victorian market</td>
+                </tr>
+                <tr>
+                    <td><strong>Keto Buddies</strong></td>
+                    <td>Strong community, Affordable</td>
+                    <td>Less medical credibility</td>
+                    <td>Emphasize medical team</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Keywords Competitors Own (You Don't)</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Keyword</th>
+                    <th>Top Competitor</th>
+                    <th>Your Ranking</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>"low carb doctor melbourne"</td>
+                    <td>Melbourne Low Carb Clinic</td>
+                    <td><span class="badge badge-critical">Not Ranking</span></td>
+                    <td>Create dedicated page</td>
+                </tr>
+                <tr>
+                    <td>"keto dietitian victoria"</td>
+                    <td>Multiple</td>
+                    <td><span class="badge badge-critical">Not Ranking</span></td>
+                    <td>Team credential pages</td>
+                </tr>
+                <tr>
+                    <td>"reverse diabetes diet australia"</td>
+                    <td>Various</td>
+                    <td><span class="badge badge-critical">Not Ranking</span></td>
+                    <td>Comprehensive guide</td>
+                </tr>
+                <tr>
+                    <td>"metabolic health coaching"</td>
+                    <td>Low Carb Keto Health</td>
+                    <td><span class="badge badge-critical">Not Ranking</span></td>
+                    <td>Service page optimization</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Your Unique Advantages</h2>
+
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon">1</div>
+                <div class="feature-title">Diverse Expertise Team</div>
+                <div class="feature-desc">Doctors, dietitians, OT, PhD researcher - unique multi-disciplinary approach</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">2</div>
+                <div class="feature-title">SBS Media Feature</div>
+                <div class="feature-desc">National credibility from mainstream media appearance</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">3</div>
+                <div class="feature-title">Published Authors</div>
+                <div class="feature-desc">Dr. Popovic and Peter Symons bring book credibility</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">4</div>
+                <div class="feature-title">Research Connection</div>
+                <div class="feature-desc">PhD candidate Steven Hamley adds academic authority</div>
+            </div>
+        </div>
+
+        <h2>Recommended Differentiation Messaging</h2>
+
+        <div class="two-col">
+            <div class="alert alert-critical">
+                <div class="alert-title">Current (Generic)</div>
+                <p>"We help people with low-carb eating"</p>
+            </div>
+            <div class="alert alert-success">
+                <div class="alert-title">Recommended (Differentiated)</div>
+                <p>"Victoria's only nutrition practice combining medical expertise, published researchers, and certified coaches—all practicing what we teach. Featured on SBS Insight."</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Implementation Roadmap -->
+    <div class="page-break"></div>
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">Section 09</div>
+            <h1 class="section-title">Implementation Roadmap</h1>
+        </div>
+
+        <h2>Phase 1: Foundation (Weeks 1-4)</h2>
+
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-phase">Week 1</div>
+                <div class="timeline-title">Critical Technical Fixes</div>
+                <div class="timeline-content">
+                    <ul>
+                        <li>Set up Google Search Console</li>
+                        <li>Submit sitemap, request indexing</li>
+                        <li>Fix homepage meta description</li>
+                        <li>Install Yoast SEO or Rank Math</li>
+                        <li>Update robots.txt with AI crawlers</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-phase">Week 2</div>
+                <div class="timeline-title">Schema Markup Implementation</div>
+                <div class="timeline-content">
+                    <ul>
+                        <li>Organization + MedicalBusiness on homepage</li>
+                        <li>LocalBusiness across all pages</li>
+                        <li>Person schema on team profiles</li>
+                        <li>FAQPage on FAQ section</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-phase">Week 3</div>
+                <div class="timeline-title">Google Business Profile</div>
+                <div class="timeline-content">
+                    <ul>
+                        <li>Claim/verify GBP listing</li>
+                        <li>Complete all profile sections</li>
+                        <li>Add 20+ professional photos</li>
+                        <li>Write optimized description</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-phase">Week 4</div>
+                <div class="timeline-title">Content Foundation</div>
+                <div class="timeline-content">
+                    <ul>
+                        <li>Create author bio templates</li>
+                        <li>Add medical review badges</li>
+                        <li>Update 3 highest-potential posts</li>
+                        <li>Establish review workflow</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <h2>Phase 2: Content & Authority (Weeks 5-12)</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Week</th>
+                    <th>Content Piece</th>
+                    <th>Target Keyword</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>5</td>
+                    <td>Ultimate Keto Diet Guide</td>
+                    <td>keto diet australia</td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>Type 2 Diabetes Reversal Guide</td>
+                    <td>reverse diabetes naturally</td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td>5 FAQ Pages</td>
+                    <td>Various question keywords</td>
+                </tr>
+                <tr>
+                    <td>8</td>
+                    <td>Low Carb for Beginners</td>
+                    <td>low carb diet beginners</td>
+                </tr>
+                <tr>
+                    <td>9</td>
+                    <td>Keto for PCOS</td>
+                    <td>keto pcos australia</td>
+                </tr>
+                <tr>
+                    <td>10</td>
+                    <td>Success Story Collection</td>
+                    <td>Brand searches</td>
+                </tr>
+                <tr>
+                    <td>11</td>
+                    <td>Video Transcripts (5)</td>
+                    <td>Various</td>
+                </tr>
+                <tr>
+                    <td>12</td>
+                    <td>Local Landing Pages (3)</td>
+                    <td>Suburb + service keywords</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Phase 3: Optimization & Scale (Weeks 13-24)</h2>
+
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-title">Core Web Vitals</div>
+                <div class="feature-desc">Performance optimization for better rankings and UX</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-title">Internal Linking</div>
+                <div class="feature-desc">Audit and improve crawlability</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-title">Backlink Analysis</div>
+                <div class="feature-desc">Competitor research and link opportunities</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-title">Featured Snippets</div>
+                <div class="feature-desc">Optimize for position zero results</div>
+            </div>
+        </div>
+
+        <h2>Key Performance Indicators</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Metric</th>
+                    <th>Baseline</th>
+                    <th>3-Month</th>
+                    <th>6-Month</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Indexed Pages</td>
+                    <td>2</td>
+                    <td>30</td>
+                    <td>75</td>
+                </tr>
+                <tr>
+                    <td>Organic Sessions</td>
+                    <td>TBD</td>
+                    <td>+100%</td>
+                    <td>+300%</td>
+                </tr>
+                <tr>
+                    <td>Featured Snippets</td>
+                    <td>0</td>
+                    <td>5</td>
+                    <td>15</td>
+                </tr>
+                <tr>
+                    <td>AI Citations (Monthly)</td>
+                    <td>0</td>
+                    <td>5</td>
+                    <td>15</td>
+                </tr>
+                <tr>
+                    <td>Google Reviews</td>
+                    <td>TBD</td>
+                    <td>+10</td>
+                    <td>+25</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Appendix -->
+    <div class="page-break"></div>
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">Section 10</div>
+            <h1 class="section-title">Technical Appendices</h1>
+        </div>
+
+        <h2>A. Homepage Schema Markup (Ready to Implement)</h2>
+
+        <pre style="font-size: 7px;">&lt;script type="application/ld+json"&gt;
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://nutritionsciencegroup.com/#organization",
+      "name": "Nutrition Science Group",
+      "url": "https://nutritionsciencegroup.com",
+      "logo": { "@type": "ImageObject", "url": "https://nutritionsciencegroup.com/logo.png" },
+      "sameAs": [
+        "https://www.facebook.com/nutritionsciencegroup",
+        "https://www.linkedin.com/company/nutritionsciencegroup"
+      ]
+    },
+    {
+      "@type": "MedicalBusiness",
+      "name": "Nutrition Science Group",
+      "description": "Evidence-based low-carb and ketogenic nutrition coaching",
+      "telephone": "+61425310625",
+      "email": "hello@nutritionsciencegroup.com",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "309 Army Road",
+        "addressLocality": "Pakenham",
+        "addressRegion": "VIC",
+        "postalCode": "3810",
+        "addressCountry": "AU"
+      },
+      "openingHoursSpecification": [{
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"],
+        "opens": "09:00", "closes": "17:00"
+      }]
+    }
+  ]
+}
+&lt;/script&gt;</pre>
+
+        <h2>B. FAQPage Schema Template</h2>
+
+        <pre style="font-size: 7px;">&lt;script type="application/ld+json"&gt;
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is ketosis?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ketosis is a metabolic state where your body burns fat for fuel
+                instead of carbohydrates. Blood ketone levels of 1.0-3.0 mmol/L
+                indicate nutritional ketosis."
+      }
+    }
+  ]
+}
+&lt;/script&gt;</pre>
+
+        <h2>C. Person Schema Template (Team Members)</h2>
+
+        <pre style="font-size: 7px;">&lt;script type="application/ld+json"&gt;
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Dr. John Stewart",
+  "jobTitle": "Wellness Coach",
+  "worksFor": { "@type": "MedicalBusiness", "name": "Nutrition Science Group" },
+  "hasCredential": [
+    { "@type": "EducationalOccupationalCredential",
+      "name": "Bachelor of Veterinary Science (BVSc)" },
+    { "@type": "EducationalOccupationalCredential",
+      "name": "Low Carb Nutrition Certification" }
+  ],
+  "knowsAbout": ["Ketogenic Diet", "Metabolic Health", "Type 2 Diabetes"]
+}
+&lt;/script&gt;</pre>
+
+        <h2>D. Meta Description Templates</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Page</th>
+                    <th>Recommended Meta Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Homepage</td>
+                    <td>"Expert keto & low-carb nutrition coaching in Victoria, Australia. Our medical team helps reverse type 2 diabetes & achieve lasting weight loss. Free 15-min consultation."</td>
+                </tr>
+                <tr>
+                    <td>Team</td>
+                    <td>"Meet the Nutrition Science Group team: doctors, dietitians & certified coaches helping Victorians achieve metabolic health through evidence-based nutrition."</td>
+                </tr>
+                <tr>
+                    <td>FAQ</td>
+                    <td>"Get answers to common keto & low-carb diet questions from Nutrition Science Group's medical team. Expert advice on ketosis, diabetes, weight loss & more."</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>E. AI Crawler Robots.txt Configuration</h2>
+
+        <pre style="font-size: 8px;"># AI Search Crawlers - EXPLICITLY ALLOW
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /</pre>
+    </div>
+
+    <!-- Final Page -->
+    <div class="page-break"></div>
+    <div style="height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);">
+        <div style="margin-bottom: 48px;">
+            <div style="font-size: 48px; font-weight: 800; letter-spacing: -2px; color: var(--gray-900);">
+                Yes <span style="background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">AI</span>
+            </div>
+            <div style="font-size: 14px; color: var(--gray-500); letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">
+                Intelligent Digital Growth
+            </div>
+        </div>
+
+        <div style="max-width: 500px; margin-bottom: 48px;">
+            <h2 style="font-family: 'Playfair Display', serif; font-size: 28px; color: var(--gray-900); margin-bottom: 16px; border: none;">Ready to Transform Your Digital Presence?</h2>
+            <p style="font-size: 13px; color: var(--gray-600); line-height: 1.7;">
+                This audit provides the roadmap. We provide the expertise to make it happen. Let's discuss how we can help you dominate traditional search and emerge as a leader in the AI search era.
+            </p>
+        </div>
+
+        <div style="background: white; border: 1px solid var(--gray-200); border-radius: 16px; padding: 32px 48px; box-shadow: 0 4px 24px rgba(0,0,0,0.05);">
+            <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--gray-400); margin-bottom: 16px;">Contact Us</div>
+            <div style="font-size: 18px; font-weight: 600; color: var(--primary); margin-bottom: 8px;">www.yesai.au</div>
+            <div style="font-size: 13px; color: var(--gray-600);">Australia's AI-First Digital Agency</div>
+        </div>
+
+        <div style="margin-top: 64px; font-size: 10px; color: var(--gray-400);">
+            &copy; 2025 Yes AI. All rights reserved.<br>
+            This document is confidential and intended solely for the named recipient.
+        </div>
+    </div>
+</body>
+</html>
