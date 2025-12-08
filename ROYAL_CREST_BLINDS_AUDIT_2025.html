@@ -66,25 +66,15 @@
             break-after: avoid;
         }
 
-        /* Yes AI Logo */
+        /* Yes AI Logo - Using PNG image */
         .yesai-logo {
             display: flex;
-            align-items: baseline;
-            font-family: 'Georgia', serif;
-            font-weight: bold;
+            align-items: center;
         }
 
-        .yesai-logo .yes {
-            color: var(--yes-red);
-            font-size: inherit;
-            text-shadow: 1px 1px 0 #000;
-        }
-
-        .yesai-logo .ai {
-            color: var(--yes-blue);
-            font-size: inherit;
-            text-shadow: 1px 1px 0 #000;
-            margin-left: 8px;
+        .yesai-logo img {
+            height: auto;
+            width: auto;
         }
 
         .yesai-logo-wrapper {
@@ -93,16 +83,20 @@
             align-items: flex-start;
         }
 
-        .yesai-swoosh {
-            width: 80px;
-            height: 12px;
-            margin-left: auto;
-            margin-top: -5px;
+        .cover-logo .yesai-logo img {
+            max-height: 100px;
         }
 
-        .yesai-swoosh svg {
-            width: 100%;
-            height: 100%;
+        .page-logo .yesai-logo img {
+            max-height: 45px;
+        }
+
+        .page-footer-logo img {
+            max-height: 30px;
+        }
+
+        .yesai-swoosh {
+            display: none;
         }
 
         /* Cover Page */
@@ -964,10 +958,7 @@
 <div class="cover-page">
     <div class="cover-header">
         <div class="yesai-logo-wrapper cover-logo">
-            <div class="yesai-logo">
-                <span class="yes">Yes</span>
-                <span class="ai">AI</span>
-            </div>
+            <div class="yesai-logo"><img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI"></div>
             <div class="yesai-swoosh">
                 <svg viewBox="0 0 100 20" preserveAspectRatio="none">
                     <path d="M0,15 Q25,0 50,10 T100,5" stroke="#0000ff" stroke-width="4" fill="none" stroke-linecap="round"/>
@@ -1008,10 +999,7 @@
 <div class="page">
     <div class="page-header">
         <div class="yesai-logo-wrapper page-logo">
-            <div class="yesai-logo">
-                <span class="yes">Yes</span>
-                <span class="ai">AI</span>
-            </div>
+            <div class="yesai-logo"><img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI"></div>
             <div class="yesai-swoosh">
                 <svg viewBox="0 0 100 20" preserveAspectRatio="none">
                     <path d="M0,15 Q25,0 50,10 T100,5" stroke="#0000ff" stroke-width="4" fill="none" stroke-linecap="round"/>
@@ -1106,7 +1094,7 @@
 
     <div class="page-footer">
         <div class="page-footer-left">
-            <div class="yesai-logo page-footer-logo"><span class="yes">Yes</span><span class="ai">AI</span></div>
+            <div class="yesai-logo page-footer-logo"><img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI"></div>
             &bull; www.yesai.au &bull; (03) 9999 7398
         </div>
         <div>Page 2</div>
@@ -1118,7 +1106,7 @@
 <div class="page">
     <div class="page-header">
         <div class="yesai-logo-wrapper page-logo">
-            <div class="yesai-logo"><span class="yes">Yes</span><span class="ai">AI</span></div>
+            <div class="yesai-logo"><img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI"></div>
             <div class="yesai-swoosh"><svg viewBox="0 0 100 20" preserveAspectRatio="none"><path d="M0,15 Q25,0 50,10 T100,5" stroke="#0000ff" stroke-width="4" fill="none" stroke-linecap="round"/></svg></div>
         </div>
         <div class="page-title-small">Critical Findings</div>
@@ -1204,7 +1192,7 @@
 
     <div class="page-footer">
         <div class="page-footer-left">
-            <div class="yesai-logo page-footer-logo"><span class="yes">Yes</span><span class="ai">AI</span></div>
+            <div class="yesai-logo page-footer-logo"><img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI"></div>
             &bull; www.yesai.au &bull; (03) 9999 7398
         </div>
         <div>Page 3</div>
@@ -1216,7 +1204,7 @@
 <div class="page">
     <div class="page-header">
         <div class="yesai-logo-wrapper page-logo">
-            <div class="yesai-logo"><span class="yes">Yes</span><span class="ai">AI</span></div>
+            <div class="yesai-logo"><img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI"></div>
             <div class="yesai-swoosh"><svg viewBox="0 0 100 20" preserveAspectRatio="none"><path d="M0,15 Q25,0 50,10 T100,5" stroke="#0000ff" stroke-width="4" fill="none" stroke-linecap="round"/></svg></div>
         </div>
         <div class="page-title-small">Contents</div>
@@ -1275,7 +1263,7 @@
 
     <div class="page-footer">
         <div class="page-footer-left">
-            <div class="yesai-logo page-footer-logo"><span class="yes">Yes</span><span class="ai">AI</span></div>
+            <div class="yesai-logo page-footer-logo"><img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI"></div>
             &bull; www.yesai.au &bull; (03) 9999 7398
         </div>
         <div>Page 4</div>
@@ -1287,7 +1275,7 @@
 <div class="page">
     <div class="page-header">
         <div class="yesai-logo-wrapper page-logo">
-            <div class="yesai-logo"><span class="yes">Yes</span><span class="ai">AI</span></div>
+            <div class="yesai-logo"><img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI"></div>
             <div class="yesai-swoosh"><svg viewBox="0 0 100 20" preserveAspectRatio="none"><path d="M0,15 Q25,0 50,10 T100,5" stroke="#0000ff" stroke-width="4" fill="none" stroke-linecap="round"/></svg></div>
         </div>
         <div class="page-title-small">Section 1: AI Search</div>
@@ -1344,7 +1332,7 @@
 
     <div class="page-footer">
         <div class="page-footer-left">
-            <div class="yesai-logo page-footer-logo"><span class="yes">Yes</span><span class="ai">AI</span></div>
+            <div class="yesai-logo page-footer-logo"><img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI"></div>
             &bull; www.yesai.au &bull; (03) 9999 7398
         </div>
         <div>Page 5</div>
@@ -1356,7 +1344,7 @@
 <div class="page">
     <div class="page-header">
         <div class="yesai-logo-wrapper page-logo">
-            <div class="yesai-logo"><span class="yes">Yes</span><span class="ai">AI</span></div>
+            <div class="yesai-logo"><img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI"></div>
             <div class="yesai-swoosh"><svg viewBox="0 0 100 20" preserveAspectRatio="none"><path d="M0,15 Q25,0 50,10 T100,5" stroke="#0000ff" stroke-width="4" fill="none" stroke-linecap="round"/></svg></div>
         </div>
         <div class="page-title-small">Section 1: AI Search (continued)</div>
@@ -1412,7 +1400,7 @@
 
     <div class="page-footer">
         <div class="page-footer-left">
-            <div class="yesai-logo page-footer-logo"><span class="yes">Yes</span><span class="ai">AI</span></div>
+            <div class="yesai-logo page-footer-logo"><img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI"></div>
             &bull; www.yesai.au &bull; (03) 9999 7398
         </div>
         <div>Page 6</div>
@@ -1424,7 +1412,7 @@
 <div class="page">
     <div class="page-header">
         <div class="yesai-logo-wrapper page-logo">
-            <div class="yesai-logo"><span class="yes">Yes</span><span class="ai">AI</span></div>
+            <div class="yesai-logo"><img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI"></div>
             <div class="yesai-swoosh"><svg viewBox="0 0 100 20" preserveAspectRatio="none"><path d="M0,15 Q25,0 50,10 T100,5" stroke="#0000ff" stroke-width="4" fill="none" stroke-linecap="round"/></svg></div>
         </div>
         <div class="page-title-small">Section 2: Traditional SEO</div>
@@ -1475,7 +1463,7 @@
 
     <div class="page-footer">
         <div class="page-footer-left">
-            <div class="yesai-logo page-footer-logo"><span class="yes">Yes</span><span class="ai">AI</span></div>
+            <div class="yesai-logo page-footer-logo"><img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI"></div>
             &bull; www.yesai.au &bull; (03) 9999 7398
         </div>
         <div>Page 7</div>
@@ -1487,7 +1475,7 @@
 <div class="page">
     <div class="page-header">
         <div class="yesai-logo-wrapper page-logo">
-            <div class="yesai-logo"><span class="yes">Yes</span><span class="ai">AI</span></div>
+            <div class="yesai-logo"><img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI"></div>
             <div class="yesai-swoosh"><svg viewBox="0 0 100 20" preserveAspectRatio="none"><path d="M0,15 Q25,0 50,10 T100,5" stroke="#0000ff" stroke-width="4" fill="none" stroke-linecap="round"/></svg></div>
         </div>
         <div class="page-title-small">Section 3: User Experience</div>
@@ -1554,7 +1542,7 @@
 
     <div class="page-footer">
         <div class="page-footer-left">
-            <div class="yesai-logo page-footer-logo"><span class="yes">Yes</span><span class="ai">AI</span></div>
+            <div class="yesai-logo page-footer-logo"><img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI"></div>
             &bull; www.yesai.au &bull; (03) 9999 7398
         </div>
         <div>Page 8</div>
@@ -1566,7 +1554,7 @@
 <div class="page">
     <div class="page-header">
         <div class="yesai-logo-wrapper page-logo">
-            <div class="yesai-logo"><span class="yes">Yes</span><span class="ai">AI</span></div>
+            <div class="yesai-logo"><img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI"></div>
             <div class="yesai-swoosh"><svg viewBox="0 0 100 20" preserveAspectRatio="none"><path d="M0,15 Q25,0 50,10 T100,5" stroke="#0000ff" stroke-width="4" fill="none" stroke-linecap="round"/></svg></div>
         </div>
         <div class="page-title-small">Section 4: Content Strategy</div>
@@ -1619,7 +1607,7 @@
 
     <div class="page-footer">
         <div class="page-footer-left">
-            <div class="yesai-logo page-footer-logo"><span class="yes">Yes</span><span class="ai">AI</span></div>
+            <div class="yesai-logo page-footer-logo"><img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI"></div>
             &bull; www.yesai.au &bull; (03) 9999 7398
         </div>
         <div>Page 9</div>
@@ -1631,7 +1619,7 @@
 <div class="page">
     <div class="page-header">
         <div class="yesai-logo-wrapper page-logo">
-            <div class="yesai-logo"><span class="yes">Yes</span><span class="ai">AI</span></div>
+            <div class="yesai-logo"><img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI"></div>
             <div class="yesai-swoosh"><svg viewBox="0 0 100 20" preserveAspectRatio="none"><path d="M0,15 Q25,0 50,10 T100,5" stroke="#0000ff" stroke-width="4" fill="none" stroke-linecap="round"/></svg></div>
         </div>
         <div class="page-title-small">Section 4: Content Strategy (continued)</div>
@@ -1679,7 +1667,7 @@
 
     <div class="page-footer">
         <div class="page-footer-left">
-            <div class="yesai-logo page-footer-logo"><span class="yes">Yes</span><span class="ai">AI</span></div>
+            <div class="yesai-logo page-footer-logo"><img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI"></div>
             &bull; www.yesai.au &bull; (03) 9999 7398
         </div>
         <div>Page 10</div>
@@ -1691,7 +1679,7 @@
 <div class="page">
     <div class="page-header">
         <div class="yesai-logo-wrapper page-logo">
-            <div class="yesai-logo"><span class="yes">Yes</span><span class="ai">AI</span></div>
+            <div class="yesai-logo"><img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI"></div>
             <div class="yesai-swoosh"><svg viewBox="0 0 100 20" preserveAspectRatio="none"><path d="M0,15 Q25,0 50,10 T100,5" stroke="#0000ff" stroke-width="4" fill="none" stroke-linecap="round"/></svg></div>
         </div>
         <div class="page-title-small">Section 5 & 6: Technical & Local SEO</div>
@@ -1742,7 +1730,7 @@
 
     <div class="page-footer">
         <div class="page-footer-left">
-            <div class="yesai-logo page-footer-logo"><span class="yes">Yes</span><span class="ai">AI</span></div>
+            <div class="yesai-logo page-footer-logo"><img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI"></div>
             &bull; www.yesai.au &bull; (03) 9999 7398
         </div>
         <div>Page 11</div>
@@ -1754,7 +1742,7 @@
 <div class="page">
     <div class="page-header">
         <div class="yesai-logo-wrapper page-logo">
-            <div class="yesai-logo"><span class="yes">Yes</span><span class="ai">AI</span></div>
+            <div class="yesai-logo"><img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI"></div>
             <div class="yesai-swoosh"><svg viewBox="0 0 100 20" preserveAspectRatio="none"><path d="M0,15 Q25,0 50,10 T100,5" stroke="#0000ff" stroke-width="4" fill="none" stroke-linecap="round"/></svg></div>
         </div>
         <div class="page-title-small">Section 7 & 8: Conversion & Accessibility</div>
@@ -1804,7 +1792,7 @@
 
     <div class="page-footer">
         <div class="page-footer-left">
-            <div class="yesai-logo page-footer-logo"><span class="yes">Yes</span><span class="ai">AI</span></div>
+            <div class="yesai-logo page-footer-logo"><img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI"></div>
             &bull; www.yesai.au &bull; (03) 9999 7398
         </div>
         <div>Page 12</div>
@@ -1816,7 +1804,7 @@
 <div class="page">
     <div class="page-header">
         <div class="yesai-logo-wrapper page-logo">
-            <div class="yesai-logo"><span class="yes">Yes</span><span class="ai">AI</span></div>
+            <div class="yesai-logo"><img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI"></div>
             <div class="yesai-swoosh"><svg viewBox="0 0 100 20" preserveAspectRatio="none"><path d="M0,15 Q25,0 50,10 T100,5" stroke="#0000ff" stroke-width="4" fill="none" stroke-linecap="round"/></svg></div>
         </div>
         <div class="page-title-small">Section 9: Implementation Roadmap</div>
@@ -1895,7 +1883,7 @@
 
     <div class="page-footer">
         <div class="page-footer-left">
-            <div class="yesai-logo page-footer-logo"><span class="yes">Yes</span><span class="ai">AI</span></div>
+            <div class="yesai-logo page-footer-logo"><img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI"></div>
             &bull; www.yesai.au &bull; (03) 9999 7398
         </div>
         <div>Page 13</div>
@@ -1907,7 +1895,7 @@
 <div class="page">
     <div class="page-header">
         <div class="yesai-logo-wrapper page-logo">
-            <div class="yesai-logo"><span class="yes">Yes</span><span class="ai">AI</span></div>
+            <div class="yesai-logo"><img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI"></div>
             <div class="yesai-swoosh"><svg viewBox="0 0 100 20" preserveAspectRatio="none"><path d="M0,15 Q25,0 50,10 T100,5" stroke="#0000ff" stroke-width="4" fill="none" stroke-linecap="round"/></svg></div>
         </div>
         <div class="page-title-small">Section 10: Schema & KPIs</div>
@@ -1965,7 +1953,7 @@
 
     <div class="page-footer">
         <div class="page-footer-left">
-            <div class="yesai-logo page-footer-logo"><span class="yes">Yes</span><span class="ai">AI</span></div>
+            <div class="yesai-logo page-footer-logo"><img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI"></div>
             &bull; www.yesai.au &bull; (03) 9999 7398
         </div>
         <div>Page 14</div>
