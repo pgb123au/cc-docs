@@ -52,6 +52,18 @@ Tests with `"tool_mocks": []` execute REAL webhooks and modify REAL Cliniko data
 2. `RETURNING *;` on ALL INSERT/UPDATE/DELETE statements
 3. NEVER use `JSON.parse()` on JSONB columns (already parsed)
 
+### Fix Location Rule (Agent vs n8n)
+**When a fix can be done in EITHER the RetellAI agent OR n8n webhook, prefer n8n:**
+
+| Fix in n8n (preferred) | Fix in Agent |
+|------------------------|--------------|
+| Type coercion (empty string → boolean/default) | Edge routing logic |
+| Adding `error_code` fields for cleaner matching | Node parameter bindings |
+| Input validation & defaults | Tool schema `required` arrays |
+| Response formatting | Prompt/instruction text |
+
+**Rationale:** n8n fixes are centralized, apply to all agents, and don't require agent redeployment.
+
 ---
 
 ## GIT AUTO-COMMIT (REQUIRED)
@@ -249,4 +261,4 @@ python run.py
 
 ---
 
-**Last Updated:** 2025-12-06
+**Last Updated:** 2025-12-09
