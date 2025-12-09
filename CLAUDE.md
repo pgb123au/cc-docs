@@ -77,6 +77,30 @@ python get_calls.py --limit 5
 
 **Rationale:** n8n fixes are centralized, apply to all agents, and don't require agent redeployment.
 
+### ⚠️ COUPLED FIXES - Agent + n8n Together
+**When a fix requires BOTH agent AND n8n changes, you MUST complete BOTH.**
+
+This is a recurring issue - DO NOT:
+- Fix the agent and forget the webhook
+- Say "we also need to update n8n" but never do it
+- Deploy agent changes without the corresponding n8n changes
+
+**MANDATORY PROCESS for coupled fixes:**
+1. **Immediately create TodoWrite entries for BOTH parts** when you identify a coupled fix
+2. Mark agent fix as `in_progress`, n8n fix as `pending`
+3. Complete agent fix, mark as `completed`
+4. **Immediately** start n8n fix - do NOT end the task
+5. Only report "DONE DONE DONE" when BOTH are deployed
+
+**Example todo list for coupled fix:**
+```
+[in_progress] Fix agent tool schema for get-availability
+[pending] Update n8n get-availability webhook response format
+[pending] Test end-to-end after both deployed
+```
+
+**If you find yourself about to say "DONE" with n8n changes still pending - STOP and complete them first.**
+
 ---
 
 ## GIT AUTO-COMMIT (REQUIRED)
@@ -272,6 +296,8 @@ python run.py
 - Read files before editing
 - Commit and push after file changes
 - Save dev work to Testing/, stable to agents/
+- **Complete BOTH agent AND n8n changes** when fixes are coupled (see COUPLED FIXES rule)
+- **Use TodoWrite** to track multi-part fixes - don't rely on memory
 
 ## NEVER DO
 
@@ -279,6 +305,8 @@ python run.py
 - Keep multiple versions in agents/ (only latest stable)
 - Overwrite source files (input ≠ output)
 - Use `tool-log-error` (doesn't exist - use `tool-add-to-followup`)
+- **Deploy agent fix without completing the paired n8n fix**
+- **Say "DONE" when pending n8n/webhook changes remain**
 
 ---
 
