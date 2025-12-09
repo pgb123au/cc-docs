@@ -1,0 +1,1346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reignite Health - Complete Digital Audit 2025 | Yes AI</title>
+    <style>
+        @page {
+            margin: 0;
+            size: A4;
+        }
+
+        @media print {
+            .page {
+                height: 297mm;
+                width: 210mm;
+                page-break-after: always;
+                break-after: page;
+            }
+            .no-break {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 11px;
+            line-height: 1.4;
+            color: #333;
+            background: #fff;
+        }
+
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 0;
+            margin: 0 auto;
+            background: white;
+            position: relative;
+        }
+
+        /* Cover Page */
+        .cover-page {
+            background: linear-gradient(135deg, #1a365d 0%, #2563eb 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 40px;
+        }
+
+        .cover-header {
+            text-align: right;
+        }
+
+        .cover-logo img {
+            max-height: 80px;
+            width: auto;
+        }
+
+        .cover-content {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .cover-title {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .cover-subtitle {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 40px;
+        }
+
+        .cover-client {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+
+        .cover-client-logo {
+            margin-bottom: 15px;
+        }
+
+        .cover-client-logo img {
+            max-height: 80px;
+            border-radius: 8px;
+        }
+
+        .cover-client-name {
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .cover-client-url {
+            font-size: 16px;
+            opacity: 0.8;
+        }
+
+        .cover-date {
+            font-size: 14px;
+            opacity: 0.7;
+            margin-top: 30px;
+        }
+
+        .cover-footer {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .cover-footer img {
+            max-height: 40px;
+        }
+
+        .cover-footer p {
+            margin-top: 10px;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        /* Content Pages */
+        .content-page {
+            padding: 25px 35px;
+            position: relative;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #2563eb;
+            margin-bottom: 20px;
+        }
+
+        .page-header-logo img {
+            max-height: 35px;
+        }
+
+        .page-header-title {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .page-footer {
+            position: absolute;
+            bottom: 20px;
+            left: 35px;
+            right: 35px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 10px;
+            border-top: 1px solid #e5e7eb;
+            font-size: 10px;
+            color: #666;
+        }
+
+        .page-footer-logo img {
+            max-height: 25px;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #1a365d;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #2563eb;
+        }
+
+        h2 {
+            font-size: 18px;
+            color: #1a365d;
+            margin: 20px 0 12px 0;
+            page-break-after: avoid;
+        }
+
+        h3 {
+            font-size: 14px;
+            color: #2563eb;
+            margin: 15px 0 10px 0;
+            page-break-after: avoid;
+        }
+
+        p {
+            margin: 8px 0;
+            text-align: justify;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+            font-size: 10px;
+            page-break-inside: avoid;
+        }
+
+        th, td {
+            border: 1px solid #e5e7eb;
+            padding: 8px 10px;
+            text-align: left;
+        }
+
+        th {
+            background: #1a365d;
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        .score-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+            page-break-inside: avoid;
+        }
+
+        .score-card {
+            background: linear-gradient(135deg, #1a365d, #2563eb);
+            color: white;
+            padding: 20px 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .score-value {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .score-label {
+            font-size: 10px;
+            opacity: 0.9;
+        }
+
+        .info-box {
+            background: #f0f9ff;
+            border-left: 4px solid #2563eb;
+            padding: 12px 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+            page-break-inside: avoid;
+        }
+
+        .info-box.warning {
+            background: #fef3c7;
+            border-left-color: #f59e0b;
+        }
+
+        .info-box.critical {
+            background: #fee2e2;
+            border-left-color: #dc2626;
+        }
+
+        .info-box.success {
+            background: #d1fae5;
+            border-left-color: #10b981;
+        }
+
+        .checklist {
+            list-style: none;
+            margin: 10px 0;
+        }
+
+        .checklist li {
+            padding: 6px 0 6px 25px;
+            position: relative;
+        }
+
+        .checklist li::before {
+            content: "[ ]";
+            position: absolute;
+            left: 0;
+            color: #2563eb;
+            font-family: monospace;
+        }
+
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 9px;
+            overflow-x: auto;
+            margin: 12px 0;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .competitor-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin: 15px 0;
+        }
+
+        .competitor-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 12px;
+            page-break-inside: avoid;
+        }
+
+        .competitor-card h4 {
+            color: #1a365d;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+
+        .stars {
+            color: #f59e0b;
+            letter-spacing: 2px;
+        }
+
+        ul, ol {
+            margin: 10px 0 10px 20px;
+        }
+
+        li {
+            margin: 4px 0;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .highlight {
+            background: #fef3c7;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 9px;
+            margin-right: 5px;
+        }
+
+        .tag.critical { background: #dc2626; }
+        .tag.high { background: #f59e0b; }
+        .tag.medium { background: #2563eb; }
+        .tag.low { background: #10b981; }
+
+        /* Back Cover */
+        .back-cover {
+            background: linear-gradient(135deg, #1a365d 0%, #2563eb 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 60px;
+        }
+
+        .back-logo img {
+            max-height: 120px;
+            margin-bottom: 40px;
+        }
+
+        .back-tagline {
+            font-size: 24px;
+            font-weight: 300;
+            margin-bottom: 50px;
+            opacity: 0.9;
+        }
+
+        .back-contact {
+            background: rgba(255,255,255,0.1);
+            padding: 30px 50px;
+            border-radius: 12px;
+        }
+
+        .back-contact p {
+            font-size: 16px;
+            margin: 10px 0;
+        }
+
+        .keep-together {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+        }
+    </style>
+</head>
+<body>
+
+<!-- COVER PAGE -->
+<div class="page cover-page">
+    <div class="cover-header">
+        <div class="cover-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+    </div>
+
+    <div class="cover-content">
+        <h1 class="cover-title">Complete Digital Audit &<br>AI Search Optimization Report</h1>
+        <p class="cover-subtitle">Technical analysis, competitive intelligence, and implementation roadmap</p>
+
+        <div class="cover-client">
+            <div class="cover-client-logo">
+                <img src="file:///C:/Users/peter/Downloads/CC/CLIENTS/reignite-health/client_logo.jpg" alt="Reignite Health">
+            </div>
+            <p class="cover-client-name">Reignite Health</p>
+            <p class="cover-client-url">reignitehealth.com.au</p>
+        </div>
+
+        <p class="cover-date">December 2025</p>
+    </div>
+
+    <div class="cover-footer">
+        <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        <p>www.yesai.au | (03) 9999 7398 | hello@yesai.au</p>
+    </div>
+</div>
+
+<!-- EXECUTIVE SUMMARY -->
+<div class="page content-page">
+    <div class="page-header">
+        <div class="page-header-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div class="page-header-title">Reignite Health | Digital Audit 2025</div>
+    </div>
+
+    <h1>Executive Summary</h1>
+
+    <p>Reignite Health is an allied health provider specializing in exercise physiology and physiotherapy services for retirement village residents across Sydney and the Central Coast. Founded by Liam Potter in 2021, the company has grown to 11-50 employees and focuses on helping aging Australians maintain independence.</p>
+
+    <h2>Key Metrics</h2>
+
+    <div class="score-grid keep-together">
+        <div class="score-card">
+            <div class="score-value">~60</div>
+            <div class="score-label">PageSpeed Mobile</div>
+        </div>
+        <div class="score-card">
+            <div class="score-value">2/5</div>
+            <div class="score-label">SEO Score</div>
+        </div>
+        <div class="score-card">
+            <div class="score-value">1/5</div>
+            <div class="score-label">AI Visibility</div>
+        </div>
+        <div class="score-card">
+            <div class="score-value">2/5</div>
+            <div class="score-label">Technical Health</div>
+        </div>
+    </div>
+
+    <div class="info-box critical keep-together">
+        <h3>Critical Findings</h3>
+        <ol>
+            <li><strong>JavaScript-Only Website</strong> - The entire site requires JavaScript to render, making it invisible to search engines and AI crawlers</li>
+            <li><strong>No Sitemap</strong> - Missing XML sitemap prevents proper indexing</li>
+            <li><strong>Blocks AI Crawlers</strong> - robots.txt actively blocks ChatGPT, Claude, and other AI systems</li>
+            <li><strong>Zero Schema Markup</strong> - No structured data for local business, services, or team</li>
+            <li><strong>Limited Web Presence</strong> - Minimal citations, reviews, or backlinks found</li>
+        </ol>
+    </div>
+
+    <div class="info-box success keep-together">
+        <h3>Strengths</h3>
+        <ol>
+            <li>Strong brand positioning: "We put life in your years"</li>
+            <li>Clear niche focus (retirement villages)</li>
+            <li>Founder credibility (Liam Potter - qualified physiotherapist)</li>
+            <li>Valid SSL with good security headers</li>
+            <li>Clean, modern website design</li>
+        </ol>
+    </div>
+
+    <div class="page-footer">
+        <div class="page-footer-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div>Page 2</div>
+    </div>
+</div>
+
+<!-- BUSINESS OVERVIEW -->
+<div class="page content-page">
+    <div class="page-header">
+        <div class="page-header-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div class="page-header-title">Reignite Health | Digital Audit 2025</div>
+    </div>
+
+    <h1>Business Overview</h1>
+
+    <div class="two-column">
+        <div class="keep-together">
+            <h3>Company Information</h3>
+            <table>
+                <tr><td><strong>Business Name</strong></td><td>Reignite Health</td></tr>
+                <tr><td><strong>Founder</strong></td><td>Liam Potter (Physiotherapist)</td></tr>
+                <tr><td><strong>Founded</strong></td><td>2021</td></tr>
+                <tr><td><strong>Employees</strong></td><td>11-50</td></tr>
+                <tr><td><strong>Primary Location</strong></td><td>Sydney, NSW</td></tr>
+                <tr><td><strong>Secondary Location</strong></td><td>Central Coast, NSW</td></tr>
+                <tr><td><strong>Website</strong></td><td>reignitehealth.com.au</td></tr>
+                <tr><td><strong>Tagline</strong></td><td>"We put life in your years"</td></tr>
+            </table>
+        </div>
+
+        <div class="keep-together">
+            <h3>Services Offered</h3>
+            <ul>
+                <li>Exercise Physiology Programs</li>
+                <li>Physiotherapy & Physical Therapy</li>
+                <li>Resistance Training & Strength Programs</li>
+                <li>Balance Improvement Training</li>
+                <li>Group Exercise Classes</li>
+                <li>Aqua Aerobics</li>
+                <li>Falls Prevention Services</li>
+                <li>Healthy Aging & Longevity Support</li>
+            </ul>
+        </div>
+    </div>
+
+    <h2>Service Areas</h2>
+    <div class="info-box keep-together">
+        <p><strong>Sydney:</strong> Northern Beaches, North Shore, Hills District</p>
+        <p><strong>Central Coast:</strong> Various retirement village locations</p>
+    </div>
+
+    <h2>Target Market</h2>
+    <p>Reignite Health exclusively serves retirement village residents, providing on-site healthcare services. This specialization differentiates them from general mobile physiotherapy providers. The company reports approximately 50% resident utilization rates at some village locations, with over 4 years of successful service delivery.</p>
+
+    <h2>Technical Audit Summary</h2>
+
+    <table class="keep-together">
+        <tr>
+            <th>Security Check</th>
+            <th>Status</th>
+            <th>Details</th>
+        </tr>
+        <tr>
+            <td>SSL Certificate</td>
+            <td style="color: green;">Valid</td>
+            <td>HTTPS properly configured</td>
+        </tr>
+        <tr>
+            <td>HSTS Header</td>
+            <td style="color: green;">Present</td>
+            <td>max-age=63072000; includeSubDomains; preload</td>
+        </tr>
+        <tr>
+            <td>X-Content-Type-Options</td>
+            <td style="color: green;">Present</td>
+            <td>nosniff</td>
+        </tr>
+        <tr>
+            <td>CDN</td>
+            <td style="color: green;">Cloudflare</td>
+            <td>Good performance and security</td>
+        </tr>
+        <tr>
+            <td>CSP Header</td>
+            <td style="color: orange;">Missing</td>
+            <td>Recommended for security</td>
+        </tr>
+    </table>
+
+    <div class="page-footer">
+        <div class="page-footer-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div>Page 3</div>
+    </div>
+</div>
+
+<!-- AI SEARCH REALITY CHECK -->
+<div class="page content-page">
+    <div class="page-header">
+        <div class="page-header-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div class="page-header-title">Reignite Health | Digital Audit 2025</div>
+    </div>
+
+    <h1>AI Search Reality Check</h1>
+
+    <p>We tested what AI systems (ChatGPT, Claude, Perplexity) know about Reignite Health. This reveals how visible your business is in the emerging AI search landscape.</p>
+
+    <div class="info-box critical keep-together">
+        <h3>Critical Issue: AI Crawlers Blocked</h3>
+        <p>Your robots.txt file actively blocks major AI systems:</p>
+        <div class="code-block">User-agent: ClaudeBot
+Disallow: /
+
+User-agent: GPTBot
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /</div>
+        <p><strong>Impact:</strong> Reignite Health will NOT appear in ChatGPT, Perplexity, Claude, or Google AI Overviews.</p>
+    </div>
+
+    <h2>AI Knowledge Test Results</h2>
+
+    <div class="keep-together">
+        <h3>Query 1: "What do you know about Reignite Health in Sydney?"</h3>
+        <div class="info-box warning">
+            <p><strong>Result:</strong> LIMITED knowledge</p>
+            <ul>
+                <li>Basic awareness the company exists</li>
+                <li>Tagline recognized: "We put life in your years"</li>
+                <li>Founder Liam Potter identified via LinkedIn</li>
+                <li>Services vaguely understood</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="keep-together">
+        <h3>Query 2: "Who provides exercise physiology for retirement villages in Sydney?"</h3>
+        <div class="info-box critical">
+            <p><strong>Result:</strong> Reignite Health NOT mentioned. Competitors cited instead:</p>
+            <ul>
+                <li>The Physio Co</li>
+                <li>Vista Healthcare</li>
+                <li>Active Living Healthcare</li>
+                <li>Physio Inq</li>
+            </ul>
+        </div>
+    </div>
+
+    <h2>AI Citation Gap Analysis</h2>
+
+    <table class="keep-together">
+        <tr>
+            <th>Search Topic</th>
+            <th>Reignite Cited?</th>
+            <th>Who's Cited Instead</th>
+        </tr>
+        <tr>
+            <td>Retirement village physio Sydney</td>
+            <td style="color: red;">No</td>
+            <td>The Physio Co, Vista Healthcare</td>
+        </tr>
+        <tr>
+            <td>Exercise physiology aged care</td>
+            <td style="color: red;">No</td>
+            <td>Physio Inq, Alpha Allied Health</td>
+        </tr>
+        <tr>
+            <td>Mobile physiotherapy seniors</td>
+            <td style="color: red;">No</td>
+            <td>My Mobile Physio, H4 Physio</td>
+        </tr>
+        <tr>
+            <td>Falls prevention Sydney</td>
+            <td style="color: red;">No</td>
+            <td>Healthcare Australia</td>
+        </tr>
+    </table>
+
+    <h2>Why Reignite Health Has Low AI Visibility</h2>
+    <ol>
+        <li><strong>robots.txt blocks AI crawlers</strong> - AI cannot learn about the business</li>
+        <li><strong>No indexable content</strong> - JavaScript-only site is invisible</li>
+        <li><strong>Limited backlinks</strong> - Few external sites mention Reignite</li>
+        <li><strong>No schema markup</strong> - AI can't understand the business structure</li>
+        <li><strong>No FAQ content</strong> - Missing Q&A that AI systems love to cite</li>
+        <li><strong>Minimal content depth</strong> - Not enough expertise signals for E-E-A-T</li>
+    </ol>
+
+    <div class="page-footer">
+        <div class="page-footer-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div>Page 4</div>
+    </div>
+</div>
+
+<!-- COMPETITOR ANALYSIS -->
+<div class="page content-page">
+    <div class="page-header">
+        <div class="page-header-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div class="page-header-title">Reignite Health | Digital Audit 2025</div>
+    </div>
+
+    <h1>Competitor Analysis</h1>
+
+    <h2>Top Competitors Identified</h2>
+
+    <table class="keep-together">
+        <tr>
+            <th>Competitor</th>
+            <th>Focus</th>
+            <th>Coverage</th>
+            <th>AI Visibility</th>
+        </tr>
+        <tr>
+            <td>The Physio Co</td>
+            <td>Mobile physio for seniors</td>
+            <td>Melb, Syd, Adelaide</td>
+            <td><span class="tag">HIGH</span></td>
+        </tr>
+        <tr>
+            <td>Vista Healthcare</td>
+            <td>Mobile physio + hydro</td>
+            <td>Sydney</td>
+            <td><span class="tag high">MEDIUM</span></td>
+        </tr>
+        <tr>
+            <td>Active Living Healthcare</td>
+            <td>Allied health (multi-discipline)</td>
+            <td>Sydney, Melbourne</td>
+            <td><span class="tag high">MEDIUM</span></td>
+        </tr>
+        <tr>
+            <td>H4 Physio</td>
+            <td>Aged care physio</td>
+            <td>National</td>
+            <td><span class="tag high">MEDIUM</span></td>
+        </tr>
+        <tr>
+            <td>Physio Inq</td>
+            <td>Mobile allied health</td>
+            <td>National</td>
+            <td><span class="tag">HIGH</span></td>
+        </tr>
+    </table>
+
+    <h2>Competitive Positioning Matrix</h2>
+
+    <table class="keep-together">
+        <tr>
+            <th>Factor</th>
+            <th>Reignite</th>
+            <th>The Physio Co</th>
+            <th>Vista</th>
+            <th>Active Living</th>
+        </tr>
+        <tr>
+            <td>Retirement Village Focus</td>
+            <td class="stars">*****</td>
+            <td class="stars">**</td>
+            <td class="stars">**</td>
+            <td class="stars">**</td>
+        </tr>
+        <tr>
+            <td>Brand Clarity</td>
+            <td class="stars">****</td>
+            <td class="stars">***</td>
+            <td class="stars">***</td>
+            <td class="stars">**</td>
+        </tr>
+        <tr>
+            <td>SEO Presence</td>
+            <td class="stars">*</td>
+            <td class="stars">*****</td>
+            <td class="stars">***</td>
+            <td class="stars">***</td>
+        </tr>
+        <tr>
+            <td>Content Depth</td>
+            <td class="stars">*</td>
+            <td class="stars">****</td>
+            <td class="stars">***</td>
+            <td class="stars">***</td>
+        </tr>
+        <tr>
+            <td>AI Visibility</td>
+            <td class="stars">*</td>
+            <td class="stars">****</td>
+            <td class="stars">***</td>
+            <td class="stars">***</td>
+        </tr>
+        <tr>
+            <td>Modern Design</td>
+            <td class="stars">*****</td>
+            <td class="stars">***</td>
+            <td class="stars">***</td>
+            <td class="stars">***</td>
+        </tr>
+    </table>
+
+    <h2>Lead Competitor: The Physio Co</h2>
+
+    <div class="two-column">
+        <div class="keep-together">
+            <h3>Their Strengths</h3>
+            <ul>
+                <li>Established since 2004 (20 years)</li>
+                <li>Strong SEO presence</li>
+                <li>Clear service pages for conditions</li>
+                <li>Extensive content (blog, FAQs)</li>
+                <li>Phone number prominent: 1300 797 793</li>
+            </ul>
+        </div>
+        <div class="keep-together">
+            <h3>Your Advantage</h3>
+            <ul>
+                <li>Retirement village specialization (niche focus)</li>
+                <li>Modern website design</li>
+                <li>Proactive/preventative approach</li>
+                <li>Direct village partnerships</li>
+                <li>Group class offerings</li>
+            </ul>
+        </div>
+    </div>
+
+    <h2>Content Gap Analysis</h2>
+    <p>Topics competitors cover that Reignite is missing:</p>
+    <ul>
+        <li>Individual condition pages (arthritis, Parkinson's, stroke recovery)</li>
+        <li>Comprehensive FAQ sections</li>
+        <li>Team/practitioner bios with credentials</li>
+        <li>Blog content on healthy aging</li>
+        <li>Testimonials with full stories</li>
+        <li>Case studies with outcomes</li>
+        <li>Service area detailed pages</li>
+    </ul>
+
+    <div class="page-footer">
+        <div class="page-footer-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div>Page 5</div>
+    </div>
+</div>
+
+<!-- SEO AUDIT -->
+<div class="page content-page">
+    <div class="page-header">
+        <div class="page-header-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div class="page-header-title">Reignite Health | Digital Audit 2025</div>
+    </div>
+
+    <h1>SEO Audit</h1>
+
+    <h2>Current SEO Status</h2>
+
+    <table class="keep-together">
+        <tr>
+            <th>Element</th>
+            <th>Current State</th>
+            <th>Recommendation</th>
+        </tr>
+        <tr>
+            <td>Title Tag</td>
+            <td>"Reignite Health" (14 chars)</td>
+            <td>Add location + service keywords (50-60 chars)</td>
+        </tr>
+        <tr>
+            <td>Meta Description</td>
+            <td>Present but no location</td>
+            <td>Add Sydney, services, CTA</td>
+        </tr>
+        <tr>
+            <td>H1 Tag</td>
+            <td>Not accessible (JS)</td>
+            <td>Ensure proper H1 exists</td>
+        </tr>
+        <tr>
+            <td>Sitemap</td>
+            <td style="color: red;">Missing</td>
+            <td>Create XML sitemap</td>
+        </tr>
+        <tr>
+            <td>Robots.txt</td>
+            <td style="color: red;">Blocking search/AI</td>
+            <td>Modify to allow indexing</td>
+        </tr>
+        <tr>
+            <td>Schema Markup</td>
+            <td style="color: red;">None</td>
+            <td>Add LocalBusiness, FAQPage, Person</td>
+        </tr>
+    </table>
+
+    <h2>Current Meta Tags</h2>
+
+    <div class="code-block">&lt;title&gt;Reignite Health&lt;/title&gt;
+&lt;meta name="description" content="We put life in your years. HELPING YOU STAY INDEPENDENT & LIVE LIFE THE WAY YOU WANT TO."/&gt;</div>
+
+    <div class="info-box warning keep-together">
+        <h3>Issues:</h3>
+        <ul>
+            <li>Title too short (14 characters vs optimal 50-60)</li>
+            <li>No location keywords (Sydney, Central Coast)</li>
+            <li>No service keywords (exercise physiology, physiotherapy)</li>
+            <li>No call-to-action</li>
+        </ul>
+    </div>
+
+    <h2>Keyword Opportunities</h2>
+
+    <table class="keep-together">
+        <tr>
+            <th>Keyword</th>
+            <th>Searches</th>
+            <th>Competition</th>
+            <th>Priority</th>
+        </tr>
+        <tr>
+            <td>exercise physiology retirement villages sydney</td>
+            <td>Low</td>
+            <td>Low</td>
+            <td><span class="tag critical">HIGH</span></td>
+        </tr>
+        <tr>
+            <td>physiotherapy retirement village</td>
+            <td>Low-Med</td>
+            <td>Low</td>
+            <td><span class="tag critical">HIGH</span></td>
+        </tr>
+        <tr>
+            <td>mobile physio aged care sydney</td>
+            <td>Med</td>
+            <td>Medium</td>
+            <td><span class="tag critical">HIGH</span></td>
+        </tr>
+        <tr>
+            <td>falls prevention elderly sydney</td>
+            <td>Med</td>
+            <td>Medium</td>
+            <td><span class="tag high">MEDIUM</span></td>
+        </tr>
+        <tr>
+            <td>healthy aging programs sydney</td>
+            <td>Low</td>
+            <td>Low</td>
+            <td><span class="tag high">MEDIUM</span></td>
+        </tr>
+        <tr>
+            <td>group exercise classes seniors sydney</td>
+            <td>Med</td>
+            <td>Medium</td>
+            <td><span class="tag high">MEDIUM</span></td>
+        </tr>
+    </table>
+
+    <h2>Google Business Profile</h2>
+
+    <div class="info-box critical keep-together">
+        <p><strong>Status:</strong> No verified Google Business Profile found</p>
+        <p><strong>Impact:</strong> Missing from Google Maps, local pack results, and review ecosystem</p>
+        <p><strong>Action:</strong> Create and verify Google Business Profile immediately</p>
+    </div>
+
+    <div class="page-footer">
+        <div class="page-footer-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div>Page 6</div>
+    </div>
+</div>
+
+<!-- DELIVERABLES: META TAGS -->
+<div class="page content-page">
+    <div class="page-header">
+        <div class="page-header-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div class="page-header-title">Reignite Health | Digital Audit 2025</div>
+    </div>
+
+    <h1>Ready-to-Implement: Meta Tags</h1>
+
+    <p>Copy these optimized meta tags directly into your website:</p>
+
+    <div class="keep-together">
+        <h3>Homepage</h3>
+        <div class="code-block">&lt;title&gt;Reignite Health | Exercise Physiology for Retirement Villages Sydney&lt;/title&gt;
+&lt;meta name="description" content="Specialised exercise physiology and physiotherapy for retirement village residents in Sydney and Central Coast. We help seniors stay independent with personalised programs. Call today."&gt;</div>
+    </div>
+
+    <div class="keep-together">
+        <h3>About Page</h3>
+        <div class="code-block">&lt;title&gt;About Reignite Health | Liam Potter & Our Physiotherapy Team&lt;/title&gt;
+&lt;meta name="description" content="Meet Liam Potter and the Reignite Health team. Since 2021, we've helped retirement village residents across Sydney stay active, strong, and independent."&gt;</div>
+    </div>
+
+    <div class="keep-together">
+        <h3>Services Page</h3>
+        <div class="code-block">&lt;title&gt;Our Services | Exercise Physiology & Physiotherapy | Reignite Health&lt;/title&gt;
+&lt;meta name="description" content="Exercise physiology, physiotherapy, falls prevention, group fitness classes, and strength training for retirement village residents. Mobile services across Sydney."&gt;</div>
+    </div>
+
+    <div class="keep-together">
+        <h3>Sydney Location Page</h3>
+        <div class="code-block">&lt;title&gt;Retirement Village Physiotherapy Sydney | Reignite Health&lt;/title&gt;
+&lt;meta name="description" content="Mobile exercise physiology and physiotherapy for retirement villages across Sydney's Northern Beaches, North Shore, and Hills District. Book your consultation."&gt;</div>
+    </div>
+
+    <div class="keep-together">
+        <h3>Central Coast Location Page</h3>
+        <div class="code-block">&lt;title&gt;Retirement Village Physiotherapy Central Coast | Reignite Health&lt;/title&gt;
+&lt;meta name="description" content="Exercise physiology and physiotherapy services for Central Coast retirement villages. Helping seniors stay active and independent. Contact Reignite Health."&gt;</div>
+    </div>
+
+    <div class="keep-together">
+        <h3>Falls Prevention Page</h3>
+        <div class="code-block">&lt;title&gt;Falls Prevention for Seniors Sydney | Reignite Health&lt;/title&gt;
+&lt;meta name="description" content="Evidence-based falls prevention programs for retirement village residents. Improve balance, strength, and confidence with Reignite Health's expert physiotherapists."&gt;</div>
+    </div>
+
+    <div class="page-footer">
+        <div class="page-footer-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div>Page 7</div>
+    </div>
+</div>
+
+<!-- DELIVERABLES: SCHEMA -->
+<div class="page content-page">
+    <div class="page-header">
+        <div class="page-header-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div class="page-header-title">Reignite Health | Digital Audit 2025</div>
+    </div>
+
+    <h1>Ready-to-Implement: Schema Markup</h1>
+
+    <p>Add this JSON-LD structured data to your website's &lt;head&gt; section:</p>
+
+    <div class="keep-together">
+        <h3>Organization Schema</h3>
+        <div class="code-block">&lt;script type="application/ld+json"&gt;
+{
+  "@context": "https://schema.org",
+  "@type": "MedicalBusiness",
+  "name": "Reignite Health",
+  "url": "https://reignitehealth.com.au",
+  "description": "Specialised exercise physiology and physiotherapy for retirement village residents across Sydney and the Central Coast.",
+  "slogan": "We put life in your years",
+  "foundingDate": "2021",
+  "founder": {
+    "@type": "Person",
+    "name": "Liam Potter",
+    "jobTitle": "Founder & Physiotherapist"
+  },
+  "areaServed": ["Sydney", "Central Coast"],
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Sydney",
+    "addressRegion": "NSW",
+    "addressCountry": "AU"
+  }
+}
+&lt;/script&gt;</div>
+    </div>
+
+    <div class="keep-together">
+        <h3>FAQPage Schema (Add to FAQ section)</h3>
+        <div class="code-block">&lt;script type="application/ld+json"&gt;
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What services does Reignite Health offer?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Reignite Health provides exercise physiology, physiotherapy, resistance training, balance improvement, group exercise classes, aqua aerobics, and falls prevention programs specifically designed for retirement village residents."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Where does Reignite Health operate?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "We provide mobile services to retirement villages across Sydney (Northern Beaches, North Shore, Hills District) and the Central Coast in NSW."
+      }
+    }
+  ]
+}
+&lt;/script&gt;</div>
+    </div>
+
+    <div class="info-box keep-together">
+        <h3>Implementation Notes</h3>
+        <ul>
+            <li>Place all schema in the &lt;head&gt; section of each page</li>
+            <li>Validate using Google's Rich Results Test</li>
+            <li>Add Service schema for each individual service page</li>
+            <li>Include Review schema when you have testimonials</li>
+        </ul>
+    </div>
+
+    <div class="page-footer">
+        <div class="page-footer-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div>Page 8</div>
+    </div>
+</div>
+
+<!-- IMPLEMENTATION ROADMAP -->
+<div class="page content-page">
+    <div class="page-header">
+        <div class="page-header-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div class="page-header-title">Reignite Health | Digital Audit 2025</div>
+    </div>
+
+    <h1>Implementation Roadmap</h1>
+
+    <h2>Critical Fixes (Week 1-2)</h2>
+
+    <table class="keep-together">
+        <tr>
+            <th>Task</th>
+            <th>Impact</th>
+            <th>Effort</th>
+        </tr>
+        <tr>
+            <td>Modify robots.txt to allow AI crawlers</td>
+            <td><span class="tag critical">HIGH</span></td>
+            <td><span class="tag low">LOW</span></td>
+        </tr>
+        <tr>
+            <td>Create XML sitemap</td>
+            <td><span class="tag critical">HIGH</span></td>
+            <td><span class="tag low">LOW</span></td>
+        </tr>
+        <tr>
+            <td>Implement server-side rendering or static HTML</td>
+            <td><span class="tag critical">HIGH</span></td>
+            <td><span class="tag critical">HIGH</span></td>
+        </tr>
+        <tr>
+            <td>Add schema markup to homepage</td>
+            <td><span class="tag critical">HIGH</span></td>
+            <td><span class="tag high">MEDIUM</span></td>
+        </tr>
+        <tr>
+            <td>Create Google Business Profile</td>
+            <td><span class="tag critical">HIGH</span></td>
+            <td><span class="tag low">LOW</span></td>
+        </tr>
+    </table>
+
+    <h2>High Priority (Week 3-4)</h2>
+
+    <table class="keep-together">
+        <tr>
+            <th>Task</th>
+            <th>Impact</th>
+            <th>Effort</th>
+        </tr>
+        <tr>
+            <td>Create Services page with indexable content</td>
+            <td><span class="tag critical">HIGH</span></td>
+            <td><span class="tag high">MEDIUM</span></td>
+        </tr>
+        <tr>
+            <td>Create About/Team page with Liam's credentials</td>
+            <td><span class="tag critical">HIGH</span></td>
+            <td><span class="tag high">MEDIUM</span></td>
+        </tr>
+        <tr>
+            <td>Add FAQ schema with 10+ questions</td>
+            <td><span class="tag critical">HIGH</span></td>
+            <td><span class="tag high">MEDIUM</span></td>
+        </tr>
+        <tr>
+            <td>Optimize meta titles and descriptions</td>
+            <td><span class="tag high">MEDIUM</span></td>
+            <td><span class="tag low">LOW</span></td>
+        </tr>
+        <tr>
+            <td>Set up Google Search Console</td>
+            <td><span class="tag critical">HIGH</span></td>
+            <td><span class="tag low">LOW</span></td>
+        </tr>
+    </table>
+
+    <h2>Medium Priority (Month 2)</h2>
+
+    <ul class="checklist">
+        <li>Create location-specific pages (Sydney, Central Coast)</li>
+        <li>Build testimonials page with full stories</li>
+        <li>Start blog with 2 posts per month</li>
+        <li>Create Falls Prevention content hub</li>
+        <li>Add condition-specific pages (arthritis, Parkinson's)</li>
+    </ul>
+
+    <h2>Ongoing Activities</h2>
+
+    <ul class="checklist">
+        <li>Publish blog content (2x monthly)</li>
+        <li>Collect and publish testimonials</li>
+        <li>Monitor Google Search Console</li>
+        <li>Update FAQ content monthly</li>
+        <li>Build backlinks from retirement industry sites</li>
+        <li>Encourage Google reviews from satisfied clients</li>
+    </ul>
+
+    <div class="page-footer">
+        <div class="page-footer-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div>Page 9</div>
+    </div>
+</div>
+
+<!-- SUMMARY PAGE -->
+<div class="page content-page">
+    <div class="page-header">
+        <div class="page-header-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div class="page-header-title">Reignite Health | Digital Audit 2025</div>
+    </div>
+
+    <h1>Summary & Next Steps</h1>
+
+    <h2>Key Takeaways</h2>
+
+    <div class="info-box success keep-together">
+        <h3>What's Working</h3>
+        <ul>
+            <li><strong>Strong niche positioning</strong> - Retirement village focus is unique in the market</li>
+            <li><strong>Clear brand identity</strong> - "We put life in your years" is memorable</li>
+            <li><strong>Founder credibility</strong> - Liam Potter's physiotherapy credentials</li>
+            <li><strong>Modern website</strong> - Clean design, good UX</li>
+            <li><strong>Solid security</strong> - SSL, HSTS, Cloudflare protection</li>
+        </ul>
+    </div>
+
+    <div class="info-box critical keep-together">
+        <h3>What Needs Fixing</h3>
+        <ul>
+            <li><strong>JavaScript-only site</strong> - Invisible to search engines</li>
+            <li><strong>AI crawlers blocked</strong> - Missing from AI search results</li>
+            <li><strong>No sitemap</strong> - Poor crawlability</li>
+            <li><strong>No schema markup</strong> - Missing structured data</li>
+            <li><strong>No Google Business Profile</strong> - Missing from local search</li>
+            <li><strong>Limited content</strong> - Not enough for topical authority</li>
+        </ul>
+    </div>
+
+    <h2>Immediate Actions (This Week)</h2>
+
+    <ol>
+        <li><strong>Update robots.txt</strong> - Allow GPTBot, ClaudeBot, Google-Extended</li>
+        <li><strong>Create Google Business Profile</strong> - Get on Google Maps</li>
+        <li><strong>Contact Emergent</strong> - Ask about SSR or static HTML export options</li>
+        <li><strong>Create sitemap.xml</strong> - Help search engines find your pages</li>
+    </ol>
+
+    <h2>Expected Results</h2>
+
+    <p>With proper implementation of this roadmap:</p>
+
+    <table class="keep-together">
+        <tr>
+            <th>Metric</th>
+            <th>Current</th>
+            <th>3 Months</th>
+            <th>6 Months</th>
+        </tr>
+        <tr>
+            <td>SEO Score</td>
+            <td>2/5</td>
+            <td>3.5/5</td>
+            <td>4/5</td>
+        </tr>
+        <tr>
+            <td>AI Visibility</td>
+            <td>1/5</td>
+            <td>2.5/5</td>
+            <td>4/5</td>
+        </tr>
+        <tr>
+            <td>Organic Traffic</td>
+            <td>Low</td>
+            <td>+50%</td>
+            <td>+150%</td>
+        </tr>
+        <tr>
+            <td>AI Citations</td>
+            <td>0</td>
+            <td>Occasional</td>
+            <td>Regular</td>
+        </tr>
+    </table>
+
+    <div class="info-box keep-together">
+        <h3>Need Help Implementing?</h3>
+        <p>Yes AI can help you implement these recommendations. Contact us to discuss a tailored implementation package.</p>
+        <p><strong>www.yesai.au | (03) 9999 7398 | hello@yesai.au</strong></p>
+    </div>
+
+    <div class="page-footer">
+        <div class="page-footer-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div>Page 10</div>
+    </div>
+</div>
+
+<!-- BACK COVER -->
+<div class="page back-cover">
+    <div class="back-logo">
+        <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+    </div>
+
+    <p class="back-tagline">AI-Powered Digital Strategy</p>
+
+    <div class="back-contact">
+        <p><strong>www.yesai.au</strong></p>
+        <p>(03) 9999 7398</p>
+        <p>hello@yesai.au</p>
+    </div>
+</div>
+
+</body>
+</html>
