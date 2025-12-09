@@ -9,14 +9,15 @@ Gather the cutting edge (latest deployed) RetellAI agent plus all reference docu
 ## What Gets Packaged
 
 1. **Cutting Edge Agent** - Latest version from `retell/Testing/` or `retell/agents/`
-2. **Whitelist Patterns** - `retell/WHITELISTED_PATTERNS.md`
-3. **RetellAI Reference Docs:**
+2. **Last Call Log** - Most recent `CALL*.json` from `retell/Testing/` subfolders (single file only by default)
+3. **Whitelist Patterns** - `retell/WHITELISTED_PATTERNS.md`
+4. **RetellAI Reference Docs:**
    - `retell/RETELLAI_REFERENCE.md`
    - `retell/RETELLAI_JSON_SCHEMAS.md`
    - `retell/AGENT_DEVELOPMENT_GUIDE.md`
-4. **Webhook Documentation:**
+5. **Webhook Documentation:**
    - `n8n/Webhooks Docs/RETELLAI_WEBHOOKS_CURRENT.md`
-5. **Test Cases** - Latest from `retell/Testing/*/TEST_RESULTS/test-cases*.json` (if exists)
+6. **Test Cases** - Latest from `retell/Testing/*/TEST_RESULTS/test-cases*.json` (if exists)
 
 ## Steps
 
@@ -31,7 +32,12 @@ mkdir -p "C:/Users/peter/Downloads/CC/retell/Testing/$(date +%Y-%m-%d)-debug-pac
 - If none found, use latest from `retell/agents/`
 - Copy to the new folder
 
-### Step 3: Copy Reference Documentation
+### Step 3: Find Last Call Log
+- Search `retell/Testing/` subfolders for `CALL*.json` files
+- Sort by modification time and get the MOST RECENT ONE ONLY
+- Copy single file to the debug package folder
+
+### Step 4: Copy Reference Documentation
 ```bash
 DEST="C:/Users/peter/Downloads/CC/retell/Testing/YYYY-MM-DD-debug-package"
 
@@ -45,11 +51,11 @@ cp "C:/Users/peter/Downloads/CC/retell/AGENT_DEVELOPMENT_GUIDE.md" "$DEST/"
 cp "C:/Users/peter/Downloads/CC/n8n/Webhooks Docs/RETELLAI_WEBHOOKS_CURRENT.md" "$DEST/"
 ```
 
-### Step 4: Copy Latest Test Cases (if available)
+### Step 5: Copy Latest Test Cases (if available)
 - Find the most recent `test-cases*.json` file in Testing subfolders
 - Copy to the debug package folder
 
-### Step 5: Create README
+### Step 6: Create README
 Generate a README.md in the folder with:
 - Date created
 - Agent version included
@@ -65,6 +71,7 @@ Folder: C:\Users\peter\Downloads\CC\retell\Testing\YYYY-MM-DD-debug-package
 
 Contents:
   - Reignite_AI_Mega_Receptionist_vX.XXX_CC.json (Agent)
+  - CALL_DATA.json (Last call log)
   - WHITELISTED_PATTERNS.md
   - RETELLAI_REFERENCE.md
   - RETELLAI_JSON_SCHEMAS.md
@@ -86,4 +93,5 @@ DONE DONE DONE
 - This package is READ-ONLY reference material
 - Safe to share externally for code review/audit
 - Contains NO credentials or API keys
+- **Only the LAST call log is included by default** - request additional calls explicitly if needed
 - Update package by re-running this command (creates new dated folder)
