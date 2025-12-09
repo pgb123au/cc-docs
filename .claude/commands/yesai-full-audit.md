@@ -670,6 +670,10 @@ table { font-size: 10px; margin: 10px 0; }
 th, td { padding: 6px 8px; }
 .info-box { padding: 10px 12px; margin: 10px 0; font-size: 11px; }
 
+/* CRITICAL: Footer overlap prevention - content must not overlap fixed footer */
+.content-page { padding: 25px 35px 70px 35px; } /* Extra 70px bottom padding for fixed footer */
+.page-footer { position: absolute; bottom: 20px; left: 35px; right: 35px; }
+
 /* Keep-together class for grouped content */
 .keep-together {
     page-break-inside: avoid !important;
