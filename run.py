@@ -33,6 +33,32 @@ def get_script_categories() -> Dict[str, List[Tuple[str, str, str]]]:
     """
     base_dir = Path(__file__).parent
 
+    # One-off scripts to exclude (patterns)
+    EXCLUDE_PATTERNS = [
+        # n8n one-off fix/update scripts
+        "fix_get_availability_",
+        "fix_get_class_schedule_",
+        "update_availability_workflow.py",
+        "update_funding_workflow.py",
+        "analyze_workflow.py",
+        "extract_node_code.py",
+        # n8n one-off test scripts
+        "test_class_schedule_cache.py",
+        "test_get_directions_cache.py",
+        "test_funding_cache.py",
+        "test_funding_simple.py",
+        # RetellAI version-specific fix scripts
+        "apply_v",
+        "verify_v",
+    ]
+
+    def is_excluded(script_name: str) -> bool:
+        """Check if script matches any exclusion pattern."""
+        for pattern in EXCLUDE_PATTERNS:
+            if pattern in script_name:
+                return True
+        return False
+
     scripts = {
         "Launcher Scripts": [],
         "n8n - Core Scripts": [],
@@ -63,19 +89,22 @@ def get_script_categories() -> Dict[str, List[Tuple[str, str, str]]]:
     n8n_python = base_dir / "n8n" / "Python"
     if n8n_python.exists():
         for script in sorted(n8n_python.glob("*.py")):
-            scripts["n8n - Core Scripts"].append((script.name, str(script), get_rel_path(script)))
+            if not is_excluded(script.name):
+                scripts["n8n - Core Scripts"].append((script.name, str(script), get_rel_path(script)))
 
     # n8n Diagnostics
     n8n_diag = base_dir / "n8n" / "Python" / "Diagnose-n8n-Errors"
     if n8n_diag.exists():
         for script in sorted(n8n_diag.glob("*.py")):
-            scripts["n8n - Diagnostics"].append((script.name, str(script), get_rel_path(script)))
+            if not is_excluded(script.name):
+                scripts["n8n - Diagnostics"].append((script.name, str(script), get_rel_path(script)))
 
     # RetellAI Scripts (main scripts folder)
     retell_scripts = base_dir / "retell" / "scripts"
     if retell_scripts.exists():
         for script in sorted(retell_scripts.glob("*.py")):
-            scripts["RetellAI - Scripts"].append((script.name, str(script), get_rel_path(script)))
+            if not is_excluded(script.name):
+                scripts["RetellAI - Scripts"].append((script.name, str(script), get_rel_path(script)))
 
     # RetellAI API Scripts - key upload/download scripts (legacy)
     retell_api_scripts = base_dir / "retell" / "archive" / "agent-history" / "testing-root-old"
