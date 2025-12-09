@@ -5,8 +5,9 @@ n8n/
 # Separate projects
 websites/
 
-# Claude Code local settings
-.claude/
+# Claude Code local settings (but track slash commands)
+.claude/*
+!.claude/commands/
 
 # MCP config (contains API keys)
 .mcp.json
