@@ -269,6 +269,49 @@ python run.py
 
 ---
 
+## FILE ORGANIZATION RULES
+
+**⚠️ NEVER save files to these root folders:**
+- `CC/` (project root)
+- `CC/retell/`
+- `CC/n8n/`
+- `CC/n8n/JSON/`
+
+### Where Files MUST Go
+
+| File Type | Correct Location | Example |
+|-----------|------------------|---------|
+| **Temp/debug JSON** | `retell/Testing/[date]/` | `temp_agent.json` → `Testing/2025-12-09/` |
+| **Agent dev files** | `retell/Testing/[date]/` | New agent versions during development |
+| **Stable agents** | `retell/agents/` | Only final tested version |
+| **n8n workflow exports** | `n8n/JSON/active_workflows/` | Production workflows |
+| **Old/archived workflows** | `n8n/JSON/archive/` | Superseded versions |
+| **Debug workflow files** | `n8n/JSON/archive/` | One-off fixes, debug exports |
+| **Python scripts (n8n)** | `n8n/Python/` | NOT in `n8n/JSON/` |
+| **Planning docs** | Relevant subfolder or delete after | NOT in root folders |
+| **Client audit reports** | `CLIENTS/[client-name]/` | NOT in `CC/` root |
+| **Call logs/debug data** | `retell/Testing/[date]/` or delete | NOT in `CC/` root |
+
+### Cleanup Rules
+
+1. **Temp files** (`temp_*.json`, `debug_*.json`) → Delete after use or save to `Testing/`
+2. **One-off scripts** → Archive to `n8n/archive/old_scripts/` or delete
+3. **Old workflow versions** → Keep only latest 1-2 in `active_workflows/`, archive rest
+4. **Download directories** → Clean `n8n/Python/downloads/` regularly (keep newest 2-3)
+5. **Planning/changelog docs** → Move to `archive/` when complete
+
+### Before Creating ANY File
+
+Ask yourself:
+1. Does this file already exist somewhere? → Edit existing
+2. Is this temporary? → Use `Testing/[date]/` or don't save
+3. Will this be needed long-term? → Put in correct permanent location
+4. Is this a one-off script? → Consider not saving, or archive immediately
+
+**If you find yourself saving to a root folder, STOP and find the correct subfolder.**
+
+---
+
 ## PROJECT OVERVIEW
 
 **System:** AI receptionist using RetellAI + n8n automation
@@ -277,4 +320,4 @@ python run.py
 
 ---
 
-**Last Updated:** 2025-12-09
+**Last Updated:** 2025-12-10
