@@ -52,6 +52,19 @@ Tests with `"tool_mocks": []` execute REAL webhooks and modify REAL Cliniko data
 2. `RETURNING *;` on ALL INSERT/UPDATE/DELETE statements
 3. NEVER use `JSON.parse()` on JSONB columns (already parsed)
 
+### RetellAI Call Data Rule
+**When user requests "last call" or "recent calls", ALWAYS fetch fresh from RetellAI API.**
+
+- Use `retell/scripts/` tools or direct API calls to get current data
+- NEVER use cached files like `last_call.json`, `call_*.json` from previous sessions
+- Delete temp call files after use (don't leave in root folders)
+
+```bash
+# Get calls from API
+cd C:\Users\peter\Downloads\CC\retell\scripts
+python get_calls.py --limit 5
+```
+
 ### Fix Location Rule (Agent vs n8n)
 **When a fix can be done in EITHER the RetellAI agent OR n8n webhook, prefer n8n:**
 
