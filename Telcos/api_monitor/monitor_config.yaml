@@ -1,0 +1,120 @@
+# API Change Monitor Configuration
+# Monitors provider API documentation for changes that may benefit n8n/RetellAI systems
+
+settings:
+  check_frequency: daily  # Run once per day
+  email_recipient: peter@yesai.au
+  webhook_url: https://auto.yr.com.au/webhook/api-change-alert
+  github_repo: peter/CC  # For auto-creating issues
+  snapshot_retention_days: 30
+
+# Claude API for analysis
+claude:
+  model: claude-sonnet-4-20250514
+  max_tokens: 4000
+
+# Provider API documentation pages to monitor
+providers:
+  telnyx:
+    name: Telnyx
+    pages:
+      - url: https://developers.telnyx.com/api/v2/overview
+        name: API Overview
+        selector: main  # CSS selector for content extraction
+      - url: https://developers.telnyx.com/docs/v2/call-control
+        name: Call Control API
+        selector: main
+      - url: https://developers.telnyx.com/docs/v2/sip-trunking
+        name: SIP Trunking
+        selector: main
+      - url: https://developers.telnyx.com/changelog
+        name: Changelog
+        selector: main
+        priority: high  # Check this first for updates
+    relevance_keywords:
+      - webhook
+      - sip
+      - call recording
+      - transcription
+      - real-time
+      - streaming
+      - fqdn
+      - codec
+      - australia
+
+  zadarma:
+    name: Zadarma
+    pages:
+      - url: https://zadarma.com/en/support/api/
+        name: API Documentation
+        selector: .api-content, .content, main
+      - url: https://zadarma.com/en/support/api/#api_method_info_balance
+        name: Balance API
+        selector: .api-content
+      - url: https://zadarma.com/en/support/api/#api_method_pbx_internal
+        name: PBX API
+        selector: .api-content
+    relevance_keywords:
+      - webhook
+      - callback
+      - sip
+      - recording
+      - statistics
+      - pbx
+      - virtual number
+
+  retellai:
+    name: RetellAI
+    pages:
+      - url: https://docs.retellai.com/api-references/introduction
+        name: API Introduction
+        selector: main, article, .content
+      - url: https://docs.retellai.com/api-references/create-web-call
+        name: Web Call API
+        selector: main
+      - url: https://docs.retellai.com/api-references/create-phone-call
+        name: Phone Call API
+        selector: main
+      - url: https://docs.retellai.com/api-references/list-call
+        name: List Calls API
+        selector: main
+      - url: https://docs.retellai.com/features/custom-llm
+        name: Custom LLM
+        selector: main
+      - url: https://docs.retellai.com/features/post-call-webhook
+        name: Post Call Webhook
+        selector: main
+        priority: high
+      - url: https://docs.retellai.com/changelog
+        name: Changelog
+        selector: main, article
+        priority: high
+    relevance_keywords:
+      - webhook
+      - agent
+      - llm
+      - tool
+      - function calling
+      - transcript
+      - sentiment
+      - booking
+      - custom function
+      - response engine
+
+# System files to reference when analyzing changes
+system_context:
+  n8n_webhooks: n8n/Webhooks Docs/RETELLAI_WEBHOOKS_CURRENT.md
+  retell_reference: retell/RETELLAI_REFERENCE.md
+  agent_guide: retell/AGENT_DEVELOPMENT_GUIDE.md
+  telco_capabilities: Telcos/Documentation/TELCO_API_CAPABILITIES.md
+
+# Impact assessment categories
+impact_categories:
+  - new_endpoint: "New API endpoint that could add functionality"
+  - parameter_change: "New or changed parameters on existing endpoints"
+  - webhook_update: "Changes to webhook payloads or events"
+  - deprecation: "Deprecated features that need migration"
+  - rate_limit: "Changes to rate limits or quotas"
+  - authentication: "Auth method changes"
+  - feature_release: "New feature announcement"
+  - bug_fix: "Bug fix that may resolve known issues"

@@ -13,7 +13,7 @@ from pathlib import Path
 
 # Configuration
 WEBHOOK_URL = "https://auto.yr.com.au/webhook/server-health-report"
-ALERT_EMAIL = "peter@yr.com.au"
+ALERT_EMAIL = "peter@yesai.au"
 
 # Thresholds
 DISK_WARNING = 80  # percent
