@@ -9,8 +9,8 @@ Switch all Reignite-related email workflows to route emails to Aspire Admin Serv
 | Field | Value |
 |-------|-------|
 | **TO** | `clients@aspireadminservices.com.au` |
-| **CC** | `Hello@reignitehealth.com.au, support@yesai.au` |
-| **BCC** | *(none)* |
+| **CC** | `Hello@reignitehealth.com.au` |
+| **BCC** | `support@yesai.au` |
 
 ## Execute this command
 
@@ -27,7 +27,8 @@ HEADERS = {'X-N8N-API-KEY': API_KEY, 'Content-Type': 'application/json'}
 
 # Sara Holiday routing
 NEW_TO = 'clients@aspireadminservices.com.au'
-NEW_CC = 'Hello@reignitehealth.com.au, support@yesai.au'
+NEW_CC = 'Hello@reignitehealth.com.au'
+NEW_BCC = 'support@yesai.au'
 
 # Workflows to update
 WORKFLOWS = [
@@ -40,7 +41,7 @@ WORKFLOWS = [
 print('Switching emails for Sara holiday routing...')
 print('TO:', NEW_TO)
 print('CC:', NEW_CC)
-print('BCC: (none)')
+print('BCC:', NEW_BCC)
 print('=' * 60)
 
 for wf_id, wf_name in WORKFLOWS:
@@ -58,13 +59,24 @@ for wf_id, wf_name in WORKFLOWS:
                 params = node.get('parameters', {})
                 old_to = params.get('sendTo', '(none)')
 
+                # Set TO address
                 params['sendTo'] = NEW_TO
-                params['ccEmail'] = NEW_CC
-                params.pop('bccEmail', None)  # Remove BCC
+
+                # Remove broken top-level CC/BCC params (these don't work!)
+                params.pop('ccEmail', None)
+                params.pop('bccEmail', None)
+
+                # Set CC and BCC inside options (correct location for Gmail node v2.x)
+                if 'options' not in params:
+                    params['options'] = {}
+                params['options']['ccList'] = NEW_CC
+                params['options']['bccList'] = NEW_BCC
 
                 node['parameters'] = params
                 modified = True
-                print(f'  Node: {node.get(\"name\", \"Gmail\")} - TO changed from {old_to}')
+                print(f'  {wf_name}')
+                print(f'    Node: {node.get(\"name\", \"Gmail\")}')
+                print(f'    TO: {old_to} -> {NEW_TO}')
 
         if not modified:
             print(f'SKIP {wf_name}: No Gmail node found')
@@ -79,15 +91,16 @@ for wf_id, wf_name in WORKFLOWS:
 
         r = requests.put(f'{BASE_URL}/workflows/{wf_id}', headers=HEADERS, json=update_data)
         if r.status_code == 200:
-            print(f'OK   {wf_name}')
+            print(f'    -> OK')
         else:
-            print(f'FAIL {wf_name}: {r.status_code} - {r.text[:200]}')
+            print(f'    -> FAIL: {r.status_code} - {r.text[:200]}')
+        print()
 
     except Exception as e:
         print(f'ERR  {wf_name}: {str(e)}')
 
 print('=' * 60)
-print('Done!')
+print('Done! Emails now route to Aspire Admin with Reignite CC and Yes AI BCC.')
 "
 ```
 
@@ -95,19 +108,28 @@ print('Done!')
 
 | Workflow | TO | CC | BCC |
 |----------|----|----|-----|
-| Email End of Call Summary | clients@aspireadminservices.com.au | Hello@reignitehealth.com.au, support@yesai.au | - |
-| Email Sara Transfer (both) | clients@aspireadminservices.com.au | Hello@reignitehealth.com.au, support@yesai.au | - |
-| Sara Approval Queue | clients@aspireadminservices.com.au | Hello@reignitehealth.com.au, support@yesai.au | - |
+| Email End of Call Summary | clients@aspireadminservices.com.au | Hello@reignitehealth.com.au | support@yesai.au |
+| Email Sara Transfer (both) | clients@aspireadminservices.com.au | Hello@reignitehealth.com.au | support@yesai.au |
+| Sara Approval Queue | clients@aspireadminservices.com.au | Hello@reignitehealth.com.au | support@yesai.au |
+
+## Technical Note
+
+**IMPORTANT:** n8n Gmail node v2.x requires CC/BCC to be set inside `options`:
+```python
+params['options']['ccList'] = 'email@example.com'   # CORRECT
+params['options']['bccList'] = 'email@example.com'  # CORRECT
+params['ccEmail'] = 'email@example.com'             # WRONG - ignored!
+```
 
 ## To Restore Original Routing (When Sara Returns)
 
-Change these values in the script above:
+Use `/retell-emails-to-peter` to route all emails to peter@yesai.au, or modify this script:
 ```python
 NEW_TO = 'hello@reignitehealth.com.au'
-NEW_CC = ''  # or remove ccEmail line
-# Add back: params['bccEmail'] = 'peter@yesai.au'
+NEW_CC = ''
+NEW_BCC = 'peter@yesai.au'
 ```
 
 ---
-**Last Updated:** 2025-12-11
-**Status:** Sara Holiday Routing ACTIVE
+**Last Updated:** 2025-12-12
+**Status:** Updated with correct options.ccList/bccList format

@@ -57,13 +57,24 @@ for wf_id, wf_name in WORKFLOWS:
                 params = node.get('parameters', {})
                 old_to = params.get('sendTo', '(none)')
 
+                # Set TO address
                 params['sendTo'] = NEW_TO
-                params.pop('ccEmail', None)   # Remove CC
-                params.pop('bccEmail', None)  # Remove BCC
+
+                # Remove broken top-level CC/BCC params
+                params.pop('ccEmail', None)
+                params.pop('bccEmail', None)
+
+                # Clear options CC/BCC (correct location for Gmail node v2.x)
+                if 'options' not in params:
+                    params['options'] = {}
+                params['options'].pop('ccList', None)
+                params['options'].pop('bccList', None)
 
                 node['parameters'] = params
                 modified = True
-                print(f'  Node: {node.get(\"name\", \"Gmail\")} - TO changed from {old_to}')
+                print(f'  {wf_name}')
+                print(f'    Node: {node.get(\"name\", \"Gmail\")}')
+                print(f'    TO: {old_to} -> {NEW_TO}')
 
         if not modified:
             print(f'SKIP {wf_name}: No Gmail node found')
@@ -78,9 +89,10 @@ for wf_id, wf_name in WORKFLOWS:
 
         r = requests.put(f'{BASE_URL}/workflows/{wf_id}', headers=HEADERS, json=update_data)
         if r.status_code == 200:
-            print(f'OK   {wf_name}')
+            print(f'    -> OK')
         else:
-            print(f'FAIL {wf_name}: {r.status_code} - {r.text[:200]}')
+            print(f'    -> FAIL: {r.status_code} - {r.text[:200]}')
+        print()
 
     except Exception as e:
         print(f'ERR  {wf_name}: {str(e)}')
@@ -98,5 +110,14 @@ print('Done! All emails now route to peter@yesai.au only.')
 | Email Sara Transfer (both) | peter@yesai.au | - | - |
 | Sara Approval Queue | peter@yesai.au | - | - |
 
+## Technical Note
+
+**IMPORTANT:** n8n Gmail node v2.x requires CC/BCC to be set inside `options`:
+```python
+params['options']['ccList'] = 'email@example.com'   # CORRECT
+params['options']['bccList'] = 'email@example.com'  # CORRECT
+params['ccEmail'] = 'email@example.com'             # WRONG - ignored!
+```
+
 ---
-**Last Updated:** 2025-12-11
+**Last Updated:** 2025-12-12
