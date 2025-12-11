@@ -147,6 +147,54 @@ providers:
       - breaking change
       - migration
 
+  n8n:
+    name: n8n
+    pages:
+      - url: https://docs.n8n.io/api/
+        name: API Overview
+        selector: main, article, .content
+        priority: high
+      - url: https://docs.n8n.io/api/api-reference/
+        name: API Reference
+        selector: main, article
+        priority: high
+      - url: https://docs.n8n.io/release-notes/
+        name: Release Notes
+        selector: main, article
+        priority: high
+      - url: https://docs.n8n.io/2-0-breaking-changes/
+        name: Breaking Changes v2.0
+        selector: main, article
+        priority: high
+      - url: https://docs.n8n.io/hosting/
+        name: Self-Hosting Guide
+        selector: main, article
+      - url: https://docs.n8n.io/integrations/builtin/core-nodes/
+        name: Core Nodes
+        selector: main, article
+      - url: https://docs.n8n.io/code/
+        name: Code Node Documentation
+        selector: main, article
+      - url: https://github.com/n8n-io/n8n/releases
+        name: GitHub Releases
+        selector: main, .markdown-body, article
+        priority: high
+    relevance_keywords:
+      - workflow
+      - webhook
+      - node
+      - credential
+      - execution
+      - breaking change
+      - deprecated
+      - migration
+      - docker
+      - postgresql
+      - api
+      - authentication
+      - rate limit
+      - security
+
 # System files to reference when analyzing changes
 system_context:
   n8n_webhooks: n8n/Webhooks Docs/RETELLAI_WEBHOOKS_CURRENT.md
