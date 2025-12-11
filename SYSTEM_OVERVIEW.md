@@ -15,8 +15,10 @@
 | Automation Workflows | 53 | 19,895 |
 | Automation Scripts | 29 | 6,431 |
 | Deployment Scripts | 17 | 7,563 |
-| Telco Scripts | 1 | 3,475 |
-| **Production Total** | **101** | **~44,500** |
+| Telco Management System | 14 | 8,451 |
+| Server Sync & Health | 6 | 2,234 |
+| API Monitoring | 3 | 925 |
+| **Production Total** | **123** | **~52,500** |
 
 ### SQL (Database Code)
 
@@ -26,120 +28,203 @@
 | Migrations | 2 | 294 | Production |
 | Functions | 2 | 298 | Active |
 | Testing | 8 | 1,393 | Development |
-| Archive | 2 | 246 | Historical |
-| **Total** | **19** | **2,622** | |
-
-**Production SQL: ~983 lines** (9 files)
-
-### Database Tables
-
-**Total: 51 tables**
-
-| Table | Size | Purpose |
-|-------|-----:|---------|
-| group_appointments | 8.5 MB | Class schedule cache |
-| individual_slots_cache | 912 KB | Individual booking slots |
-| webhook_log | 904 KB | API call logging |
-| patients | 824 KB | Patient records (877 patients) |
-| webhook_cache | 176 KB | Response caching |
-| appointment_log | 144 KB | Booking history |
-| patient_funding_cache | 128 KB | Funding eligibility cache |
-| error_log | 128 KB | Error tracking |
-| call_log | 120 KB | Call events |
-| calls | - | Call records (304 calls) |
-
-### Voice Agent Architecture
-
-- **109 conversation nodes** (conversation, function, logic_split, end)
-- **24 function nodes** (webhook calls)
-- **20 webhook tools** integrated
-- **Equation-based routing** for complex decision trees
+| **Total** | **17** | **2,376** | |
 
 ---
 
-## Features Ranked by Impact (50)
+## Voice Agent Architecture
 
-**Scoring:** Cleverness (1-10) × Complexity (1-10) × Usefulness (1-10)
+The voice agent is a sophisticated conversational AI system built on a state machine architecture with intelligent routing.
 
-| Rank | Score | Feature | C | X | U |
-|-----:|------:|---------|:-:|:-:|:-:|
-| 1 | 810 | **Appointment Booking Flow** - Multi-step orchestration: funding check → availability → slot selection → create appointment | 9 | 9 | 10 |
-| 2 | 720 | **Intent Classification** - NLU-driven detection of caller intent (book, cancel, reschedule, enquiry, transfer) | 9 | 8 | 10 |
-| 3 | 640 | **Funding Eligibility Checks** - Validates HCP/NDIS/Private funding with Australian healthcare rules | 8 | 8 | 10 |
-| 4 | 576 | **Booking Rules Engine** - Enforces service-specific constraints (lead times, practitioner requirements, funding) | 8 | 8 | 9 |
-| 5 | 576 | **Smart Error Handling** - Graceful degradation when backends fail, prevents call abandonment | 8 | 8 | 9 |
-| 6 | 560 | **Availability Search** - Real-time practitioner calendar queries with slot aggregation | 7 | 8 | 10 |
-| 7 | 504 | **Caller ID Lookup** - Silent pre-greeting phone lookup enables personalized experience | 8 | 7 | 9 |
-| 8 | 504 | **Email Call Summaries** - Auto-generated end-of-call reports with full conversation context | 8 | 7 | 9 |
-| 9 | 504 | **Human Transfer (Sara)** - Seamless escalation with context handoff to human receptionist | 8 | 7 | 9 |
-| 10 | 504 | **Patient Context Persistence** - Maintains state across tool calls and conversation branches | 8 | 7 | 9 |
-| 11 | 448 | **EP Assessment Flow** - Domain-specific workflow tracking exercise physiology requirements | 8 | 7 | 8 |
-| 12 | 448 | **Conversation Summarization** - Auto-generates natural language call summaries | 8 | 7 | 8 |
-| 13 | 441 | **Appointment Rescheduling** - Atomic cancel + rebook with availability checking | 7 | 7 | 9 |
-| 14 | 441 | **Class Enrollment** - Books patients into group sessions with capacity validation | 7 | 7 | 9 |
-| 15 | 392 | **Patient Search by Name** - Fuzzy matching with confidence scoring and multi-result handling | 7 | 7 | 8 |
-| 16 | 392 | **Recurring Conflict Detection** - Identifies clashes with existing recurring appointments | 8 | 7 | 7 |
-| 17 | 392 | **Multi-Village Support** - Routes to correct clinic location with location-aware logic | 7 | 7 | 8 |
-| 18 | 378 | **Timezone Handling** - Sydney/Melbourne timezone conversion with DST awareness | 6 | 7 | 9 |
-| 19 | 378 | **Referral Validation** - Checks Medicare referral existence for funded services | 7 | 6 | 9 |
-| 20 | 378 | **Medicare Compliance** - Ensures bookings meet Medicare funding requirements | 6 | 7 | 9 |
-| 21 | 336 | **Service Type Triage** - Maps caller intent to appropriate service category | 7 | 6 | 8 |
-| 22 | 336 | **Duplicate Booking Prevention** - Checks existing appointments before creating new ones | 7 | 6 | 8 |
-| 23 | 336 | **Funding Type Detection** - Auto-determines HCP/NDIS/Private from patient records | 7 | 6 | 8 |
-| 24 | 336 | **Referral Expiry Tracking** - Monitors HCP validity and remaining sessions | 7 | 6 | 8 |
-| 25 | 336 | **Public Holiday Detection** - Australian holiday calendar integration | 7 | 6 | 8 |
-| 26 | 294 | **Class Waitlist Management** - Queues patients when classes reach capacity | 7 | 6 | 7 |
-| 27 | 288 | **Multi-Village Patient Matching** - Disambiguates same-name patients across locations | 8 | 6 | 6 |
-| 28 | 288 | **Class Schedule Lookup** - Retrieves group classes by type, location, and date | 6 | 6 | 8 |
-| 29 | 288 | **Class Capacity Checking** - Validates available spots before enrollment | 6 | 6 | 8 |
-| 30 | 280 | **Appointment Confirmation Readback** - Natural language confirmation before finalizing | 7 | 5 | 8 |
-| 31 | 252 | **Reschedule Availability Check** - Context-aware slot queries for rescheduling | 6 | 6 | 7 |
-| 32 | 252 | **MAC Assessment Scripts** - Medical Assessment Certification eligibility handling | 7 | 6 | 6 |
-| 33 | 245 | **FAQ Capture & Routing** - Logs unanswered questions for staff follow-up | 7 | 5 | 7 |
-| 34 | 240 | **Patient Notes Updates** - Appends call notes to patient records | 6 | 5 | 8 |
-| 35 | 210 | **DOB Verification** - Secondary verification when name match is uncertain | 6 | 5 | 7 |
-| 36 | 210 | **Practitioner Preference Capture** - Records and respects preferred provider | 6 | 5 | 7 |
-| 37 | 210 | **Operating Hours Awareness** - Business hours validation and after-hours messaging | 6 | 5 | 7 |
-| 38 | 210 | **Protected Slots Enforcement** - Respects blocked time for meetings/breaks | 6 | 5 | 7 |
-| 39 | 210 | **HCP Details Capture** - Records Health Care Provider referral information | 6 | 5 | 7 |
-| 40 | 210 | **Callback Scheduling** - Captures callback requests for follow-up queue | 6 | 5 | 7 |
-| 41 | 210 | **Follow-up List Management** - Tracks patients needing manual intervention | 6 | 5 | 7 |
-| 42 | 200 | **List Upcoming Appointments** - Retrieves and reads scheduled appointments | 5 | 5 | 8 |
-| 43 | 200 | **Appointment Cancellation** - Cancels with reason tracking and confirmation | 5 | 5 | 8 |
-| 44 | 200 | **SMS Notifications** - Appointment confirmations and reminders via SMS | 5 | 5 | 8 |
-| 45 | 175 | **Class Enrollment Confirmation** - Confirms details and sends notification | 5 | 5 | 7 |
-| 46 | 175 | **Instructor Email Notifications** - Notifies instructors of new enrollments | 5 | 5 | 7 |
-| 47 | 160 | **New Patient Detection** - Identifies first-time callers for registration | 5 | 4 | 8 |
-| 48 | 140 | **Directions & Location Info** - Provides addresses and parking info | 5 | 4 | 7 |
-| 49 | 120 | **Cancellation Reason Capture** - Records cancellation reasons for analytics | 5 | 4 | 6 |
-| 50 | 120 | **After-Hours Messaging** - Custom flows outside business hours | 5 | 4 | 6 |
+### Core Metrics
 
-**Legend:** C = Cleverness, X = Complexity, U = Usefulness
+| Metric | Value |
+|--------|------:|
+| **Conversation Nodes** | 109 |
+| **Function Nodes** | 24 |
+| **Webhook Integrations** | 20 |
+| **Distinct Conversation Paths** | 50+ |
+| **State Variables Tracked** | 35+ |
+
+### Architecture Highlights
+
+- **Equation-Based Routing** - Complex boolean expressions determine conversation flow based on multiple variables (funding status, patient type, time of day, service requested)
+- **Silent Pre-Processing** - Function nodes execute backend lookups before speaking, enabling personalized greetings without delay
+- **Multi-Modal State Machine** - Four node types (conversation, function, logic_split, end) enable both linear flows and complex branching
+- **Graceful Degradation** - Every webhook call has fallback paths to maintain conversation even when backends fail
+- **Context Accumulation** - Variables persist across the entire call, building a complete picture for handoffs and summaries
+
+### Node Type Distribution
+
+| Type | Count | Purpose |
+|------|------:|---------|
+| Conversation | 62 | Speak to caller, collect responses |
+| Function | 24 | Silent webhook calls |
+| Logic Split | 18 | Variable-based routing |
+| End | 5 | Call termination points |
 
 ---
 
-## Top 10 Features by Category
+## Voice Agent Features (80)
 
-### Highest Cleverness (Innovation)
-1. Appointment Booking Flow (9)
-2. Intent Classification (9)
-3. Funding Eligibility Checks (8)
-4. Booking Rules Engine (8)
-5. Smart Error Handling (8)
+### Patient Identification & Verification
+1. **Caller ID Lookup** - Silent pre-greeting phone lookup for personalized experience
+2. **Patient Search by Name** - Fuzzy matching with confidence scoring
+3. **DOB Verification** - Secondary verification for uncertain matches
+4. **Multi-Village Patient Matching** - Disambiguates same-name patients across locations
+5. **New Patient Detection** - Routes first-time callers to registration
+6. **Phone Number Normalization** - Handles Australian mobile/landline formats
+7. **Confidence Score Thresholds** - Configurable match certainty requirements
+8. **Multiple Match Handling** - Presents options when several patients match
 
-### Highest Complexity (Engineering Effort)
-1. Appointment Booking Flow (9)
-2. Intent Classification (8)
-3. Funding Eligibility Checks (8)
-4. Booking Rules Engine (8)
-5. Smart Error Handling (8)
+### Appointment Booking
+9. **Multi-Step Booking Flow** - Funding → availability → slot → confirmation
+10. **Practitioner Preference Capture** - Records and respects preferred provider
+11. **Service Type Triage** - Routes to appropriate service category
+12. **Real-Time Availability Search** - Live calendar queries with slot aggregation
+13. **Appointment Confirmation Readback** - Verbal confirmation before finalizing
+14. **Duplicate Booking Prevention** - Checks existing appointments first
+15. **Booking Rules Engine** - Enforces lead times, practitioner requirements
+16. **Timezone Handling** - Sydney/Melbourne conversion with DST awareness
+17. **Practitioner Availability Windows** - Respects individual schedules
+18. **Slot Duration Matching** - Ensures service fits available time
 
-### Highest Usefulness (Business Value)
-1. Appointment Booking Flow (10)
-2. Intent Classification (10)
-3. Funding Eligibility Checks (10)
-4. Availability Search (10)
-5. Booking Rules Engine (9)
+### Appointment Management
+19. **List Upcoming Appointments** - Retrieves and reads scheduled visits
+20. **Appointment Rescheduling** - Atomic cancel + rebook flow
+21. **Reschedule Availability Check** - Context-aware slot queries
+22. **Appointment Cancellation** - With reason tracking and confirmation
+23. **Cancellation Reason Capture** - Analytics on why patients cancel
+24. **Recurring Conflict Detection** - Prevents double-booking recurring slots
+25. **Appointment History Awareness** - References past visits in conversation
+26. **Same-Day Booking Handling** - Special flow for urgent requests
+
+### Funding & Eligibility
+27. **Funding Eligibility Checks** - Validates HCP/NDIS/Private status
+28. **Funding Type Detection** - Auto-determines from patient records
+29. **Referral Validation** - Checks Medicare referral existence
+30. **Referral Expiry Tracking** - Monitors validity and remaining sessions
+31. **EP Assessment Flow** - Tracks exercise physiology requirements
+32. **Medicare Compliance** - Ensures bookings meet funding rules
+33. **NDIS Plan Verification** - Validates NDIS funding status
+34. **Private Fee Quotes** - Provides pricing for self-funded patients
+35. **Bulk Billing Eligibility** - Checks concession card status
+36. **Session Count Tracking** - Monitors remaining funded sessions
+
+### Exercise Classes
+37. **Class Schedule Lookup** - Retrieves classes by type and location
+38. **Class Enrollment** - Books into group sessions with capacity check
+39. **Class Capacity Checking** - Validates spots before enrollment
+40. **Class Waitlist Management** - Queues patients for full classes
+41. **Class Enrollment Confirmation** - Details and notification sending
+42. **Instructor Email Notifications** - Alerts instructors of enrollments
+43. **Class Type Recognition** - Understands Pilates, Strength, Yoga, etc.
+44. **Recurring Class Bookings** - Weekly/fortnightly enrollment options
+45. **Class Location Details** - Venue-specific instructions
+
+### Location & Scheduling
+46. **Multi-Village Support** - Routes to correct clinic location
+47. **Directions & Location Info** - Addresses and parking details
+48. **Operating Hours Awareness** - Business hours validation
+49. **Public Holiday Detection** - Australian holiday calendar
+50. **Protected Slots Enforcement** - Respects blocked time for meetings
+51. **Village-Specific Services** - Different offerings per location
+52. **Travel Time Considerations** - Accounts for patient travel
+53. **Parking Availability Info** - Location-specific parking guidance
+
+### Patient Communication
+54. **SMS Notifications** - Appointment confirmations via SMS
+55. **Email Call Summaries** - End-of-call reports to staff
+56. **Conversation Summarization** - Auto-generated call summaries
+57. **Patient Notes Updates** - Appends notes to records
+58. **HCP Details Capture** - Records referral information
+59. **MAC Assessment Scripts** - Medical Assessment Certification handling
+60. **Booking Confirmation Messages** - Multi-channel confirmations
+61. **Reminder Scheduling** - Triggers for future reminders
+62. **Staff Alert Routing** - Urgent matters to specific staff
+
+### Call Handling & Transfers
+63. **Human Transfer with Context** - Seamless escalation to receptionist
+64. **FAQ Capture & Routing** - Logs unanswered questions
+65. **Callback Scheduling** - Captures callback requests
+66. **Follow-up List Management** - Tracks patients needing intervention
+67. **After-Hours Messaging** - Custom flows outside business hours
+68. **Voicemail Detection** - Handles answering machine scenarios
+69. **Call Priority Classification** - Urgent vs routine handling
+70. **Transfer Warm Handoff** - Context passed to human agent
+
+### System Intelligence
+71. **Intent Classification** - NLU-driven intent detection
+72. **Smart Error Handling** - Graceful backend failure recovery
+73. **Patient Context Persistence** - State across tool calls
+74. **Conversation Memory** - References earlier in same call
+75. **Adaptive Prompting** - Adjusts based on patient responses
+76. **Silence Detection** - Handles pauses appropriately
+77. **Interruption Handling** - Manages caller interruptions
+78. **Clarification Requests** - Asks for unclear input
+79. **Confirmation Loops** - Verifies critical information
+80. **Call Analytics Logging** - Tracks outcomes for reporting
+
+---
+
+## Telco Management System Features (20)
+
+Multi-provider phone number management across Telnyx, Zadarma, and voice platform.
+
+1. **Unified Number Dashboard** - Single view across all carriers
+2. **Real-Time Number Status** - Live status from carrier APIs
+3. **Agent-to-Number Mapping** - Links voice agents to phone numbers
+4. **Number Provisioning** - Automated new number setup
+5. **Number Porting Management** - Track porting requests
+6. **Carrier API Integration** - Telnyx, Zadarma unified interface
+7. **Cost Tracking by Number** - Per-number billing aggregation
+8. **Number Search & Filter** - Find numbers by area code, features
+9. **Bulk Number Operations** - Mass updates and assignments
+10. **Number Health Monitoring** - Detects routing issues
+11. **Call Volume Analytics** - Per-number usage statistics
+12. **Failover Configuration** - Backup routing rules
+13. **Number Tagging System** - Organize by client/purpose
+14. **Geographic Distribution View** - Numbers by region
+15. **Carrier Balance Monitoring** - Track prepaid balances
+16. **Number Release Workflow** - Safe decommissioning process
+17. **Inbound Route Management** - Configure call handling
+18. **Emergency Number Registry** - Track critical numbers
+19. **Number Audit Trail** - History of changes
+20. **Multi-Tenant Support** - Separate client number pools
+
+---
+
+## API Monitoring System Features (10)
+
+Automated monitoring of external API documentation for breaking changes.
+
+1. **Documentation Change Detection** - Hash-based page monitoring
+2. **Claude-Powered Impact Analysis** - AI assessment of change severity
+3. **Multi-Provider Monitoring** - Cliniko, Telnyx, Zadarma, voice platform
+4. **Automatic GitHub Issue Creation** - Actionable change tickets
+5. **Priority Classification** - Critical/High/Medium/Low ratings
+6. **Affected System Mapping** - Links changes to impacted workflows
+7. **Diff Visualization** - Clear before/after comparison
+8. **Scheduled Monitoring Runs** - Configurable check intervals
+9. **Alert Email Notifications** - Immediate alerts for critical changes
+10. **Historical Change Archive** - Track API evolution over time
+
+---
+
+## Server Monitoring System Features (10)
+
+Health monitoring across AWS EC2 and RackNerd infrastructure.
+
+1. **Dual-Server Health Checks** - AWS and RackNerd monitoring
+2. **Disk Usage Alerts** - Threshold-based warnings
+3. **Memory Utilization Tracking** - Real-time memory stats
+4. **Docker Container Status** - Container health verification
+5. **Service Uptime Monitoring** - PostgreSQL, automation platform
+6. **Automated Health Reports** - Scheduled status webhooks
+7. **SSH Tunnel Health** - Verify remote access
+8. **Database Connection Pool** - Monitor connection health
+9. **SSL Certificate Expiry** - Track cert renewal dates
+10. **Cross-Server Sync Status** - Verify replication health
 
 ---
 
@@ -151,21 +236,57 @@
 | **Automation** | 53 active workflows for backend operations |
 | **Database** | PostgreSQL on AWS EC2 (51 tables, cached lookups) |
 | **Practice Management** | Cliniko integration (real-time sync) |
-| **Phone Numbers** | +61 2 8880 0226 (Sydney), +61 2 4062 0999 (Secondary) |
-| **Email** | Gmail OAuth for call summaries and notifications |
-| **SMS** | Mobile message integration for confirmations |
+| **Secondary Server** | RackNerd VPS for monitoring and sync |
 
 ---
 
 ## Technology Stack
 
+### Voice & Conversation
 - **Voice AI Platform** - Conversational AI with natural language understanding
-- **Workflow Automation** - Self-hosted automation platform on AWS EC2
-- **PostgreSQL** - Database with JSONB caching
+- **Speech-to-Text** - Real-time transcription
+- **Text-to-Speech** - Natural voice synthesis
+- **WebSocket Streaming** - Low-latency audio transport
+
+### Automation & Integration
+- **Workflow Automation** - Self-hosted automation platform
+- **Webhook Architecture** - RESTful API integrations
+- **Event-Driven Processing** - Async workflow triggers
+- **OAuth 2.0** - Secure API authentication
+
+### Data & Storage
+- **PostgreSQL** - Primary database with JSONB caching
+- **Redis-Style Caching** - Response memoization
+- **JSONB Documents** - Flexible schema storage
+- **Incremental Sync** - Delta-based data updates
+
+### External Services
 - **Cliniko API** - Practice management integration
+- **Telnyx API** - Telephony and SMS
+- **Zadarma API** - VoIP and call routing
+- **Gmail API** - Email notifications
+- **Google Sheets API** - Reporting and data export
+
+### Infrastructure
+- **AWS EC2** - Primary cloud compute
+- **RackNerd VPS** - Secondary monitoring server
 - **Docker** - Container orchestration
-- **Python** - Automation scripts, deployment tools
-- **AWS EC2** - Cloud infrastructure
+- **Ubuntu Server** - Operating system
+- **SSH Tunnels** - Secure remote access
+- **Nginx** - Reverse proxy
+
+### Development & Deployment
+- **Python 3.11** - Automation scripts
+- **Node.js** - Webhook processing
+- **Git** - Version control
+- **GitHub** - Repository hosting
+- **Claude API** - AI-powered analysis tools
+
+### Monitoring & Observability
+- **Custom Health Checks** - Server monitoring scripts
+- **API Change Monitor** - Documentation tracking
+- **Error Logging** - Centralized error capture
+- **Call Analytics** - Performance dashboards
 
 ---
 
