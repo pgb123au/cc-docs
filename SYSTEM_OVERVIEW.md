@@ -1,7 +1,4 @@
-# Reignite AI Voice Receptionist - System Overview
-
-**Version:** v11.204
-**Last Updated:** 2025-12-12
+# AI Voice Receptionist / Booking System Overview
 
 ---
 
@@ -18,7 +15,8 @@
 | Telco Management System | 14 | 8,451 | 5 | 800 |
 | Server Sync & Health | 6 | 2,234 | 3 | 450 |
 | API Monitoring | 3 | 925 | 2 | 300 |
-| **Total** | **123** | **~52,500** | **1,005** | **~524,000** |
+| Custom Slash Commands | 29 | 5,720 | 5 | 400 |
+| **Total** | **152** | **~58,300** | **1,010** | **~524,000** |
 
 ### SQL (Database Code)
 
@@ -63,6 +61,16 @@ The voice agent is a sophisticated conversational AI system built on a state mac
 - **Conditional Speech Patterns** - Different phrasings based on patient type, time of day, and context
 - **Error State Recovery** - Automatic retry logic and graceful error messaging
 - **Call Handoff Protocol** - Structured context packaging for human transfer scenarios
+- **Barge-In Detection** - Allows callers to interrupt and redirect conversation mid-speech
+- **Confidence-Based Branching** - Routes differently based on speech recognition confidence scores
+- **Slot Filling Logic** - Progressively collects required information across multiple turns
+- **Disambiguation Flows** - Handles ambiguous responses with targeted clarification questions
+- **Time-Aware Greetings** - Adjusts salutations based on time of day (morning/afternoon/evening)
+- **Caller History Integration** - References previous calls and appointments in conversation
+- **Multi-Turn Confirmation** - Complex bookings require staged confirmation checkpoints
+- **Natural Number Handling** - Understands spoken dates, times, and phone numbers in various formats
+- **Sentiment-Aware Responses** - Adjusts tone based on detected caller frustration or urgency
+- **Fallback Escalation Ladder** - Progressive escalation from retry to clarify to transfer
 
 ### Node Type Distribution
 
@@ -78,90 +86,88 @@ The voice agent is a sophisticated conversational AI system built on a state mac
 
 ## Voice Agent Features (80)
 
-Ranked by Impact Score: Cleverness (C) × Complexity (X) × Usefulness (U)
-
-| Rank | Score | Feature | Category | C | X | U |
-|-----:|------:|---------|----------|:-:|:-:|:-:|
-| 1 | 810 | Multi-Step Booking Flow | Booking | 9 | 9 | 10 |
-| 2 | 720 | Intent Classification | Intelligence | 9 | 8 | 10 |
-| 3 | 640 | Funding Eligibility Checks | Funding | 8 | 8 | 10 |
-| 4 | 576 | Booking Rules Engine | Booking | 8 | 8 | 9 |
-| 5 | 576 | Smart Error Handling | Intelligence | 8 | 8 | 9 |
-| 6 | 560 | Real-Time Availability Search | Booking | 7 | 8 | 10 |
-| 7 | 504 | Caller ID Lookup | Identification | 8 | 7 | 9 |
-| 8 | 504 | Email Call Summaries | Communication | 8 | 7 | 9 |
-| 9 | 504 | Human Transfer with Context | Transfers | 8 | 7 | 9 |
-| 10 | 504 | Patient Context Persistence | Intelligence | 8 | 7 | 9 |
-| 11 | 448 | EP Assessment Flow | Funding | 8 | 7 | 8 |
-| 12 | 448 | Conversation Summarization | Communication | 8 | 7 | 8 |
-| 13 | 448 | Conversation Memory | Intelligence | 8 | 7 | 8 |
-| 14 | 441 | Appointment Rescheduling | Management | 7 | 7 | 9 |
-| 15 | 441 | Class Enrollment | Classes | 7 | 7 | 9 |
-| 16 | 392 | Patient Search by Name | Identification | 7 | 7 | 8 |
-| 17 | 392 | Recurring Conflict Detection | Management | 8 | 7 | 7 |
-| 18 | 392 | Multi-Village Support | Location | 7 | 7 | 8 |
-| 19 | 392 | Adaptive Prompting | Intelligence | 7 | 7 | 8 |
-| 20 | 378 | Timezone Handling | Booking | 6 | 7 | 9 |
-| 21 | 378 | Referral Validation | Funding | 7 | 6 | 9 |
-| 22 | 378 | Medicare Compliance | Funding | 6 | 7 | 9 |
-| 23 | 336 | Service Type Triage | Booking | 7 | 6 | 8 |
-| 24 | 336 | Duplicate Booking Prevention | Booking | 7 | 6 | 8 |
-| 25 | 336 | Funding Type Detection | Funding | 7 | 6 | 8 |
-| 26 | 336 | Referral Expiry Tracking | Funding | 7 | 6 | 8 |
-| 27 | 336 | Public Holiday Detection | Location | 7 | 6 | 8 |
-| 28 | 336 | Class Schedule Lookup | Classes | 7 | 6 | 8 |
-| 29 | 336 | Transfer Warm Handoff | Transfers | 7 | 6 | 8 |
-| 30 | 336 | Confirmation Loops | Intelligence | 7 | 6 | 8 |
-| 31 | 294 | Class Waitlist Management | Classes | 7 | 6 | 7 |
-| 32 | 294 | NDIS Plan Verification | Funding | 7 | 6 | 7 |
-| 33 | 294 | Session Count Tracking | Funding | 7 | 6 | 7 |
-| 34 | 288 | Multi-Village Patient Matching | Identification | 8 | 6 | 6 |
-| 35 | 288 | Class Capacity Checking | Classes | 6 | 6 | 8 |
-| 36 | 288 | Staff Alert Routing | Communication | 6 | 6 | 8 |
-| 37 | 280 | Appointment Confirmation Readback | Booking | 7 | 5 | 8 |
-| 38 | 280 | Practitioner Availability Windows | Booking | 7 | 5 | 8 |
-| 39 | 252 | Reschedule Availability Check | Management | 6 | 6 | 7 |
-| 40 | 252 | MAC Assessment Scripts | Funding | 7 | 6 | 6 |
-| 41 | 252 | Class Type Recognition | Classes | 6 | 6 | 7 |
-| 42 | 252 | Recurring Class Bookings | Classes | 6 | 6 | 7 |
-| 43 | 252 | Interruption Handling | Intelligence | 7 | 6 | 6 |
-| 44 | 245 | FAQ Capture & Routing | Transfers | 7 | 5 | 7 |
-| 45 | 240 | Patient Notes Updates | Communication | 6 | 5 | 8 |
-| 46 | 240 | Booking Confirmation Messages | Communication | 6 | 5 | 8 |
-| 47 | 210 | DOB Verification | Identification | 6 | 5 | 7 |
-| 48 | 210 | Practitioner Preference Capture | Booking | 6 | 5 | 7 |
-| 49 | 210 | Operating Hours Awareness | Location | 6 | 5 | 7 |
-| 50 | 210 | Protected Slots Enforcement | Location | 6 | 5 | 7 |
-| 51 | 210 | HCP Details Capture | Communication | 6 | 5 | 7 |
-| 52 | 210 | Callback Scheduling | Transfers | 6 | 5 | 7 |
-| 53 | 210 | Follow-up List Management | Transfers | 6 | 5 | 7 |
-| 54 | 210 | Clarification Requests | Intelligence | 6 | 5 | 7 |
-| 55 | 200 | New Patient Detection | Identification | 5 | 5 | 8 |
-| 56 | 200 | List Upcoming Appointments | Management | 5 | 5 | 8 |
-| 57 | 200 | Appointment Cancellation | Management | 5 | 5 | 8 |
-| 58 | 200 | SMS Notifications | Communication | 5 | 5 | 8 |
-| 59 | 200 | Call Analytics Logging | Intelligence | 5 | 5 | 8 |
-| 60 | 175 | Phone Number Normalization | Identification | 5 | 5 | 7 |
-| 61 | 175 | Confidence Score Thresholds | Identification | 5 | 5 | 7 |
-| 62 | 175 | Slot Duration Matching | Booking | 5 | 5 | 7 |
-| 63 | 175 | Class Enrollment Confirmation | Classes | 5 | 5 | 7 |
-| 64 | 175 | Instructor Email Notifications | Classes | 5 | 5 | 7 |
-| 65 | 175 | Village-Specific Services | Location | 5 | 5 | 7 |
-| 66 | 175 | Reminder Scheduling | Communication | 5 | 5 | 7 |
-| 67 | 175 | Silence Detection | Intelligence | 5 | 5 | 7 |
-| 68 | 160 | Multiple Match Handling | Identification | 5 | 4 | 8 |
-| 69 | 160 | Same-Day Booking Handling | Management | 5 | 4 | 8 |
-| 70 | 160 | Private Fee Quotes | Funding | 5 | 4 | 8 |
-| 71 | 140 | Appointment History Awareness | Management | 5 | 4 | 7 |
-| 72 | 140 | Bulk Billing Eligibility | Funding | 5 | 4 | 7 |
-| 73 | 140 | Class Location Details | Classes | 5 | 4 | 7 |
-| 74 | 140 | Directions & Location Info | Location | 5 | 4 | 7 |
-| 75 | 140 | Travel Time Considerations | Location | 5 | 4 | 7 |
-| 76 | 140 | Voicemail Detection | Transfers | 5 | 4 | 7 |
-| 77 | 120 | Cancellation Reason Capture | Management | 5 | 4 | 6 |
-| 78 | 120 | Parking Availability Info | Location | 5 | 4 | 6 |
-| 79 | 120 | After-Hours Messaging | Transfers | 5 | 4 | 6 |
-| 80 | 120 | Call Priority Classification | Transfers | 5 | 4 | 6 |
+| Feature | Category |
+|---------|----------|
+| Multi-Step Booking Flow | Booking |
+| Intent Classification | Intelligence |
+| Funding Eligibility Checks | Funding |
+| Booking Rules Engine | Booking |
+| Smart Error Handling | Intelligence |
+| Real-Time Availability Search | Booking |
+| Caller ID Lookup | Identification |
+| Email Call Summaries | Communication |
+| Human Transfer with Context | Transfers |
+| Patient Context Persistence | Intelligence |
+| EP Assessment Flow | Funding |
+| Conversation Summarization | Communication |
+| Conversation Memory | Intelligence |
+| Appointment Rescheduling | Management |
+| Class Enrollment | Classes |
+| Patient Search by Name | Identification |
+| Recurring Conflict Detection | Management |
+| Multi-Village Support | Location |
+| Adaptive Prompting | Intelligence |
+| Timezone Handling | Booking |
+| Referral Validation | Funding |
+| Medicare Compliance | Funding |
+| Service Type Triage | Booking |
+| Duplicate Booking Prevention | Booking |
+| Funding Type Detection | Funding |
+| Referral Expiry Tracking | Funding |
+| Public Holiday Detection | Location |
+| Class Schedule Lookup | Classes |
+| Transfer Warm Handoff | Transfers |
+| Confirmation Loops | Intelligence |
+| Class Waitlist Management | Classes |
+| NDIS Plan Verification | Funding |
+| Session Count Tracking | Funding |
+| Multi-Village Patient Matching | Identification |
+| Class Capacity Checking | Classes |
+| Staff Alert Routing | Communication |
+| Appointment Confirmation Readback | Booking |
+| Practitioner Availability Windows | Booking |
+| Reschedule Availability Check | Management |
+| MAC Assessment Scripts | Funding |
+| Class Type Recognition | Classes |
+| Recurring Class Bookings | Classes |
+| Interruption Handling | Intelligence |
+| FAQ Capture & Routing | Transfers |
+| Patient Notes Updates | Communication |
+| Booking Confirmation Messages | Communication |
+| DOB Verification | Identification |
+| Practitioner Preference Capture | Booking |
+| Operating Hours Awareness | Location |
+| Protected Slots Enforcement | Location |
+| HCP Details Capture | Communication |
+| Callback Scheduling | Transfers |
+| Follow-up List Management | Transfers |
+| Clarification Requests | Intelligence |
+| New Patient Detection | Identification |
+| List Upcoming Appointments | Management |
+| Appointment Cancellation | Management |
+| SMS Notifications | Communication |
+| Call Analytics Logging | Intelligence |
+| Phone Number Normalization | Identification |
+| Confidence Score Thresholds | Identification |
+| Slot Duration Matching | Booking |
+| Class Enrollment Confirmation | Classes |
+| Instructor Email Notifications | Classes |
+| Village-Specific Services | Location |
+| Reminder Scheduling | Communication |
+| Silence Detection | Intelligence |
+| Multiple Match Handling | Identification |
+| Same-Day Booking Handling | Management |
+| Private Fee Quotes | Funding |
+| Appointment History Awareness | Management |
+| Bulk Billing Eligibility | Funding |
+| Class Location Details | Classes |
+| Directions & Location Info | Location |
+| Travel Time Considerations | Location |
+| Voicemail Detection | Transfers |
+| Cancellation Reason Capture | Management |
+| Parking Availability Info | Location |
+| After-Hours Messaging | Transfers |
+| Call Priority Classification | Transfers |
 
 ---
 
@@ -257,7 +263,13 @@ Health monitoring across AWS EC2 and VPS2 infrastructure.
 | **Secondary Server** | VPS2 for monitoring and sync |
 | **Load Balancing** | Geographic routing for optimal latency |
 | **CDN** | Static asset delivery |
-| **Backup Storage** | Automated daily backups with 30-day retention |
+| **Backup Storage** | Automated daily backups with retention policy |
+| **Server Snapshots** | Point-in-time EC2 instance recovery |
+| **Backup Monitoring** | Automated verification of backup completion |
+| **CloudWatch Metrics** | CPU, memory, disk, network monitoring |
+| **CloudWatch Alarms** | Threshold-based alerting for resource usage |
+| **CloudWatch Logs** | Centralized application log aggregation |
+| **CloudWatch Events** | Scheduled tasks and event-driven automation |
 | **Logging Infrastructure** | Centralized log aggregation |
 | **Secrets Management** | Encrypted credential storage |
 | **CI/CD Pipeline** | Automated testing and deployment |
@@ -310,5 +322,3 @@ Health monitoring across AWS EC2 and VPS2 infrastructure.
 - **Call Analytics** - Performance dashboards
 
 ---
-
-*Generated: 2025-12-12*
