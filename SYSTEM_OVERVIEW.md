@@ -57,125 +57,89 @@
 
 ---
 
-## Features (50)
+## Features Ranked by Impact (50)
 
-### Patient Identification & Verification (5)
+**Scoring:** Cleverness (1-10) × Complexity (1-10) × Usefulness (1-10)
 
-1. **Caller ID Lookup** - Automatic patient identification from incoming phone number (silent lookup before greeting)
+| Rank | Score | Feature | C | X | U |
+|-----:|------:|---------|:-:|:-:|:-:|
+| 1 | 810 | **Appointment Booking Flow** - Multi-step orchestration: funding check → availability → slot selection → create appointment | 9 | 9 | 10 |
+| 2 | 720 | **Intent Classification** - NLU-driven detection of caller intent (book, cancel, reschedule, enquiry, transfer) | 9 | 8 | 10 |
+| 3 | 640 | **Funding Eligibility Checks** - Validates HCP/NDIS/Private funding with Australian healthcare rules | 8 | 8 | 10 |
+| 4 | 576 | **Booking Rules Engine** - Enforces service-specific constraints (lead times, practitioner requirements, funding) | 8 | 8 | 9 |
+| 5 | 576 | **Smart Error Handling** - Graceful degradation when backends fail, prevents call abandonment | 8 | 8 | 9 |
+| 6 | 560 | **Availability Search** - Real-time practitioner calendar queries with slot aggregation | 7 | 8 | 10 |
+| 7 | 504 | **Caller ID Lookup** - Silent pre-greeting phone lookup enables personalized experience | 8 | 7 | 9 |
+| 8 | 504 | **Email Call Summaries** - Auto-generated end-of-call reports with full conversation context | 8 | 7 | 9 |
+| 9 | 504 | **Human Transfer (Sara)** - Seamless escalation with context handoff to human receptionist | 8 | 7 | 9 |
+| 10 | 504 | **Patient Context Persistence** - Maintains state across tool calls and conversation branches | 8 | 7 | 9 |
+| 11 | 448 | **EP Assessment Flow** - Domain-specific workflow tracking exercise physiology requirements | 8 | 7 | 8 |
+| 12 | 448 | **Conversation Summarization** - Auto-generates natural language call summaries | 8 | 7 | 8 |
+| 13 | 441 | **Appointment Rescheduling** - Atomic cancel + rebook with availability checking | 7 | 7 | 9 |
+| 14 | 441 | **Class Enrollment** - Books patients into group sessions with capacity validation | 7 | 7 | 9 |
+| 15 | 392 | **Patient Search by Name** - Fuzzy matching with confidence scoring and multi-result handling | 7 | 7 | 8 |
+| 16 | 392 | **Recurring Conflict Detection** - Identifies clashes with existing recurring appointments | 8 | 7 | 7 |
+| 17 | 392 | **Multi-Village Support** - Routes to correct clinic location with location-aware logic | 7 | 7 | 8 |
+| 18 | 378 | **Timezone Handling** - Sydney/Melbourne timezone conversion with DST awareness | 6 | 7 | 9 |
+| 19 | 378 | **Referral Validation** - Checks Medicare referral existence for funded services | 7 | 6 | 9 |
+| 20 | 378 | **Medicare Compliance** - Ensures bookings meet Medicare funding requirements | 6 | 7 | 9 |
+| 21 | 336 | **Service Type Triage** - Maps caller intent to appropriate service category | 7 | 6 | 8 |
+| 22 | 336 | **Duplicate Booking Prevention** - Checks existing appointments before creating new ones | 7 | 6 | 8 |
+| 23 | 336 | **Funding Type Detection** - Auto-determines HCP/NDIS/Private from patient records | 7 | 6 | 8 |
+| 24 | 336 | **Referral Expiry Tracking** - Monitors HCP validity and remaining sessions | 7 | 6 | 8 |
+| 25 | 336 | **Public Holiday Detection** - Australian holiday calendar integration | 7 | 6 | 8 |
+| 26 | 294 | **Class Waitlist Management** - Queues patients when classes reach capacity | 7 | 6 | 7 |
+| 27 | 288 | **Multi-Village Patient Matching** - Disambiguates same-name patients across locations | 8 | 6 | 6 |
+| 28 | 288 | **Class Schedule Lookup** - Retrieves group classes by type, location, and date | 6 | 6 | 8 |
+| 29 | 288 | **Class Capacity Checking** - Validates available spots before enrollment | 6 | 6 | 8 |
+| 30 | 280 | **Appointment Confirmation Readback** - Natural language confirmation before finalizing | 7 | 5 | 8 |
+| 31 | 252 | **Reschedule Availability Check** - Context-aware slot queries for rescheduling | 6 | 6 | 7 |
+| 32 | 252 | **MAC Assessment Scripts** - Medical Assessment Certification eligibility handling | 7 | 6 | 6 |
+| 33 | 245 | **FAQ Capture & Routing** - Logs unanswered questions for staff follow-up | 7 | 5 | 7 |
+| 34 | 240 | **Patient Notes Updates** - Appends call notes to patient records | 6 | 5 | 8 |
+| 35 | 210 | **DOB Verification** - Secondary verification when name match is uncertain | 6 | 5 | 7 |
+| 36 | 210 | **Practitioner Preference Capture** - Records and respects preferred provider | 6 | 5 | 7 |
+| 37 | 210 | **Operating Hours Awareness** - Business hours validation and after-hours messaging | 6 | 5 | 7 |
+| 38 | 210 | **Protected Slots Enforcement** - Respects blocked time for meetings/breaks | 6 | 5 | 7 |
+| 39 | 210 | **HCP Details Capture** - Records Health Care Provider referral information | 6 | 5 | 7 |
+| 40 | 210 | **Callback Scheduling** - Captures callback requests for follow-up queue | 6 | 5 | 7 |
+| 41 | 210 | **Follow-up List Management** - Tracks patients needing manual intervention | 6 | 5 | 7 |
+| 42 | 200 | **List Upcoming Appointments** - Retrieves and reads scheduled appointments | 5 | 5 | 8 |
+| 43 | 200 | **Appointment Cancellation** - Cancels with reason tracking and confirmation | 5 | 5 | 8 |
+| 44 | 200 | **SMS Notifications** - Appointment confirmations and reminders via SMS | 5 | 5 | 8 |
+| 45 | 175 | **Class Enrollment Confirmation** - Confirms details and sends notification | 5 | 5 | 7 |
+| 46 | 175 | **Instructor Email Notifications** - Notifies instructors of new enrollments | 5 | 5 | 7 |
+| 47 | 160 | **New Patient Detection** - Identifies first-time callers for registration | 5 | 4 | 8 |
+| 48 | 140 | **Directions & Location Info** - Provides addresses and parking info | 5 | 4 | 7 |
+| 49 | 120 | **Cancellation Reason Capture** - Records cancellation reasons for analytics | 5 | 4 | 6 |
+| 50 | 120 | **After-Hours Messaging** - Custom flows outside business hours | 5 | 4 | 6 |
 
-2. **Patient Search by Name** - Name-based search with fuzzy matching and confidence scoring
+**Legend:** C = Cleverness, X = Complexity, U = Usefulness
 
-3. **DOB Verification** - Secondary verification using date of birth when name match is uncertain
+---
 
-4. **Multi-Village Patient Matching** - Disambiguates patients with same name across different clinic locations
+## Top 10 Features by Category
 
-5. **New Patient Detection** - Identifies first-time callers and routes to registration flow
+### Highest Cleverness (Innovation)
+1. Appointment Booking Flow (9)
+2. Intent Classification (9)
+3. Funding Eligibility Checks (8)
+4. Booking Rules Engine (8)
+5. Smart Error Handling (8)
 
-### Appointment Booking (8)
+### Highest Complexity (Engineering Effort)
+1. Appointment Booking Flow (9)
+2. Intent Classification (8)
+3. Funding Eligibility Checks (8)
+4. Booking Rules Engine (8)
+5. Smart Error Handling (8)
 
-6. **Appointment Booking Flow** - Multi-step flow: check funding eligibility → get availability → select practitioner/slot → create appointment
-
-7. **Practitioner Preference Capture** - Records and respects patient's preferred provider for bookings
-
-8. **Service Type Triage** - Determines appropriate service category (EP, physio, group class, etc.)
-
-9. **Availability Search** - Queries real-time practitioner calendars for open slots
-
-10. **Appointment Confirmation Readback** - Reads back booking details for verbal confirmation before finalizing
-
-11. **Duplicate Booking Prevention** - Checks for existing appointments before creating new ones
-
-12. **Booking Rules Engine** - Enforces service-specific constraints (lead times, practitioner requirements, funding rules)
-
-13. **Timezone Handling** - Converts all times to Sydney/Melbourne timezone for consistency
-
-### Appointment Management (6)
-
-14. **List Upcoming Appointments** - Retrieves and reads patient's scheduled appointments
-
-15. **Appointment Rescheduling** - Finds alternative slots and moves existing bookings
-
-16. **Reschedule Availability Check** - Queries available slots specifically for rescheduling context
-
-17. **Appointment Cancellation** - Cancels bookings with reason tracking and confirmation
-
-18. **Cancellation Reason Capture** - Records why appointments are cancelled for analytics
-
-19. **Recurring Conflict Detection** - Identifies when new bookings would conflict with existing recurring appointments
-
-### Funding & Eligibility (6)
-
-20. **Funding Eligibility Checks** - Validates HCP/NDIS/Private funding status before booking
-
-21. **Funding Type Detection** - Automatically determines HCP/NDIS/Private from patient records
-
-22. **Referral Validation** - Checks if valid referral exists for Medicare-funded services
-
-23. **Referral Expiry Tracking** - Monitors HCP referral validity and remaining sessions
-
-24. **EP Assessment Flow** - Tracks exercise physiology assessment requirements and completion status
-
-25. **Medicare Compliance** - Ensures bookings comply with Medicare funding requirements
-
-### Exercise Classes (6)
-
-26. **Class Schedule Lookup** - Retrieves available group exercise classes by type and location
-
-27. **Class Enrollment** - Books patients into group sessions with capacity checking
-
-28. **Class Capacity Checking** - Validates spots available before enrolling in group sessions
-
-29. **Class Waitlist Management** - Adds patients to waitlist when classes are full
-
-30. **Class Enrollment Confirmation** - Confirms class details and sends enrollment notification
-
-31. **Instructor Email Notifications** - Notifies class instructors when new enrollments occur
-
-### Location & Scheduling (5)
-
-32. **Multi-Village Support** - Routes to correct clinic location (Yarra Junction, Warburton, etc.)
-
-33. **Directions & Location Info** - Provides clinic addresses, parking info, and class-specific locations
-
-34. **Operating Hours Awareness** - Validates business hours, adjusts messaging for after-hours calls
-
-35. **Public Holiday Detection** - Checks Australian public holidays, prevents bookings on closed days
-
-36. **Protected Slots Enforcement** - Respects blocked/reserved time slots for staff meetings, breaks
-
-### Patient Communication (6)
-
-37. **SMS Notifications** - Sends appointment confirmations and reminders via SMS
-
-38. **Email Call Summaries** - Automated end-of-call reports emailed to clinic staff
-
-39. **Conversation Summarization** - Auto-generates call summary for email reports
-
-40. **Patient Notes Updates** - Appends call notes and booking details to patient records
-
-41. **HCP Details Capture** - Records Health Care Provider referral information for Medicare claims
-
-42. **MAC Assessment Scripts** - Medical Assessment Certification eligibility scripts and outcome handling
-
-### Call Handling & Transfers (5)
-
-43. **Human Transfer (Sara)** - Seamless escalation to human receptionist with context handoff
-
-44. **FAQ Capture & Routing** - Logs unanswered questions for staff follow-up
-
-45. **Callback Scheduling** - Captures callback requests and routes to follow-up queue
-
-46. **Follow-up List Management** - Tracks patients needing callbacks or manual intervention
-
-47. **After-Hours Messaging** - Custom flows for calls outside business hours
-
-### System Intelligence (3)
-
-48. **Intent Classification** - Detects caller intent (book, cancel, reschedule, enquiry, transfer)
-
-49. **Smart Error Handling** - Graceful recovery when backend services fail or return unexpected data
-
-50. **Patient Context Persistence** - Maintains conversation state across tool calls and transfers
+### Highest Usefulness (Business Value)
+1. Appointment Booking Flow (10)
+2. Intent Classification (10)
+3. Funding Eligibility Checks (10)
+4. Availability Search (10)
+5. Booking Rules Engine (9)
 
 ---
 
