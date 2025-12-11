@@ -1,5 +1,5 @@
 # API Change Monitor Configuration
-# Monitors provider API documentation for changes that may benefit n8n/RetellAI systems
+# Monitors provider API documentation for changes - both BENEFICIAL and BREAKING
 
 settings:
   check_frequency: daily  # Run once per day
@@ -101,6 +101,52 @@ providers:
       - custom function
       - response engine
 
+  cliniko:
+    name: Cliniko
+    pages:
+      - url: https://docs.api.cliniko.com/
+        name: API Overview
+        selector: main, article, .content
+        priority: high
+      - url: https://docs.api.cliniko.com/openapi/patient/patient
+        name: Patient API
+        selector: main, article
+      - url: https://docs.api.cliniko.com/openapi/patient/listpatients-get
+        name: List Patients API
+        selector: main, article
+      - url: https://docs.api.cliniko.com/openapi/individual-appointment
+        name: Individual Appointment API
+        selector: main, article
+        priority: high
+      - url: https://docs.api.cliniko.com/openapi/group-appointment
+        name: Group Appointment API
+        selector: main, article
+      - url: https://docs.api.cliniko.com/openapi/appointment-type
+        name: Appointment Types API
+        selector: main, article
+      - url: https://docs.api.cliniko.com/openapi/practitioner
+        name: Practitioner API
+        selector: main, article
+      - url: https://docs.api.cliniko.com/openapi/availability
+        name: Availability API
+        selector: main, article
+        priority: high
+      - url: https://docs.api.cliniko.com/developer-portal/
+        name: Developer Portal
+        selector: main, article
+    relevance_keywords:
+      - appointment
+      - patient
+      - practitioner
+      - availability
+      - booking
+      - webhook
+      - rate limit
+      - authentication
+      - deprecated
+      - breaking change
+      - migration
+
 # System files to reference when analyzing changes
 system_context:
   n8n_webhooks: n8n/Webhooks Docs/RETELLAI_WEBHOOKS_CURRENT.md
@@ -108,13 +154,28 @@ system_context:
   agent_guide: retell/AGENT_DEVELOPMENT_GUIDE.md
   telco_capabilities: Telcos/Documentation/TELCO_API_CAPABILITIES.md
 
-# Impact assessment categories
+# Impact assessment categories - BOTH good and bad changes
 impact_categories:
-  - new_endpoint: "New API endpoint that could add functionality"
-  - parameter_change: "New or changed parameters on existing endpoints"
-  - webhook_update: "Changes to webhook payloads or events"
-  - deprecation: "Deprecated features that need migration"
-  - rate_limit: "Changes to rate limits or quotas"
-  - authentication: "Auth method changes"
-  - feature_release: "New feature announcement"
-  - bug_fix: "Bug fix that may resolve known issues"
+  # BENEFICIAL changes (opportunities)
+  beneficial:
+    - new_endpoint: "New API endpoint that could add functionality"
+    - new_parameter: "New optional parameters on existing endpoints"
+    - webhook_enhancement: "New webhook events or payload fields"
+    - feature_release: "New feature announcement"
+    - bug_fix: "Bug fix that may resolve known issues"
+    - performance_improvement: "Speed or efficiency improvements"
+    - new_region: "New geographic regions or data centers"
+    - rate_limit_increase: "Increased rate limits or quotas"
+
+  # BREAKING/HARMFUL changes (risks)
+  breaking:
+    - deprecation: "Deprecated features that need migration"
+    - removal: "Removed endpoints, parameters, or features"
+    - breaking_change: "Changes that break existing integrations"
+    - rate_limit_decrease: "Reduced rate limits or quotas"
+    - auth_change: "Authentication method changes"
+    - response_format_change: "Changes to response structure or field types"
+    - required_parameter: "New required parameters on existing endpoints"
+    - sunset_date: "End-of-life or sunset announcements"
+    - pricing_change: "Changes to API pricing or billing"
+    - security_requirement: "New security requirements (TLS version, etc.)"

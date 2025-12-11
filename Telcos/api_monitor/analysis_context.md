@@ -2,14 +2,54 @@
 
 This document provides context about the current system capabilities to help analyze whether API changes are relevant.
 
+**IMPORTANT: Analyze for BOTH beneficial AND breaking/harmful changes!**
+
 ## Overview
 
 We operate an AI voice receptionist system using:
 - **RetellAI** - AI voice agent platform (handles calls, agent logic, LLM integration)
 - **n8n** - Workflow automation (webhooks, database, Cliniko integration)
+- **Cliniko** - Practice management system (patients, appointments, practitioners)
 - **Telnyx** - SIP trunking provider (Australian phone numbers)
 - **Zadarma** - Secondary phone provider (Australian numbers)
 - **PostgreSQL** - Data warehouse for call records, analytics
+
+## Current Cliniko Usage (CRITICAL)
+
+### Integration Points
+- **Patient lookup** - Search by phone number, name, DOB
+- **Appointment booking** - Create individual appointments
+- **Availability checking** - Query practitioner availability slots
+- **Practitioner listing** - Get active practitioners for booking
+- **Patient creation** - Register new patients during calls
+
+### API Endpoints We Use
+- `GET /patients` - Search patients
+- `POST /patients` - Create new patients
+- `GET /individual_appointments` - List appointments
+- `POST /individual_appointments` - Book appointments
+- `GET /practitioners` - List practitioners
+- `GET /available_times` - Check availability
+- `GET /appointment_types` - Get service types
+
+### Current Rate Limit
+- 200 requests per minute per user
+- We implement request throttling in n8n
+
+### Things We Would Benefit From
+- Batch patient lookup
+- Webhook notifications for appointment changes
+- Better availability query options
+- Patient merge/deduplication API
+- Appointment rescheduling in single call
+
+### Breaking Changes We MUST Know About
+- Rate limit changes (we're near limits during peak)
+- Authentication changes
+- Response format changes
+- Required field additions
+- Endpoint deprecations
+- Date/time format changes (affects booking logic)
 
 ## Current RetellAI Usage
 
@@ -45,6 +85,13 @@ The system uses these n8n webhook endpoints:
 - Agent analytics/metrics endpoints
 - Batch operations for calls/agents
 
+### Breaking Changes We MUST Know About
+- Webhook payload format changes
+- Tool call response format changes
+- Agent configuration changes
+- LLM provider changes
+- Pricing/billing changes
+
 ## Current Telnyx Usage
 
 ### SIP Configuration
@@ -66,6 +113,12 @@ The system uses these n8n webhook endpoints:
 - Transcription services
 - Number porting automation
 - Emergency calling compliance features
+
+### Breaking Changes We MUST Know About
+- SIP protocol changes
+- Codec deprecations
+- Authentication changes
+- Regional routing changes
 
 ## Current Zadarma Usage
 
@@ -100,27 +153,40 @@ All RetellAI tool calls route through n8n webhooks on `auto.yr.com.au`:
 
 ## Analysis Guidelines
 
-When analyzing API changes, consider:
+**CRITICAL: Look for BOTH opportunities AND risks!**
 
-1. **Direct Impact** - Does this change something we currently use?
-2. **New Capability** - Does this enable something we couldn't do before?
-3. **Reliability** - Could this improve system reliability or error handling?
-4. **Performance** - Could this reduce latency or improve call quality?
-5. **Cost** - Could this reduce API costs or improve efficiency?
-6. **Compliance** - Does this affect Australian telecom compliance?
+### BENEFICIAL Changes (Opportunities)
+1. **New Features** - Does this enable something we couldn't do before?
+2. **Performance** - Could this reduce latency or improve quality?
+3. **Reliability** - Could this improve uptime or error handling?
+4. **Cost Savings** - Could this reduce API costs?
+5. **New Endpoints** - New capabilities we could leverage
+
+### BREAKING/HARMFUL Changes (Risks)
+1. **Deprecations** - Features being removed we currently use
+2. **Breaking Changes** - Changes that will break our integration
+3. **Rate Limits** - Reduced quotas that could throttle us
+4. **Auth Changes** - New authentication requirements
+5. **Response Changes** - Modified field names, types, or structure
+6. **Required Fields** - New mandatory parameters
+7. **Sunset Dates** - End-of-life announcements
+8. **Pricing** - Cost increases or billing changes
+9. **Security** - New TLS or security requirements
 
 ### Priority Levels
 
-- **CRITICAL** - Breaking change or deprecation affecting current functionality
-- **HIGH** - New feature that solves a known pain point
-- **MEDIUM** - Useful enhancement worth investigating
+- **CRITICAL** - Breaking change or deprecation affecting current functionality - IMMEDIATE ACTION REQUIRED
+- **HIGH** - Either a major new feature OR a change with migration deadline
+- **MEDIUM** - Useful enhancement OR minor change requiring future attention
 - **LOW** - Nice to have, not urgent
 
-### Known Pain Points (prioritize fixes for these)
+### Known Pain Points (prioritize changes affecting these)
 
-1. Occasional webhook timeouts on complex operations
-2. Call recording retrieval latency
-3. Sentiment analysis accuracy
-4. Multi-turn conversation context handling
-5. Australian phone number format handling
-6. SIP connection reliability during peak hours
+1. Cliniko rate limits during peak booking times
+2. Occasional webhook timeouts on complex operations
+3. Call recording retrieval latency
+4. Sentiment analysis accuracy
+5. Multi-turn conversation context handling
+6. Australian phone number format handling
+7. SIP connection reliability during peak hours
+8. Patient duplicate detection
