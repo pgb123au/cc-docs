@@ -1,5 +1,5 @@
 ---
-description: Full autonomous n8n webhook/database fix process - includes agent changes if needed (15 steps)
+description: Full autonomous n8n webhook/database fix process - includes agent changes if needed (16 steps)
 ---
 
 # n8n Webhook Fix Process - AUTO
@@ -28,7 +28,7 @@ You review the list and either approve or request changes.
 
 ---
 
-## After Approval: Autonomous Execution (Steps 2-15)
+## After Approval: Autonomous Execution (Steps 2-16)
 
 | Step | Description |
 |------|-------------|
@@ -46,6 +46,7 @@ You review the list and either approve or request changes.
 | 13 | Git commit |
 | 14 | Zero deferral check |
 | 15 | Final report + capture learnings |
+| 16 | **Proactive bug hunt - suggest similar bugs** |
 
 ---
 
@@ -466,6 +467,53 @@ Save to working folder: `LEARNINGS_[date].md` (max 20 lines)
 If CRITICAL learning: `>>> SUGGEST ADDING TO CLAUDE.md: [one-liner] <<<`
 
 Output: "Created: [FULL WINDOWS PATH]"
+
+---
+
+## Step 16: Proactive Bug Hunt
+
+Based on the bugs fixed in this session, suggest where similar issues might exist.
+
+### 16A: Pattern Analysis
+For each root cause found, identify the pattern:
+- What type of mistake was it? (typo, missing field, wrong logic, copy-paste error)
+- What made it happen? (assumption, outdated code, incomplete change)
+- Where else might this pattern exist?
+
+### 16B: Suggest Locations to Check
+
+Output a table:
+| Bug Pattern | Where Else to Look | Likelihood |
+|-------------|-------------------|------------|
+| [pattern from this session] | [other workflows/functions/tables] | HIGH/MEDIUM/LOW |
+| [pattern from this session] | [other locations] | HIGH/MEDIUM/LOW |
+
+Examples:
+- If fixed a missing `error_code` → check other webhook responses for same issue
+- If fixed wrong SQL column name → check other queries using that table
+- If fixed a COUPLED issue → check if other webhooks have same agent dependency
+- If fixed copy-paste error → check if same bad pattern was copied elsewhere
+
+### 16C: Ask User
+
+```
+>>> POTENTIAL SIMILAR BUGS IDENTIFIED <<<
+
+Based on the patterns found in this session, these locations may have the same issues:
+
+[table from 16B]
+
+Would you like me to investigate these now?
+- Reply "Yes" or "Go look" → I'll search and report findings
+- Reply "No" or "Later" → Session complete
+```
+
+**STOP and wait for user response.**
+
+If user says yes:
+1. Search each suggested location
+2. Report findings (confirmed bug / looks OK / needs manual review)
+3. If bugs found, ask if user wants to fix them now (loops back to Step 1)
 
 ---
 
