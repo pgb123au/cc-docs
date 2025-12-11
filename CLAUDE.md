@@ -176,10 +176,25 @@ python CC-Made-generate-workflow-docs.py
 | **SSH Key** | `C:\Users\peter\.ssh\metabase-aws` | For n8n server access |
 | **n8n Server** | `ubuntu@52.13.124.171` | ⚠️ NOT 54.149.95.69 |
 
+### Bash Path Format (CRITICAL)
+
+**Windows paths DON'T work in bash.** Always use Unix-style `/c/` format:
+
+| WRONG (will fail) | CORRECT |
+|-------------------|---------|
+| `cd C:\Users\peter\Downloads\CC` | `cd /c/Users/peter/Downloads/CC` |
+| `cd C:\Users\peter\Downloads\CC\n8n\Python` | `cd /c/Users/peter/Downloads/CC/n8n/Python` |
+
+**Exception:** Python scripts and SSH commands can use Windows paths with quotes:
+```bash
+ssh -i "C:\Users\peter\.ssh\metabase-aws" ubuntu@...  # OK
+python "C:\Users\peter\...\script.py"                  # OK
+```
+
 ### Key Commands
 ```bash
 # Deploy agent to production
-cd C:\Users\peter\Downloads\CC\retell\scripts
+cd /c/Users/peter/Downloads/CC/retell/scripts
 python deploy_agent.py agent.json
 
 # Validate agent (pre-import)
@@ -189,10 +204,10 @@ python retell_agent_validator.py agent.json --fix
 python retell_audit.py agent.json -o report.md
 
 # View phone numbers
-cd C:\Users\peter\Downloads\CC\Telcos && python telco.py
+cd /c/Users/peter/Downloads/CC/Telcos && python telco.py
 
 # n8n webhook tools
-cd C:\Users\peter\Downloads\CC\n8n\Python
+cd /c/Users/peter/Downloads/CC/n8n/Python
 python CC-Made-n8n_api_download_workflows.py --retell
 
 # Upload/update n8n workflow (filter to required fields only)
@@ -226,6 +241,46 @@ ssh -i "C:\Users\peter\.ssh\metabase-aws" ubuntu@52.13.124.171 \
 | `retellai_prod` | patients, webhook_cache, retell_calls, sync_metadata |
 
 **Reference:** `n8n/Guides Docs/N8N_SETUP_CREDENTIAL_FOR_N8N_DATABASE.md`
+
+### n8n Workflow Updates: API vs Direct SQL
+
+**⚠️ ALWAYS prefer n8n REST API over direct SQL for workflow changes:**
+
+| Method | When to Use |
+|--------|-------------|
+| **n8n REST API** | Updating workflow nodes, email addresses, parameters - PREFERRED |
+| **Direct SQL** | Read-only queries, simple text searches, data inspection |
+
+**Why API is better:**
+1. No SQL escaping nightmares (quotes, special chars break SSH+psql chains)
+2. JSON parsing handled properly
+3. Automatic validation
+4. No risk of corrupting workflow JSON
+
+**n8n database has corrupted Unicode** in some workflows that breaks `json_array_elements()`. Use text extraction instead:
+```sql
+-- FAILS on some workflows:
+SELECT n.value->>'sendTo' FROM workflow_entity w
+CROSS JOIN LATERAL json_array_elements(w.nodes) AS n(value);
+
+-- WORKS - text-based extraction:
+SELECT substring(nodes::text from 'sendTo":"([^"]+)') FROM workflow_entity;
+```
+
+**API pattern for workflow updates:**
+```python
+import requests
+API_KEY = '...'
+BASE_URL = 'https://auto.yr.com.au/api/v1'
+HEADERS = {'X-N8N-API-KEY': API_KEY, 'Content-Type': 'application/json'}
+
+# GET, modify, PUT back
+wf = requests.get(f'{BASE_URL}/workflows/{wf_id}', headers=HEADERS).json()
+# ... modify wf['nodes'] ...
+requests.put(f'{BASE_URL}/workflows/{wf_id}', headers=HEADERS,
+    json={'name': wf['name'], 'nodes': wf['nodes'],
+          'connections': wf['connections'], 'settings': wf.get('settings', {})})
+```
 
 ---
 
@@ -300,7 +355,7 @@ ssh -i "C:\Users\peter\.ssh\metabase-aws" ubuntu@52.13.124.171 \
 
 ```bash
 # Launch the script menu to see all available scripts
-cd C:\Users\peter\Downloads\CC
+cd /c/Users/peter/Downloads/CC
 python run.py
 ```
 
