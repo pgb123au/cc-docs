@@ -36,6 +36,34 @@ Files created/modified:
 
 **⚠️ ALL tests, simulations, and webhook calls MUST use Peter Ball's data. Never use real patient data.**
 
+### RetellAI JSON Schema (MEMORIZE THIS)
+
+**MANDATORY: Before writing ANY agent JSON, READ an existing node first to verify schema.**
+
+```bash
+# Quick schema check - run this BEFORE writing new nodes/edges
+python3 -c "import json; d=json.load(open('agent.json')); print(json.dumps(d['conversation_flow']['nodes'][0], indent=2)[:800])"
+```
+
+| Wrong (Common Mistakes) | Correct (RetellAI) |
+|-------------------------|-------------------|
+| `target` | `destination_node_id` |
+| `target_node_id` | `destination_node_id` |
+| `condition` | `transition_condition` |
+| `condition_prompt` | `transition_condition.prompt` |
+| `prompt` (for node content) | `instruction` |
+| `text` (in instruction) | `instruction.text` with `type: "prompt"` |
+
+**Node types and their purpose:**
+| Type | Purpose | User Interaction? |
+|------|---------|-------------------|
+| `conversation` | Speaks to user, can ask questions | YES |
+| `function` | Calls webhooks silently | NO |
+| `logic_split` | Silent instant routing on variables | NO - NEVER converts to/from conversation |
+| `end` | Terminates call | NO |
+
+**RULE: Before proposing node type changes, READ the node's instruction to understand what it does.**
+
 ### RetellAI Simulation Tests
 Tests with `"tool_mocks": []` execute REAL webhooks and modify REAL Cliniko data.
 
@@ -361,4 +389,4 @@ Ask yourself:
 
 ---
 
-**Last Updated:** 2025-12-10
+**Last Updated:** 2025-12-11
