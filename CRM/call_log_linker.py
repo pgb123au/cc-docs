@@ -229,11 +229,11 @@ def link_retell_calls():
             'Content-Type': 'application/json'
         }
 
-        # Get recent calls
-        response = requests.get(
+        # Get recent calls (POST with json body)
+        response = requests.post(
             'https://api.retellai.com/v2/list-calls',
             headers=headers,
-            params={'limit': 100}
+            json={'limit': 100, 'sort_order': 'descending'}
         )
 
         if response.status_code != 200:

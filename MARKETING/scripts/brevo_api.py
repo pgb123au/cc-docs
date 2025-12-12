@@ -269,6 +269,63 @@ class BrevoClient:
         """Get list of validated sender emails."""
         return self._request("GET", "senders")
 
+    # ========== BLOCKLIST / SUPPRESSION ==========
+
+    def blocklist_contact(self, email: str = None, phone: str = None):
+        """
+        Add a contact to the blocklist (suppression list).
+
+        Args:
+            email: Email to blocklist
+            phone: Phone to blocklist (for SMS)
+        """
+        if email:
+            # For email blocklist, update contact with emailBlacklisted: true
+            return self._request("PUT", f"contacts/{email}", {
+                "emailBlacklisted": True
+            })
+        return {"success": False, "error": "Email required for blocklist"}
+
+    def blocklist_contacts_bulk(self, emails: list):
+        """
+        Blocklist multiple contacts.
+
+        Args:
+            emails: List of email addresses to blocklist
+        """
+        results = {"success": 0, "failed": 0, "errors": []}
+
+        for email in emails:
+            result = self.blocklist_contact(email=email)
+            if result.get("success"):
+                results["success"] += 1
+            else:
+                results["failed"] += 1
+                results["errors"].append({"email": email, "error": result.get("error")})
+
+        return results
+
+    def import_blocklist_from_csv(self, csv_path: str, email_column: str = "email"):
+        """
+        Import blocklist from CSV file.
+
+        Args:
+            csv_path: Path to CSV file
+            email_column: Name of column containing emails
+        """
+        import csv
+
+        emails = []
+        with open(csv_path, 'r', encoding='utf-8') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                email = row.get(email_column, '').strip().lower()
+                if email and '@' in email:
+                    emails.append(email)
+
+        print(f"Found {len(emails)} emails to blocklist")
+        return self.blocklist_contacts_bulk(emails)
+
     # ========== DEALS (CRM) ==========
 
     def create_deal(
