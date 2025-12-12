@@ -30,3 +30,7 @@ Desktop.ini
 # Large data files
 CRM/All_Companies_*.csv
 CRM/All_Contacts_*.csv
+# Large contact files
+CRM/Master_Contacts_With_Flags.csv
+CRM/Safe_To_Contact.csv
+CRM/Fresh_Leads_Never_Called.csv
