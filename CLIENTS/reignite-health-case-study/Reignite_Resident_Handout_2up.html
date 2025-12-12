@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reignite Health - Resident Handouts (2-up A4)</title>
+    <style>
+        @page {
+            margin: 0;
+            size: A4 landscape;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: white;
+        }
+
+        .page {
+            width: 297mm;
+            height: 210mm;
+            display: flex;
+            margin: 0;
+            padding: 0;
+        }
+
+        .handout {
+            width: 148.5mm;
+            height: 210mm;
+            padding: 10mm;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px dashed #ccc;
+        }
+
+        .handout:last-child {
+            border-right: none;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding-bottom: 6mm;
+            border-bottom: 2px solid #E63946;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+            color: #E63946;
+            letter-spacing: -1px;
+        }
+
+        .logo-text span {
+            color: #1a1a2e;
+        }
+
+        .tagline {
+            font-size: 11px;
+            color: #666;
+            font-style: italic;
+            margin-top: 1mm;
+        }
+
+        /* Main content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 5mm 0;
+        }
+
+        .headline {
+            text-align: center;
+            background: linear-gradient(135deg, #1a1a3e 0%, #2a2a5e 100%);
+            color: white;
+            padding: 5mm 3mm;
+            border-radius: 6px;
+            margin-bottom: 4mm;
+        }
+
+        .headline h1 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 1mm;
+        }
+
+        .headline p {
+            font-size: 11px;
+            opacity: 0.9;
+        }
+
+        /* Services */
+        .services {
+            margin-bottom: 4mm;
+        }
+
+        .services h2 {
+            font-size: 12px;
+            color: #1a1a3e;
+            margin-bottom: 2mm;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .service-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5mm;
+        }
+
+        .service-item {
+            background: #f8f9fa;
+            padding: 2mm 3mm;
+            border-radius: 4px;
+            font-size: 10px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 1.5mm;
+        }
+
+        .service-item::before {
+            content: "✓";
+            color: #E63946;
+            font-weight: bold;
+            font-size: 11px;
+        }
+
+        /* Call to action */
+        .cta {
+            background: #E63946;
+            color: white;
+            text-align: center;
+            padding: 5mm;
+            border-radius: 6px;
+            margin-bottom: 4mm;
+        }
+
+        .cta-label {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 1mm;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .phone-number {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .availability {
+            font-size: 10px;
+            margin-top: 1mm;
+            opacity: 0.95;
+        }
+
+        /* Benefits */
+        .benefits {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 3mm;
+        }
+
+        .benefit {
+            text-align: center;
+            flex: 1;
+        }
+
+        .benefit-icon {
+            font-size: 20px;
+            margin-bottom: 1mm;
+        }
+
+        .benefit-text {
+            font-size: 9px;
+            color: #555;
+            line-height: 1.2;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding-top: 3mm;
+            border-top: 1px solid #ddd;
+        }
+
+        .footer-text {
+            font-size: 9px;
+            color: #888;
+            margin-bottom: 1mm;
+        }
+
+        .website {
+            font-size: 10px;
+            color: #1a1a3e;
+            font-weight: 600;
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <!-- Handout 1 -->
+        <div class="handout">
+            <div class="header">
+                <div class="logo-text">REIGNITE <span>HEALTH</span></div>
+                <div class="tagline">"We put life in your years"</div>
+            </div>
+            <div class="main-content">
+                <div class="headline">
+                    <h1>Book Your Class Today!</h1>
+                    <p>Stay active, strong & independent</p>
+                </div>
+                <div class="services">
+                    <h2>Classes Available</h2>
+                    <div class="service-grid">
+                        <div class="service-item">Exercise Physiology</div>
+                        <div class="service-item">Physiotherapy</div>
+                        <div class="service-item">Group Classes</div>
+                        <div class="service-item">Aqua Aerobics</div>
+                        <div class="service-item">Strength Training</div>
+                        <div class="service-item">Balance & Falls</div>
+                    </div>
+                </div>
+                <div class="cta">
+                    <div class="cta-label">Call to Book</div>
+                    <div class="phone-number">02 8880 0226</div>
+                    <div class="availability">24/7 - Our friendly receptionist is always here!</div>
+                </div>
+                <div class="benefits">
+                    <div class="benefit">
+                        <div class="benefit-icon">📞</div>
+                        <div class="benefit-text">Easy<br>Booking</div>
+                    </div>
+                    <div class="benefit">
+                        <div class="benefit-icon">🏠</div>
+                        <div class="benefit-text">Right Here<br>In Your Village</div>
+                    </div>
+                    <div class="benefit">
+                        <div class="benefit-icon">💳</div>
+                        <div class="benefit-text">Medicare &<br>NDIS Accepted</div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer">
+                <div class="footer-text">Serving Sydney & Central Coast retirement villages</div>
+                <div class="website">www.reignitehealth.com.au</div>
+            </div>
+        </div>
+
+        <!-- Handout 2 (identical) -->
+        <div class="handout">
+            <div class="header">
+                <div class="logo-text">REIGNITE <span>HEALTH</span></div>
+                <div class="tagline">"We put life in your years"</div>
+            </div>
+            <div class="main-content">
+                <div class="headline">
+                    <h1>Book Your Class Today!</h1>
+                    <p>Stay active, strong & independent</p>
+                </div>
+                <div class="services">
+                    <h2>Classes Available</h2>
+                    <div class="service-grid">
+                        <div class="service-item">Exercise Physiology</div>
+                        <div class="service-item">Physiotherapy</div>
+                        <div class="service-item">Group Classes</div>
+                        <div class="service-item">Aqua Aerobics</div>
+                        <div class="service-item">Strength Training</div>
+                        <div class="service-item">Balance & Falls</div>
+                    </div>
+                </div>
+                <div class="cta">
+                    <div class="cta-label">Call to Book</div>
+                    <div class="phone-number">02 8880 0226</div>
+                    <div class="availability">24/7 - Our friendly receptionist is always here!</div>
+                </div>
+                <div class="benefits">
+                    <div class="benefit">
+                        <div class="benefit-icon">📞</div>
+                        <div class="benefit-text">Easy<br>Booking</div>
+                    </div>
+                    <div class="benefit">
+                        <div class="benefit-icon">🏠</div>
+                        <div class="benefit-text">Right Here<br>In Your Village</div>
+                    </div>
+                    <div class="benefit">
+                        <div class="benefit-icon">💳</div>
+                        <div class="benefit-text">Medicare &<br>NDIS Accepted</div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer">
+                <div class="footer-text">Serving Sydney & Central Coast retirement villages</div>
+                <div class="website">www.reignitehealth.com.au</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
