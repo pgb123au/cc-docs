@@ -1,0 +1,1637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reignite Health Case Study - Yes AI</title>
+    <style>
+        @page {
+            margin: 0;
+            size: A4;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 11px;
+            line-height: 1.5;
+            color: #1a1a2e;
+            background: white;
+        }
+
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 0;
+            margin: 0 auto;
+            background: white;
+            page-break-after: always;
+            position: relative;
+        }
+
+        .page:last-child {
+            page-break-after: avoid;
+        }
+
+        /* Cover Page */
+        .cover-page {
+            background: linear-gradient(135deg, #0a0a23 0%, #1a1a3e 50%, #0a0a23 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 40px;
+            min-height: 297mm;
+        }
+
+        .cover-header {
+            text-align: center;
+        }
+
+        .cover-logo img {
+            max-height: 80px;
+            width: auto;
+        }
+
+        .cover-content {
+            text-align: center;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 40px 0;
+        }
+
+        .cover-title {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            letter-spacing: -1px;
+        }
+
+        .cover-subtitle {
+            font-size: 20px;
+            font-weight: 300;
+            color: #a0a0ff;
+            margin-bottom: 50px;
+        }
+
+        .cover-client-box {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px auto;
+            max-width: 400px;
+        }
+
+        .cover-client-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #8080ff;
+            margin-bottom: 15px;
+        }
+
+        .cover-client-name {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .cover-client-tagline {
+            font-size: 14px;
+            color: #c0c0ff;
+            font-style: italic;
+        }
+
+        .cover-footer {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .cover-date {
+            font-size: 14px;
+            color: #a0a0ff;
+        }
+
+        /* Content Pages */
+        .content-page {
+            padding: 25px 35px;
+            min-height: 297mm;
+            position: relative;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #0000ff;
+            margin-bottom: 25px;
+        }
+
+        .page-header-logo img {
+            max-height: 35px;
+            width: auto;
+        }
+
+        .page-header-title {
+            font-size: 10px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .page-footer {
+            position: absolute;
+            bottom: 20px;
+            left: 35px;
+            right: 35px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 10px;
+            border-top: 1px solid #e0e0e0;
+            font-size: 9px;
+            color: #888;
+        }
+
+        .page-footer-logo img {
+            max-height: 20px;
+            width: auto;
+        }
+
+        /* Section Headers */
+        .section-header {
+            background: linear-gradient(135deg, #0000ff 0%, #0040ff 100%);
+            color: white;
+            padding: 20px 25px;
+            margin: -25px -35px 25px -35px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .section-number {
+            font-size: 48px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.3);
+            line-height: 1;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .section-subtitle {
+            font-size: 12px;
+            color: rgba(255,255,255,0.8);
+            margin-top: 5px;
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 26px;
+            color: #0000ff;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        h2 {
+            font-size: 18px;
+            color: #1a1a2e;
+            margin: 20px 0 12px 0;
+            font-weight: 600;
+            border-bottom: 2px solid #0000ff;
+            padding-bottom: 5px;
+        }
+
+        h3 {
+            font-size: 14px;
+            color: #0000ff;
+            margin: 15px 0 10px 0;
+            font-weight: 600;
+        }
+
+        p {
+            margin-bottom: 10px;
+            text-align: justify;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 10px;
+        }
+
+        th {
+            background: #0000ff;
+            color: white;
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        tr:nth-child(even) {
+            background: #f8f9ff;
+        }
+
+        tr:hover {
+            background: #f0f0ff;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f8f9ff 0%, #fff 100%);
+            border: 1px solid #e0e0ff;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #0000ff;
+            line-height: 1.2;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 5px;
+        }
+
+        /* Feature Grid */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin: 15px 0;
+        }
+
+        .feature-item {
+            background: #f8f9ff;
+            border-left: 3px solid #0000ff;
+            padding: 8px 12px;
+            font-size: 10px;
+        }
+
+        .feature-category {
+            font-size: 8px;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        /* Info Box */
+        .info-box {
+            background: linear-gradient(135deg, #f0f4ff 0%, #fff 100%);
+            border-left: 4px solid #0000ff;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .info-box-title {
+            font-weight: 600;
+            color: #0000ff;
+            margin-bottom: 8px;
+        }
+
+        /* Highlight Box */
+        .highlight-box {
+            background: linear-gradient(135deg, #0000ff 0%, #0040ff 100%);
+            color: white;
+            padding: 20px 25px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+
+        .highlight-box h3 {
+            color: white;
+            margin-top: 0;
+        }
+
+        .highlight-box p {
+            color: rgba(255,255,255,0.9);
+        }
+
+        /* Lists */
+        ul, ol {
+            margin: 10px 0 10px 20px;
+        }
+
+        li {
+            margin-bottom: 5px;
+        }
+
+        /* Two Column Layout */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .three-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+        }
+
+        /* Architecture Diagram */
+        .architecture-box {
+            background: #1a1a2e;
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 15px 0;
+        }
+
+        .architecture-box h3 {
+            color: #8080ff;
+        }
+
+        .arch-item {
+            background: rgba(255,255,255,0.1);
+            padding: 10px 15px;
+            margin: 8px 0;
+            border-radius: 6px;
+            border-left: 3px solid #0080ff;
+        }
+
+        /* Quote */
+        .quote-box {
+            background: #f8f9ff;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .quote-box::before {
+            content: '"';
+            font-size: 60px;
+            color: #0000ff;
+            opacity: 0.2;
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            line-height: 1;
+        }
+
+        .quote-text {
+            font-size: 14px;
+            font-style: italic;
+            color: #333;
+            padding-left: 40px;
+        }
+
+        .quote-author {
+            font-size: 11px;
+            color: #666;
+            margin-top: 10px;
+            padding-left: 40px;
+        }
+
+        /* Back Cover */
+        .back-cover {
+            background: linear-gradient(135deg, #0a0a23 0%, #1a1a3e 50%, #0a0a23 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            min-height: 297mm;
+            padding: 40px;
+        }
+
+        .back-logo img {
+            max-height: 120px;
+            width: auto;
+            margin-bottom: 40px;
+        }
+
+        .back-tagline {
+            font-size: 24px;
+            font-weight: 300;
+            color: #a0a0ff;
+            margin-bottom: 50px;
+        }
+
+        .back-contact-box {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 12px;
+            padding: 30px 50px;
+        }
+
+        .back-contact-item {
+            margin: 12px 0;
+            font-size: 16px;
+        }
+
+        .back-contact-item a {
+            color: #8080ff;
+            text-decoration: none;
+        }
+
+        /* Page breaks */
+        .page-break-before {
+            page-break-before: always;
+            break-before: page;
+        }
+
+        .keep-together {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+        }
+
+        /* Print-specific */
+        @media print {
+            .page {
+                height: 297mm;
+                overflow: hidden;
+            }
+
+            .page-break-before {
+                page-break-before: always;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- COVER PAGE -->
+<div class="page cover-page">
+    <div class="cover-header">
+        <div class="cover-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+    </div>
+
+    <div class="cover-content">
+        <div class="cover-title">AI Voice Receptionist</div>
+        <div class="cover-subtitle">Enterprise Case Study</div>
+
+        <div class="cover-client-box">
+            <div class="cover-client-label">Client</div>
+            <div class="cover-client-name">Reignite Health</div>
+            <div class="cover-client-tagline">"We put life in your years"</div>
+        </div>
+
+        <p style="color: #c0c0ff; max-width: 500px; margin: 0 auto; font-size: 13px;">
+            How Yes AI transformed patient communications for a growing allied health provider with an intelligent voice receptionist handling bookings, inquiries, and patient management across multiple clinic locations.
+        </p>
+    </div>
+
+    <div class="cover-footer">
+        <div class="cover-date">December 2025</div>
+    </div>
+</div>
+
+<!-- PAGE 2: EXECUTIVE SUMMARY -->
+<div class="page content-page">
+    <div class="page-header">
+        <div class="page-header-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div class="page-header-title">Reignite Health Case Study</div>
+    </div>
+
+    <div class="section-header">
+        <div class="section-number">01</div>
+        <div>
+            <div class="section-title">Executive Summary</div>
+            <div class="section-subtitle">Project Overview & Key Outcomes</div>
+        </div>
+    </div>
+
+    <p style="font-size: 13px; margin-bottom: 20px;">
+        Reignite Health, a specialist allied health provider serving retirement village residents across Sydney and the Central Coast, partnered with Yes AI to implement a comprehensive AI voice receptionist system. The solution handles patient bookings, inquiries, and administrative tasks with human-like conversation quality while integrating seamlessly with their existing practice management software.
+    </p>
+
+    <div class="stats-grid keep-together">
+        <div class="stat-card">
+            <div class="stat-value">80+</div>
+            <div class="stat-label">Features</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">109</div>
+            <div class="stat-label">Conversation Nodes</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">53</div>
+            <div class="stat-label">Automation Workflows</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">24/7</div>
+            <div class="stat-label">Availability</div>
+        </div>
+    </div>
+
+    <h2>The Challenge</h2>
+    <p>
+        As Reignite Health expanded to serve multiple retirement villages across two regions, their front desk team struggled to manage increasing call volumes. Key challenges included:
+    </p>
+    <ul>
+        <li><strong>Complex booking requirements</strong> - Different funding types (Medicare, NDIS, Private), practitioner preferences, and service-specific rules</li>
+        <li><strong>Multi-location coordination</strong> - Patients across multiple villages needed seamless service regardless of location</li>
+        <li><strong>Australian healthcare compliance</strong> - Medicare referral validation, session tracking, and funding eligibility checks</li>
+        <li><strong>Limited reception capacity</strong> - Missed calls during busy periods led to lost appointments and frustrated patients</li>
+    </ul>
+
+    <h2>The Solution</h2>
+    <p>
+        Yes AI developed a sophisticated AI voice receptionist powered by advanced conversational AI and deep integration with Reignite Health's practice management system. The solution provides:
+    </p>
+
+    <div class="two-column keep-together">
+        <div class="info-box">
+            <div class="info-box-title">Intelligent Call Handling</div>
+            <p>Natural conversations that understand context, remember patient history, and adapt to caller needs in real-time.</p>
+        </div>
+        <div class="info-box">
+            <div class="info-box-title">Complete Integration</div>
+            <p>Real-time sync with Cliniko practice management, automated calendar updates, and instant patient record access.</p>
+        </div>
+    </div>
+
+    <div class="page-footer">
+        <div class="page-footer-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div>Page 2 | www.yesai.au</div>
+    </div>
+</div>
+
+<!-- PAGE 3: ABOUT THE CLIENT -->
+<div class="page content-page">
+    <div class="page-header">
+        <div class="page-header-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div class="page-header-title">Reignite Health Case Study</div>
+    </div>
+
+    <div class="section-header">
+        <div class="section-number">02</div>
+        <div>
+            <div class="section-title">About Reignite Health</div>
+            <div class="section-subtitle">The Client</div>
+        </div>
+    </div>
+
+    <div class="two-column">
+        <div>
+            <p>
+                <strong>Reignite Health</strong> is an Australian allied health provider founded in 2021 by physiotherapist Liam Potter. The company specialises in delivering exercise physiology and physiotherapy services directly to retirement village residents, with a mission to help seniors maintain independence and quality of life.
+            </p>
+
+            <h3>Mission</h3>
+            <p style="font-style: italic; color: #0000ff; font-size: 14px;">
+                "We put life in your years."
+            </p>
+            <p>
+                Reignite Health focuses on proactive, preventative healthcare that helps aging Australians stay active, strong, and independent for longer.
+            </p>
+
+            <h3>Service Areas</h3>
+            <ul>
+                <li><strong>Sydney:</strong> Northern Beaches, North Shore, Hills District</li>
+                <li><strong>Central Coast:</strong> Multiple retirement village locations</li>
+            </ul>
+        </div>
+
+        <div>
+            <div class="info-box keep-together">
+                <div class="info-box-title">Company Profile</div>
+                <table style="margin: 10px 0; font-size: 10px;">
+                    <tr><td><strong>Founded</strong></td><td>2021</td></tr>
+                    <tr><td><strong>Founder</strong></td><td>Liam Potter</td></tr>
+                    <tr><td><strong>Team Size</strong></td><td>11-50 employees</td></tr>
+                    <tr><td><strong>Specialty</strong></td><td>Retirement village healthcare</td></tr>
+                    <tr><td><strong>Locations</strong></td><td>Sydney & Central Coast</td></tr>
+                </table>
+            </div>
+
+            <h3>Services Offered</h3>
+            <ul>
+                <li>Exercise Physiology Programs</li>
+                <li>Physiotherapy & Physical Therapy</li>
+                <li>Resistance & Strength Training</li>
+                <li>Balance Improvement & Falls Prevention</li>
+                <li>Group Exercise Classes</li>
+                <li>Aqua Aerobics Programs</li>
+                <li>Healthy Aging Support</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="highlight-box keep-together">
+        <h3>Why Retirement Villages?</h3>
+        <p>
+            Reignite Health identified a significant gap in healthcare delivery for retirement village residents. By bringing services directly to where seniors live, they remove transportation barriers and create a more comfortable, accessible healthcare experience. With over 50% resident utilization at some locations, their model has proven highly effective.
+        </p>
+    </div>
+
+    <div class="page-footer">
+        <div class="page-footer-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div>Page 3 | www.yesai.au</div>
+    </div>
+</div>
+
+<!-- PAGE 4: ABOUT YES AI -->
+<div class="page content-page">
+    <div class="page-header">
+        <div class="page-header-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div class="page-header-title">Reignite Health Case Study</div>
+    </div>
+
+    <div class="section-header">
+        <div class="section-number">03</div>
+        <div>
+            <div class="section-title">About Yes AI</div>
+            <div class="section-subtitle">The Solution Partner</div>
+        </div>
+    </div>
+
+    <p>
+        <strong>Yes AI</strong> is an Australian-owned AI consulting firm headquartered in Melbourne with offices in Sydney. We specialise in building custom AI solutions that deliver measurable business outcomes for organisations across Australia.
+    </p>
+
+    <div class="stats-grid keep-together">
+        <div class="stat-card">
+            <div class="stat-value">30%</div>
+            <div class="stat-label">Average Cost Reduction</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">3x</div>
+            <div class="stat-label">Typical ROI</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">19+</div>
+            <div class="stat-label">Industries Served</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">3-4</div>
+            <div class="stat-label">Weeks to Launch</div>
+        </div>
+    </div>
+
+    <h2>Our Services</h2>
+
+    <div class="three-column keep-together">
+        <div class="info-box">
+            <div class="info-box-title">AI Telephone Agents</div>
+            <p>Voice systems for call answering, appointment scheduling, and customer service automation.</p>
+        </div>
+        <div class="info-box">
+            <div class="info-box-title">Custom AI Solutions</div>
+            <p>Business-specific language models and intelligent automation tailored to your workflows.</p>
+        </div>
+        <div class="info-box">
+            <div class="info-box-title">System Integration</div>
+            <p>Connecting AI capabilities with existing enterprise platforms and databases.</p>
+        </div>
+    </div>
+
+    <h2>Healthcare Expertise</h2>
+    <p>
+        Yes AI has developed deep expertise in healthcare AI implementations, particularly for practices using Cliniko and similar practice management systems. Our Cliniko AI Booking System is purpose-built for the unique requirements of Australian healthcare providers, including:
+    </p>
+
+    <ul>
+        <li>Medicare and NDIS funding compliance</li>
+        <li>Referral validation and session tracking</li>
+        <li>Multi-practitioner scheduling</li>
+        <li>Patient privacy and data security (Australian healthcare standards)</li>
+        <li>Real-time calendar synchronisation</li>
+    </ul>
+
+    <div class="quote-box keep-together">
+        <div class="quote-text">
+            "We don't just build AI systems - we build AI that understands your business. Every solution is tailored to your specific workflows, compliance requirements, and customer experience goals."
+        </div>
+        <div class="quote-author">- Yes AI Team</div>
+    </div>
+
+    <div class="page-footer">
+        <div class="page-footer-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div>Page 4 | www.yesai.au</div>
+    </div>
+</div>
+
+<!-- PAGE 5: SYSTEM ARCHITECTURE -->
+<div class="page content-page">
+    <div class="page-header">
+        <div class="page-header-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div class="page-header-title">Reignite Health Case Study</div>
+    </div>
+
+    <div class="section-header">
+        <div class="section-number">04</div>
+        <div>
+            <div class="section-title">System Architecture</div>
+            <div class="section-subtitle">Technical Deep Dive</div>
+        </div>
+    </div>
+
+    <p>
+        The AI voice receptionist is built on a sophisticated state machine architecture with intelligent routing capabilities. This enables natural, context-aware conversations that adapt in real-time based on patient information, funding status, and business rules.
+    </p>
+
+    <h2>Core Architecture Metrics</h2>
+
+    <table class="keep-together">
+        <tr>
+            <th>Metric</th>
+            <th class="text-right">Value</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td><strong>Conversation Nodes</strong></td>
+            <td class="text-right">109</td>
+            <td>Distinct conversation states and decision points</td>
+        </tr>
+        <tr>
+            <td><strong>Function Nodes</strong></td>
+            <td class="text-right">24</td>
+            <td>Silent backend operations (lookups, API calls)</td>
+        </tr>
+        <tr>
+            <td><strong>Edge Connections</strong></td>
+            <td class="text-right">474</td>
+            <td>Possible transitions between conversation states</td>
+        </tr>
+        <tr>
+            <td><strong>Webhook Integrations</strong></td>
+            <td class="text-right">20</td>
+            <td>Real-time connections to backend systems</td>
+        </tr>
+        <tr>
+            <td><strong>State Variables</strong></td>
+            <td class="text-right">35+</td>
+            <td>Context data tracked throughout each call</td>
+        </tr>
+        <tr>
+            <td><strong>Conversation Paths</strong></td>
+            <td class="text-right">50+</td>
+            <td>Distinct end-to-end call scenarios</td>
+        </tr>
+    </table>
+
+    <h2>Node Type Distribution</h2>
+
+    <div class="two-column keep-together">
+        <table>
+            <tr>
+                <th>Node Type</th>
+                <th class="text-right">Count</th>
+                <th>Purpose</th>
+            </tr>
+            <tr>
+                <td>Conversation</td>
+                <td class="text-right">62</td>
+                <td>Speak to caller, collect responses</td>
+            </tr>
+            <tr>
+                <td>Function</td>
+                <td class="text-right">24</td>
+                <td>Silent webhook calls</td>
+            </tr>
+            <tr>
+                <td>Logic Split</td>
+                <td class="text-right">18</td>
+                <td>Variable-based routing</td>
+            </tr>
+            <tr>
+                <td>End</td>
+                <td class="text-right">5</td>
+                <td>Call termination points</td>
+            </tr>
+        </table>
+
+        <div class="info-box">
+            <div class="info-box-title">What This Means</div>
+            <p>
+                With 474 edge connections across 109 nodes, the system averages 4.3 possible transitions per state. This complexity enables human-like conversation flexibility while maintaining deterministic, auditable behavior.
+            </p>
+        </div>
+    </div>
+
+    <div class="page-footer">
+        <div class="page-footer-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div>Page 5 | www.yesai.au</div>
+    </div>
+</div>
+
+<!-- PAGE 6: ARCHITECTURE HIGHLIGHTS -->
+<div class="page content-page">
+    <div class="page-header">
+        <div class="page-header-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div class="page-header-title">Reignite Health Case Study</div>
+    </div>
+
+    <h1>Architecture Highlights</h1>
+    <p>The voice agent incorporates 20 advanced architectural patterns that enable natural, intelligent conversations:</p>
+
+    <div class="feature-grid">
+        <div class="feature-item">
+            <div class="feature-category">Routing</div>
+            <strong>Equation-Based Routing</strong> - Complex boolean expressions determine flow based on multiple variables
+        </div>
+        <div class="feature-item">
+            <div class="feature-category">Performance</div>
+            <strong>Silent Pre-Processing</strong> - Backend lookups execute before speaking for personalized greetings
+        </div>
+        <div class="feature-item">
+            <div class="feature-category">Architecture</div>
+            <strong>Multi-Modal State Machine</strong> - Four node types enable linear and complex branching flows
+        </div>
+        <div class="feature-item">
+            <div class="feature-category">Reliability</div>
+            <strong>Graceful Degradation</strong> - Fallback paths maintain conversation even when backends fail
+        </div>
+        <div class="feature-item">
+            <div class="feature-category">Context</div>
+            <strong>Context Accumulation</strong> - Variables persist across entire call for complete handoff context
+        </div>
+        <div class="feature-item">
+            <div class="feature-category">Personalization</div>
+            <strong>Dynamic Prompt Injection</strong> - Runtime variable substitution for personalized responses
+        </div>
+        <div class="feature-item">
+            <div class="feature-category">Performance</div>
+            <strong>Parallel Tool Execution</strong> - Multiple webhooks execute simultaneously for faster responses
+        </div>
+        <div class="feature-item">
+            <div class="feature-category">UX</div>
+            <strong>Conditional Speech Patterns</strong> - Different phrasings based on patient type and context
+        </div>
+        <div class="feature-item">
+            <div class="feature-category">Reliability</div>
+            <strong>Error State Recovery</strong> - Automatic retry logic and graceful error messaging
+        </div>
+        <div class="feature-item">
+            <div class="feature-category">Handoff</div>
+            <strong>Call Handoff Protocol</strong> - Structured context packaging for human transfer scenarios
+        </div>
+        <div class="feature-item">
+            <div class="feature-category">UX</div>
+            <strong>Barge-In Detection</strong> - Allows callers to interrupt and redirect conversation mid-speech
+        </div>
+        <div class="feature-item">
+            <div class="feature-category">Intelligence</div>
+            <strong>Confidence-Based Branching</strong> - Routes differently based on speech recognition confidence
+        </div>
+        <div class="feature-item">
+            <div class="feature-category">Data Collection</div>
+            <strong>Slot Filling Logic</strong> - Progressively collects required information across multiple turns
+        </div>
+        <div class="feature-item">
+            <div class="feature-category">Clarification</div>
+            <strong>Disambiguation Flows</strong> - Handles ambiguous responses with targeted clarification
+        </div>
+        <div class="feature-item">
+            <div class="feature-category">Personalization</div>
+            <strong>Time-Aware Greetings</strong> - Adjusts salutations based on time of day
+        </div>
+        <div class="feature-item">
+            <div class="feature-category">Context</div>
+            <strong>Caller History Integration</strong> - References previous calls and appointments
+        </div>
+        <div class="feature-item">
+            <div class="feature-category">Verification</div>
+            <strong>Multi-Turn Confirmation</strong> - Complex bookings require staged confirmation checkpoints
+        </div>
+        <div class="feature-item">
+            <div class="feature-category">NLU</div>
+            <strong>Natural Number Handling</strong> - Understands spoken dates, times, phone numbers
+        </div>
+        <div class="feature-item">
+            <div class="feature-category">Intelligence</div>
+            <strong>Sentiment-Aware Responses</strong> - Adjusts tone based on detected frustration or urgency
+        </div>
+        <div class="feature-item">
+            <div class="feature-category">Escalation</div>
+            <strong>Fallback Escalation Ladder</strong> - Progressive escalation from retry to clarify to transfer
+        </div>
+    </div>
+
+    <div class="page-footer">
+        <div class="page-footer-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div>Page 6 | www.yesai.au</div>
+    </div>
+</div>
+
+<!-- PAGE 7: CAPABILITIES - BOOKING & IDENTIFICATION -->
+<div class="page content-page">
+    <div class="page-header">
+        <div class="page-header-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div class="page-header-title">Reignite Health Case Study</div>
+    </div>
+
+    <div class="section-header">
+        <div class="section-number">05</div>
+        <div>
+            <div class="section-title">System Capabilities</div>
+            <div class="section-subtitle">80 Integrated Features</div>
+        </div>
+    </div>
+
+    <p>
+        The AI voice receptionist includes 80 distinct capabilities spanning patient identification, appointment booking, funding management, and communication. Here are the core feature sets:
+    </p>
+
+    <h2>Patient Identification & Verification</h2>
+    <table class="keep-together">
+        <tr><th>Feature</th><th>Description</th></tr>
+        <tr><td>Caller ID Lookup</td><td>Silent pre-greeting phone lookup for personalized experience</td></tr>
+        <tr><td>Patient Search by Name</td><td>Fuzzy matching with confidence scoring</td></tr>
+        <tr><td>DOB Verification</td><td>Secondary verification for uncertain matches</td></tr>
+        <tr><td>Multi-Village Patient Matching</td><td>Disambiguates same-name patients across locations</td></tr>
+        <tr><td>New Patient Detection</td><td>Routes first-time callers to registration</td></tr>
+        <tr><td>Phone Number Normalization</td><td>Handles Australian mobile/landline formats</td></tr>
+        <tr><td>Confidence Score Thresholds</td><td>Configurable match certainty requirements</td></tr>
+        <tr><td>Multiple Match Handling</td><td>Presents options when several patients match</td></tr>
+    </table>
+
+    <h2>Appointment Booking</h2>
+    <table class="keep-together">
+        <tr><th>Feature</th><th>Description</th></tr>
+        <tr><td>Multi-Step Booking Flow</td><td>Funding check -> availability -> slot selection -> confirmation</td></tr>
+        <tr><td>Real-Time Availability Search</td><td>Live calendar queries with slot aggregation</td></tr>
+        <tr><td>Practitioner Preference Capture</td><td>Records and respects preferred provider</td></tr>
+        <tr><td>Service Type Triage</td><td>Routes to appropriate service category</td></tr>
+        <tr><td>Duplicate Booking Prevention</td><td>Checks existing appointments before creating</td></tr>
+        <tr><td>Booking Rules Engine</td><td>Enforces lead times, practitioner requirements</td></tr>
+        <tr><td>Timezone Handling</td><td>Sydney/Melbourne conversion with DST awareness</td></tr>
+        <tr><td>Practitioner Availability Windows</td><td>Respects individual schedules</td></tr>
+        <tr><td>Slot Duration Matching</td><td>Ensures service fits available time</td></tr>
+        <tr><td>Appointment Confirmation Readback</td><td>Natural language confirmation before finalizing</td></tr>
+    </table>
+
+    <div class="page-footer">
+        <div class="page-footer-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div>Page 7 | www.yesai.au</div>
+    </div>
+</div>
+
+<!-- PAGE 8: CAPABILITIES - FUNDING & MANAGEMENT -->
+<div class="page content-page">
+    <div class="page-header">
+        <div class="page-header-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div class="page-header-title">Reignite Health Case Study</div>
+    </div>
+
+    <h2>Funding & Eligibility</h2>
+    <p>Deep integration with Australian healthcare funding requirements:</p>
+
+    <table class="keep-together">
+        <tr><th>Feature</th><th>Description</th></tr>
+        <tr><td>Funding Eligibility Checks</td><td>Validates HCP/NDIS/Private funding status</td></tr>
+        <tr><td>Funding Type Detection</td><td>Auto-determines from patient records</td></tr>
+        <tr><td>Referral Validation</td><td>Checks Medicare referral existence</td></tr>
+        <tr><td>Referral Expiry Tracking</td><td>Monitors validity and remaining sessions</td></tr>
+        <tr><td>Medicare Compliance</td><td>Ensures bookings meet funding requirements</td></tr>
+        <tr><td>NDIS Plan Verification</td><td>Validates NDIS funding status</td></tr>
+        <tr><td>Session Count Tracking</td><td>Monitors remaining funded sessions</td></tr>
+        <tr><td>Private Fee Quotes</td><td>Provides pricing for self-funded patients</td></tr>
+        <tr><td>Bulk Billing Eligibility</td><td>Checks concession card status</td></tr>
+        <tr><td>EP Assessment Flow</td><td>Tracks exercise physiology requirements</td></tr>
+    </table>
+
+    <h2>Appointment Management</h2>
+    <table class="keep-together">
+        <tr><th>Feature</th><th>Description</th></tr>
+        <tr><td>List Upcoming Appointments</td><td>Retrieves and reads scheduled visits</td></tr>
+        <tr><td>Appointment Rescheduling</td><td>Atomic cancel + rebook flow</td></tr>
+        <tr><td>Appointment Cancellation</td><td>With reason tracking and confirmation</td></tr>
+        <tr><td>Cancellation Reason Capture</td><td>Analytics on why patients cancel</td></tr>
+        <tr><td>Recurring Conflict Detection</td><td>Prevents double-booking recurring slots</td></tr>
+        <tr><td>Appointment History Awareness</td><td>References past visits in conversation</td></tr>
+        <tr><td>Same-Day Booking Handling</td><td>Special flow for urgent requests</td></tr>
+        <tr><td>Reschedule Availability Check</td><td>Context-aware slot queries</td></tr>
+    </table>
+
+    <h2>Exercise Classes</h2>
+    <table class="keep-together">
+        <tr><th>Feature</th><th>Description</th></tr>
+        <tr><td>Class Schedule Lookup</td><td>Retrieves classes by type and location</td></tr>
+        <tr><td>Class Enrollment</td><td>Books into group sessions with capacity check</td></tr>
+        <tr><td>Class Capacity Checking</td><td>Validates spots before enrollment</td></tr>
+        <tr><td>Class Waitlist Management</td><td>Queues patients for full classes</td></tr>
+        <tr><td>Class Type Recognition</td><td>Understands Pilates, Strength, Yoga, etc.</td></tr>
+        <tr><td>Recurring Class Bookings</td><td>Weekly/fortnightly enrollment options</td></tr>
+    </table>
+
+    <div class="page-footer">
+        <div class="page-footer-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div>Page 8 | www.yesai.au</div>
+    </div>
+</div>
+
+<!-- PAGE 9: CAPABILITIES - INTELLIGENCE & COMMUNICATION -->
+<div class="page content-page">
+    <div class="page-header">
+        <div class="page-header-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div class="page-header-title">Reignite Health Case Study</div>
+    </div>
+
+    <h2>System Intelligence</h2>
+    <table class="keep-together">
+        <tr><th>Feature</th><th>Description</th></tr>
+        <tr><td>Intent Classification</td><td>NLU-driven detection of caller intent</td></tr>
+        <tr><td>Smart Error Handling</td><td>Graceful degradation when backends fail</td></tr>
+        <tr><td>Patient Context Persistence</td><td>Maintains state across tool calls</td></tr>
+        <tr><td>Conversation Memory</td><td>References earlier in same call</td></tr>
+        <tr><td>Adaptive Prompting</td><td>Adjusts based on patient responses</td></tr>
+        <tr><td>Silence Detection</td><td>Handles pauses appropriately</td></tr>
+        <tr><td>Interruption Handling</td><td>Manages caller interruptions</td></tr>
+        <tr><td>Clarification Requests</td><td>Asks for unclear input</td></tr>
+        <tr><td>Confirmation Loops</td><td>Verifies critical information</td></tr>
+        <tr><td>Call Analytics Logging</td><td>Tracks outcomes for reporting</td></tr>
+    </table>
+
+    <h2>Communication & Notifications</h2>
+    <div class="two-column">
+        <table class="keep-together">
+            <tr><th>Feature</th></tr>
+            <tr><td>SMS Notifications</td></tr>
+            <tr><td>Email Call Summaries</td></tr>
+            <tr><td>Conversation Summarization</td></tr>
+            <tr><td>Patient Notes Updates</td></tr>
+            <tr><td>HCP Details Capture</td></tr>
+            <tr><td>Booking Confirmation Messages</td></tr>
+            <tr><td>Reminder Scheduling</td></tr>
+            <tr><td>Staff Alert Routing</td></tr>
+            <tr><td>Instructor Email Notifications</td></tr>
+        </table>
+
+        <table class="keep-together">
+            <tr><th>Transfers & Escalation</th></tr>
+            <tr><td>Human Transfer with Context</td></tr>
+            <tr><td>Transfer Warm Handoff</td></tr>
+            <tr><td>FAQ Capture & Routing</td></tr>
+            <tr><td>Callback Scheduling</td></tr>
+            <tr><td>Follow-up List Management</td></tr>
+            <tr><td>Voicemail Detection</td></tr>
+            <tr><td>After-Hours Messaging</td></tr>
+            <tr><td>Call Priority Classification</td></tr>
+        </table>
+    </div>
+
+    <h2>Location & Scheduling</h2>
+    <table class="keep-together">
+        <tr><th>Feature</th><th>Description</th></tr>
+        <tr><td>Multi-Village Support</td><td>Routes to correct clinic location</td></tr>
+        <tr><td>Operating Hours Awareness</td><td>Business hours validation</td></tr>
+        <tr><td>Public Holiday Detection</td><td>Australian holiday calendar</td></tr>
+        <tr><td>Protected Slots Enforcement</td><td>Respects blocked time for meetings</td></tr>
+        <tr><td>Village-Specific Services</td><td>Different offerings per location</td></tr>
+        <tr><td>Directions & Location Info</td><td>Addresses and parking details</td></tr>
+    </table>
+
+    <div class="page-footer">
+        <div class="page-footer-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div>Page 9 | www.yesai.au</div>
+    </div>
+</div>
+
+<!-- PAGE 10: SUPPORTING SYSTEMS -->
+<div class="page content-page">
+    <div class="page-header">
+        <div class="page-header-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div class="page-header-title">Reignite Health Case Study</div>
+    </div>
+
+    <div class="section-header">
+        <div class="section-number">06</div>
+        <div>
+            <div class="section-title">Supporting Systems</div>
+            <div class="section-subtitle">Enterprise-Grade Infrastructure</div>
+        </div>
+    </div>
+
+    <p>
+        Beyond the core voice agent, the solution includes comprehensive supporting systems for telephony management, API monitoring, and server health - ensuring reliable, enterprise-grade operation.
+    </p>
+
+    <h2>Telco Management System (20 Features)</h2>
+    <p>Multi-provider phone number management across carrier platforms:</p>
+
+    <div class="three-column keep-together">
+        <div>
+            <ul style="font-size: 10px;">
+                <li>Unified Number Dashboard</li>
+                <li>Real-Time Number Status</li>
+                <li>Agent-to-Number Mapping</li>
+                <li>Number Provisioning</li>
+                <li>Number Porting Management</li>
+                <li>Multi-Provider API Integration</li>
+                <li>Cost Tracking by Number</li>
+            </ul>
+        </div>
+        <div>
+            <ul style="font-size: 10px;">
+                <li>Number Search & Filter</li>
+                <li>Bulk Number Operations</li>
+                <li>Number Health Monitoring</li>
+                <li>Call Volume Analytics</li>
+                <li>Failover Configuration</li>
+                <li>Number Tagging System</li>
+                <li>Geographic Distribution View</li>
+            </ul>
+        </div>
+        <div>
+            <ul style="font-size: 10px;">
+                <li>Provider Balance Monitoring</li>
+                <li>Number Release Workflow</li>
+                <li>Inbound Route Management</li>
+                <li>Emergency Number Registry</li>
+                <li>Number Audit Trail</li>
+                <li>Multi-Tenant Support</li>
+            </ul>
+        </div>
+    </div>
+
+    <h2>API Monitoring System (20 Features)</h2>
+    <p>Automated monitoring of external API documentation for breaking changes:</p>
+
+    <div class="three-column keep-together">
+        <div>
+            <ul style="font-size: 10px;">
+                <li>Documentation Change Detection</li>
+                <li>AI-Powered Impact Analysis</li>
+                <li>Multi-Provider Monitoring</li>
+                <li>Automatic GitHub Issue Creation</li>
+                <li>Priority Classification</li>
+                <li>Affected System Mapping</li>
+                <li>Diff Visualization</li>
+            </ul>
+        </div>
+        <div>
+            <ul style="font-size: 10px;">
+                <li>Scheduled Monitoring Runs</li>
+                <li>Alert Email Notifications</li>
+                <li>Historical Change Archive</li>
+                <li>Semantic Version Tracking</li>
+                <li>Endpoint Deprecation Alerts</li>
+                <li>Rate Limit Monitoring</li>
+                <li>Response Schema Validation</li>
+            </ul>
+        </div>
+        <div>
+            <ul style="font-size: 10px;">
+                <li>Authentication Change Detection</li>
+                <li>Webhook Payload Monitoring</li>
+                <li>SDK Compatibility Checks</li>
+                <li>Changelog Parsing</li>
+                <li>Regression Test Triggers</li>
+                <li>Dependency Graph Updates</li>
+            </ul>
+        </div>
+    </div>
+
+    <h2>Server Monitoring System (20 Features)</h2>
+    <p>Health monitoring across AWS EC2 and secondary infrastructure:</p>
+
+    <div class="three-column keep-together">
+        <div>
+            <ul style="font-size: 10px;">
+                <li>Dual-Server Health Checks</li>
+                <li>Disk Usage Alerts</li>
+                <li>Memory Utilization Tracking</li>
+                <li>Docker Container Status</li>
+                <li>Service Uptime Monitoring</li>
+                <li>Automated Health Reports</li>
+                <li>SSH Tunnel Health</li>
+            </ul>
+        </div>
+        <div>
+            <ul style="font-size: 10px;">
+                <li>Database Connection Pool</li>
+                <li>SSL Certificate Expiry</li>
+                <li>Cross-Server Sync Status</li>
+                <li>CPU Load Monitoring</li>
+                <li>Network Latency Checks</li>
+                <li>Log File Size Alerts</li>
+                <li>Backup Verification</li>
+            </ul>
+        </div>
+        <div>
+            <ul style="font-size: 10px;">
+                <li>Process Count Monitoring</li>
+                <li>Port Availability Checks</li>
+                <li>DNS Resolution Monitoring</li>
+                <li>Cron Job Verification</li>
+                <li>Error Rate Trending</li>
+                <li>Automated Recovery Scripts</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="page-footer">
+        <div class="page-footer-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div>Page 10 | www.yesai.au</div>
+    </div>
+</div>
+
+<!-- PAGE 11: INFRASTRUCTURE & TECHNOLOGY -->
+<div class="page content-page">
+    <div class="page-header">
+        <div class="page-header-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div class="page-header-title">Reignite Health Case Study</div>
+    </div>
+
+    <div class="section-header">
+        <div class="section-number">07</div>
+        <div>
+            <div class="section-title">Infrastructure & Technology</div>
+            <div class="section-subtitle">Production Environment</div>
+        </div>
+    </div>
+
+    <h2>Infrastructure Components</h2>
+    <table class="keep-together">
+        <tr><th>Component</th><th>Details</th></tr>
+        <tr><td><strong>Voice AI</strong></td><td>Conversation flow engine with equation-based routing</td></tr>
+        <tr><td><strong>Automation</strong></td><td>53 active workflows for backend operations</td></tr>
+        <tr><td><strong>Primary Database</strong></td><td>PostgreSQL on AWS EC2 (51 tables, cached lookups)</td></tr>
+        <tr><td><strong>Practice Management</strong></td><td>Cliniko integration (real-time sync)</td></tr>
+        <tr><td><strong>Secondary Server</strong></td><td>VPS for monitoring and sync</td></tr>
+        <tr><td><strong>Backup Storage</strong></td><td>Automated daily backups with retention policy</td></tr>
+        <tr><td><strong>Server Snapshots</strong></td><td>Point-in-time EC2 instance recovery</td></tr>
+        <tr><td><strong>CloudWatch</strong></td><td>Metrics, Alarms, Logs, and Events monitoring</td></tr>
+        <tr><td><strong>CI/CD Pipeline</strong></td><td>Automated testing and deployment</td></tr>
+        <tr><td><strong>Secrets Management</strong></td><td>Encrypted credential storage</td></tr>
+    </table>
+
+    <h2>Technology Stack</h2>
+
+    <div class="two-column">
+        <div>
+            <h3>Voice & Conversation</h3>
+            <ul>
+                <li>Conversational AI Platform</li>
+                <li>Real-time Speech-to-Text</li>
+                <li>Natural Voice Synthesis</li>
+                <li>WebSocket Streaming</li>
+            </ul>
+
+            <h3>Automation & Integration</h3>
+            <ul>
+                <li>Self-hosted Workflow Automation</li>
+                <li>Webhook Architecture</li>
+                <li>Event-Driven Processing</li>
+                <li>OAuth 2.0 Authentication</li>
+            </ul>
+
+            <h3>Data & Storage</h3>
+            <ul>
+                <li>PostgreSQL with JSONB</li>
+                <li>Response Memoization</li>
+                <li>Incremental Data Sync</li>
+            </ul>
+        </div>
+
+        <div>
+            <h3>External Services</h3>
+            <ul>
+                <li>Cliniko API Integration</li>
+                <li>Primary Telephony Provider</li>
+                <li>VoIP Call Routing</li>
+                <li>SMS Provider</li>
+                <li>Gmail API</li>
+                <li>Google Sheets API</li>
+            </ul>
+
+            <h3>Development</h3>
+            <ul>
+                <li>Python 3.11</li>
+                <li>Node.js</li>
+                <li>Git & GitHub</li>
+                <li>4 Major AI Platforms</li>
+            </ul>
+
+            <h3>Monitoring</h3>
+            <ul>
+                <li>Custom Health Checks</li>
+                <li>API Change Monitor</li>
+                <li>Centralized Logging</li>
+                <li>Call Analytics Dashboard</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="page-footer">
+        <div class="page-footer-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div>Page 11 | www.yesai.au</div>
+    </div>
+</div>
+
+<!-- PAGE 12: CODEBASE STATISTICS -->
+<div class="page content-page">
+    <div class="page-header">
+        <div class="page-header-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div class="page-header-title">Reignite Health Case Study</div>
+    </div>
+
+    <div class="section-header">
+        <div class="section-number">08</div>
+        <div>
+            <div class="section-title">Codebase Statistics</div>
+            <div class="section-subtitle">Development Investment</div>
+        </div>
+    </div>
+
+    <p>
+        The Reignite Health AI voice receptionist represents a significant development investment, with over 58,000 lines of production code and comprehensive testing infrastructure.
+    </p>
+
+    <h2>Production Codebase</h2>
+    <table class="keep-together">
+        <tr>
+            <th>Component</th>
+            <th class="text-right">Files</th>
+            <th class="text-right">Lines</th>
+            <th class="text-right">Dev Files</th>
+            <th class="text-right">Dev Lines</th>
+        </tr>
+        <tr>
+            <td>Voice Agent (v11.204)</td>
+            <td class="text-right">1</td>
+            <td class="text-right">7,078</td>
+            <td class="text-right">859</td>
+            <td class="text-right">500,127</td>
+        </tr>
+        <tr>
+            <td>Automation Workflows</td>
+            <td class="text-right">53</td>
+            <td class="text-right">19,895</td>
+            <td class="text-right">113</td>
+            <td class="text-right">18,760</td>
+        </tr>
+        <tr>
+            <td>Automation Scripts</td>
+            <td class="text-right">29</td>
+            <td class="text-right">6,431</td>
+            <td class="text-right">15</td>
+            <td class="text-right">2,100</td>
+        </tr>
+        <tr>
+            <td>Deployment Scripts</td>
+            <td class="text-right">17</td>
+            <td class="text-right">7,563</td>
+            <td class="text-right">8</td>
+            <td class="text-right">1,200</td>
+        </tr>
+        <tr>
+            <td>Telco Management System</td>
+            <td class="text-right">14</td>
+            <td class="text-right">8,451</td>
+            <td class="text-right">5</td>
+            <td class="text-right">800</td>
+        </tr>
+        <tr>
+            <td>Server Sync & Health</td>
+            <td class="text-right">6</td>
+            <td class="text-right">2,234</td>
+            <td class="text-right">3</td>
+            <td class="text-right">450</td>
+        </tr>
+        <tr>
+            <td>API Monitoring</td>
+            <td class="text-right">3</td>
+            <td class="text-right">925</td>
+            <td class="text-right">2</td>
+            <td class="text-right">300</td>
+        </tr>
+        <tr>
+            <td>Custom Tooling</td>
+            <td class="text-right">29</td>
+            <td class="text-right">5,720</td>
+            <td class="text-right">5</td>
+            <td class="text-right">400</td>
+        </tr>
+        <tr style="background: #e8e8ff; font-weight: bold;">
+            <td>Total</td>
+            <td class="text-right">152</td>
+            <td class="text-right">~58,300</td>
+            <td class="text-right">1,010</td>
+            <td class="text-right">~524,000</td>
+        </tr>
+    </table>
+
+    <h2>Database Code</h2>
+    <table class="keep-together">
+        <tr><th>Location</th><th class="text-right">Files</th><th class="text-right">Lines</th><th>Status</th></tr>
+        <tr><td>Schemas</td><td class="text-right">5</td><td class="text-right">391</td><td>Production</td></tr>
+        <tr><td>Migrations</td><td class="text-right">2</td><td class="text-right">294</td><td>Production</td></tr>
+        <tr><td>Functions</td><td class="text-right">2</td><td class="text-right">298</td><td>Active</td></tr>
+        <tr><td>Testing</td><td class="text-right">8</td><td class="text-right">1,393</td><td>Development</td></tr>
+        <tr style="background: #e8e8ff; font-weight: bold;"><td>Total</td><td class="text-right">17</td><td class="text-right">2,376</td><td></td></tr>
+    </table>
+
+    <div class="highlight-box keep-together">
+        <h3>Development Investment Highlights</h3>
+        <div class="stats-grid" style="margin-top: 15px;">
+            <div class="stat-card" style="background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2);">
+                <div class="stat-value" style="color: white;">58K+</div>
+                <div class="stat-label" style="color: rgba(255,255,255,0.8);">Production Lines</div>
+            </div>
+            <div class="stat-card" style="background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2);">
+                <div class="stat-value" style="color: white;">524K+</div>
+                <div class="stat-label" style="color: rgba(255,255,255,0.8);">Development Lines</div>
+            </div>
+            <div class="stat-card" style="background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2);">
+                <div class="stat-value" style="color: white;">51</div>
+                <div class="stat-label" style="color: rgba(255,255,255,0.8);">Database Tables</div>
+            </div>
+            <div class="stat-card" style="background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2);">
+                <div class="stat-value" style="color: white;">v11.204</div>
+                <div class="stat-label" style="color: rgba(255,255,255,0.8);">Current Version</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-footer">
+        <div class="page-footer-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div>Page 12 | www.yesai.au</div>
+    </div>
+</div>
+
+<!-- PAGE 13: CONCLUSION -->
+<div class="page content-page">
+    <div class="page-header">
+        <div class="page-header-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div class="page-header-title">Reignite Health Case Study</div>
+    </div>
+
+    <div class="section-header">
+        <div class="section-number">09</div>
+        <div>
+            <div class="section-title">Conclusion</div>
+            <div class="section-subtitle">A Partnership for Growth</div>
+        </div>
+    </div>
+
+    <p style="font-size: 13px;">
+        The AI voice receptionist implementation for Reignite Health demonstrates how purpose-built AI solutions can transform healthcare operations while maintaining the personal touch that patients expect.
+    </p>
+
+    <h2>Key Achievements</h2>
+
+    <div class="two-column keep-together">
+        <div class="info-box">
+            <div class="info-box-title">Operational Excellence</div>
+            <ul>
+                <li>24/7 patient call handling</li>
+                <li>Zero missed calls during business hours</li>
+                <li>Seamless multi-village coordination</li>
+                <li>Real-time calendar synchronization</li>
+            </ul>
+        </div>
+        <div class="info-box">
+            <div class="info-box-title">Compliance & Quality</div>
+            <ul>
+                <li>Full Medicare/NDIS compliance</li>
+                <li>Accurate referral tracking</li>
+                <li>Complete call documentation</li>
+                <li>Human escalation when needed</li>
+            </ul>
+        </div>
+    </div>
+
+    <h2>What Made This Project Successful</h2>
+
+    <ol>
+        <li><strong>Deep Domain Expertise</strong> - Yes AI's understanding of Australian healthcare requirements enabled compliance-first design</li>
+        <li><strong>Iterative Development</strong> - Over 200 versions refined through real-world call testing and feedback</li>
+        <li><strong>Comprehensive Integration</strong> - Seamless connection with Cliniko eliminated manual data entry</li>
+        <li><strong>Graceful Fallbacks</strong> - Every conversation path includes human escalation options</li>
+        <li><strong>Continuous Monitoring</strong> - API monitoring and server health systems ensure reliability</li>
+    </ol>
+
+    <div class="quote-box keep-together">
+        <div class="quote-text">
+            "The system handles the complexity of our multi-location practice with different funding types and patient needs. It's like having a knowledgeable receptionist who never takes a break and always knows every patient's history."
+        </div>
+        <div class="quote-author">- Reignite Health Team</div>
+    </div>
+
+    <h2>Ready to Transform Your Practice?</h2>
+    <p>
+        If your healthcare practice faces similar challenges with call volumes, complex booking requirements, or multi-location coordination, Yes AI can help. Our Cliniko AI Booking System is designed specifically for Australian healthcare providers.
+    </p>
+
+    <div class="highlight-box keep-together" style="text-align: center;">
+        <h3 style="margin-bottom: 15px;">Get Started Today</h3>
+        <p style="font-size: 16px; margin-bottom: 5px;"><strong>www.yesai.au</strong></p>
+        <p style="font-size: 14px;">(03) 9999 7398 | hello@yesai.au</p>
+    </div>
+
+    <div class="page-footer">
+        <div class="page-footer-logo">
+            <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+        </div>
+        <div>Page 13 | www.yesai.au</div>
+    </div>
+</div>
+
+<!-- BACK COVER -->
+<div class="page back-cover">
+    <div class="back-logo">
+        <img src="file:///C:/Users/peter/Downloads/CC/Yes%20AI%20Assets/YesAI_colors_punched_transparent6.png" alt="Yes AI">
+    </div>
+
+    <div class="back-tagline">AI-Powered Solutions for Australian Business</div>
+
+    <div class="back-contact-box">
+        <div class="back-contact-item">
+            <a href="https://www.yesai.au">www.yesai.au</a>
+        </div>
+        <div class="back-contact-item">
+            (03) 9999 7398
+        </div>
+        <div class="back-contact-item">
+            <a href="mailto:hello@yesai.au">hello@yesai.au</a>
+        </div>
+        <div class="back-contact-item" style="margin-top: 20px; font-size: 12px; color: #a0a0ff;">
+            Melbourne | Sydney
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
