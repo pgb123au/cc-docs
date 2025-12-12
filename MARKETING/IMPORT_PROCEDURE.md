@@ -43,57 +43,69 @@ This procedure ensures ALL available data is captured for each contact:
 
 ## PHASE 2: Call Recording Search
 
-### 2.1 Search Strategy (CRITICAL LESSONS)
+### 2.1 Search Strategy
 
-**DO NOT** rely solely on phone numbers from CSV - they may be wrong!
+Search call logs using these methods (in order of reliability):
 
-Search call logs using MULTIPLE methods:
-1. **Phone number from appointment notes** (e.g., `+61408687109`)
-2. **Phone number from CSV** (e.g., `phone_from_list`)
-3. **Company name in transcript** (handles transcription errors)
-4. **Timestamp from retell_log** (e.g., `25/08/2025, 16:4`)
-5. **Fuzzy name matching** (e.g., "Panade" = "Paradise")
+1. **Phone number match** - Match `to_number` or `from_number` in call logs
+2. **Timestamp from retell_log** - Use date/time hint from appointment data (e.g., `25/08/2025, 16:4`)
+
+**NOTE:** Do NOT use transcript searching - it causes false positives (e.g., "completely" matches "etel").
 
 ### 2.2 Search Code Template
 
 ```python
 import json
+import re
 
-def find_call_recording(company_name, phone_numbers, timestamp_hint):
+def clean_phone(phone):
+    """Normalize phone number - last 9 digits only."""
+    if not phone:
+        return ""
+    return re.sub(r'[^\d]', '', str(phone))[-9:]
+
+def find_call_recording(phone_numbers, timestamp_hint):
     """
     Search call logs for a specific contact.
 
     Args:
-        company_name: Company name (will fuzzy match)
         phone_numbers: List of possible phone numbers
         timestamp_hint: Date/time from retell_log (DD/MM/YYYY, HH:MM)
     """
     matches = []
+    seen_ids = set()
 
     for sheet in ['call_log_sheet_export.json', 'call_log_sheet2_export.json']:
         with open(f'C:/Users/peter/Downloads/CC/CRM/{sheet}', 'r') as f:
             data = json.load(f)
 
         for record in data:
-            # Method 1: Phone number match
-            to_num = str(record.get('to_number', ''))
-            from_num = str(record.get('from_number', ''))
+            call_id = record.get('call_id', '')
+            if call_id in seen_ids:
+                continue
+
+            matched = False
+
+            # Method 1: Phone number match (PREFERRED)
+            to_num = clean_phone(record.get('to_number', ''))
+            from_num = clean_phone(record.get('from_number', ''))
             for phone in phone_numbers:
-                clean_phone = phone.replace('+', '').replace(' ', '')[-9:]
-                if clean_phone in to_num or clean_phone in from_num:
-                    matches.append(('phone', record))
+                clean_p = clean_phone(phone)
+                if clean_p and len(clean_p) >= 8:
+                    if clean_p in to_num or clean_p in from_num:
+                        matched = True
+                        break
 
-            # Method 2: Company name in transcript (fuzzy)
-            transcript = record.get('plain_transcript', '').lower()
-            company_lower = company_name.lower()
-            # Check first 3-4 chars for transcription errors
-            if company_lower[:4] in transcript or company_lower in transcript:
-                matches.append(('transcript', record))
+            # Method 2: Timestamp match (if no phone match)
+            if not matched and timestamp_hint:
+                start_time = record.get('start_time', '')
+                # Convert timestamp hint to match format
+                if timestamp_hint[:10] in start_time:
+                    matched = True
 
-            # Method 3: Timestamp match
-            start_time = record.get('start_time', '')
-            if timestamp_hint and timestamp_hint[:16] in start_time:
-                matches.append(('timestamp', record))
+            if matched:
+                seen_ids.add(call_id)
+                matches.append(record)
 
     return matches
 ```
@@ -290,15 +302,90 @@ def verify_contact(client, email):
 
 ### From Paradise Distributors
 1. **Phone number in CSV may be WRONG** - use call logs `to_number`
-2. **Transcript errors** - "Panade" = "Paradise" - search fuzzy
-3. **Timestamp matching** - use retell_log date to narrow search
-4. Appointment notes have full call details including correct phone
+2. **Timestamp matching** - use retell_log date to find calls
+3. Appointment notes have full call details including correct phone
+4. **Personal email domains cause bad company records** - gmail.com as company domain
+
+### From Bulk Import Review
+1. **NEVER use personal email domains as company domain**
+2. **NEVER use URLs as company names** - extract proper name
+3. **48 companies had URL-like names** from original telemarketer import
+4. **NEVER search transcripts** - causes massive false positives (e.g., "completely" matches "etel")
 
 ### General
-1. Always search call logs by MULTIPLE methods
-2. Cross-reference appointment notes with call logs
-3. The actual called phone is in `to_number`, not CSV
-4. SMS field conflicts mean phone is shared - add to NOTES instead
+1. Search call logs by phone number and timestamp ONLY
+2. The actual called phone is in `to_number`, not CSV
+3. SMS field conflicts mean phone is shared - add to NOTES instead
+4. Use appointment data for company names (most accurate)
+
+---
+
+## DATA QUALITY RULES
+
+### Personal Email Domains (NEVER use as company domain)
+
+```python
+PERSONAL_DOMAINS = [
+    'gmail.com', 'hotmail.com', 'yahoo.com', 'outlook.com',
+    'bigpond.com', 'live.com', 'icloud.com', 'aol.com',
+    'msn.com', 'optusnet.com.au', 'hotmail.com.au',
+    'yahoo.com.au', 'mail.com'
+]
+
+def get_company_domain(email, company_name=None):
+    """Extract domain only if it's a business domain."""
+    if not email or '@' not in email:
+        return None
+
+    domain = email.split('@')[1].lower()
+
+    # Never use personal email domains
+    if domain in PERSONAL_DOMAINS:
+        return None
+
+    return domain
+```
+
+### Company Name Cleaning
+
+```python
+def clean_company_name(name):
+    """Extract proper company name from URL-like strings."""
+    if not name:
+        return None
+
+    # Remove URL prefixes
+    name = name.replace('https://', '').replace('http://', '').replace('www.', '')
+
+    # If it looks like a domain, try to extract company name
+    if '.com' in name or '.au' in name or '.net' in name:
+        # Remove TLD and path
+        name = name.split('/')[0]  # Remove path
+        name = name.replace('.com.au', '').replace('.net.au', '')
+        name = name.replace('.com', '').replace('.au', '').replace('.net', '')
+
+        # Convert to title case
+        name = name.replace('-', ' ').replace('_', ' ').title()
+
+    return name.strip() if name else None
+```
+
+### Company Creation Rules
+
+1. **Source priority for company name:**
+   - Appointments data (most accurate - real names)
+   - HubSpot exports (verified business names)
+   - Master CSV (may have domains only)
+
+2. **Domain handling:**
+   - Only set domain if from business email
+   - Never use gmail.com, hotmail.com, etc.
+   - If contact uses personal email, leave domain blank
+
+3. **Name validation:**
+   - Reject names that are URLs
+   - Reject names with http/www
+   - Clean domain-style names to proper names
 
 ---
 
