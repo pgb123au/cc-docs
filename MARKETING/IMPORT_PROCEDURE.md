@@ -39,6 +39,71 @@ This procedure ensures ALL available data is captured for each contact:
 | Client Folders | `CLIENTS/[company-name]/` | Audit reports, emails, logos |
 | DNC List | `CRM/DO_NOT_CALL_Master.csv` | Blocklist status |
 
+### 1.3 Name Enrichment (REQUIRED when name is empty)
+
+**CRITICAL:** If the primary source (appointments) has an empty name field, you MUST:
+
+1. **Search by email** in secondary sources:
+   - `CRM/All_Contacts_2025_07_07_Cleaned.csv` - look for exact email match
+   - `CRM/Master_Contacts_With_Flags.csv` - may have name from original list
+
+2. **Search by email domain** in company sources:
+   - `CRM/All_Companies_2025-07-07_Cleaned_For_HubSpot.csv` - check `Company Domain Name` column
+   - Extract domain from email (e.g., `amrs@amariners.com.au` → search for `amariners.com.au`)
+
+3. **Search by company name** if available:
+   - HubSpot contacts/companies with matching company
+
+4. **Manual lookup** if not found:
+   - Check original Google Sheet for any additional columns
+   - Look up company website for contact names
+   - Flag for manual review if name cannot be found
+
+**Example Code:**
+```python
+def enrich_name(email, company_name=None):
+    """Search secondary sources for contact name when primary source is empty."""
+    domain = email.split('@')[1] if '@' in email else None
+
+    # 1. Search HubSpot Contacts by email
+    with open('CRM/All_Contacts_2025_07_07_Cleaned.csv', 'r', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            if row.get('email', '').lower() == email.lower():
+                first = row.get('first_name', '') or row.get('First Name', '')
+                last = row.get('last_name', '') or row.get('Last Name', '')
+                if first or last:
+                    return first, last
+
+    # 2. Search Master Contacts by email
+    with open('CRM/Master_Contacts_With_Flags.csv', 'r', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            if row.get('email', '').lower() == email.lower():
+                name = row.get('name', '') or row.get('contact_name', '')
+                if name:
+                    parts = name.split()
+                    return parts[0], ' '.join(parts[1:]) if len(parts) > 1 else ''
+
+    # 3. Search HubSpot Companies by domain for primary contact
+    if domain:
+        with open('CRM/All_Companies_2025-07-07_Cleaned_For_HubSpot.csv', 'r', encoding='utf-8') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                if domain.lower() in str(row.get('Company Domain Name', '')).lower():
+                    # Found company - check for primary contact
+                    print(f"Found company: {row.get('Company name')} - check for contacts")
+
+    return None, None  # Name not found - flag for manual review
+```
+
+**Root Cause of Missing Names:**
+- Appointment spreadsheets may only capture email (no name column filled)
+- Telemarketer notes may use email as identifier
+- Original lead source may not have had name
+
+**If name cannot be found:** Add to NOTES: `"Name not available - manual lookup required"`
+
 ---
 
 ## PHASE 2: Call Recording Search
