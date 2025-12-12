@@ -1,7 +1,7 @@
 # Brevo CRM Import - Status Report
 
-**Last Updated:** 2025-12-13 08:00 AEDT
-**Session:** Marketing Automation Setup
+**Last Updated:** 2025-12-13 11:30 AEDT
+**Session:** Marketing Automation Setup (Continued)
 
 ---
 
@@ -74,8 +74,13 @@ All created and working:
 - `WEBSITE` - Company website
 - `SOURCE` - Data source (e.g., "massive_list_sa.csv")
 - `APPOINTMENT_DATE` - Date of appointment
+- `APPOINTMENT_TIME` - Time of appointment (NEW)
 - `APPOINTMENT_STATUS` - Status (e.g., "Seen - Client")
 - `DEAL_STAGE` - Won/Lost/Negotiation/etc.
+- `QUALITY` - Lead quality rating (NEW)
+- `FOLLOWUP_STATUS` - Follow-up status (NEW)
+- `RETELL_LOG` - Retell call timestamp (NEW)
+- `NOTES` - General notes (NEW)
 
 ---
 
@@ -171,24 +176,53 @@ print('Companies:', companies)
 
 ## EXAMPLE: Complete Contact Record
 
-**Reignite Health (COMPLETE):**
-```
-Contact:
-  Email: sara@reignitehealth.com.au
-  FIRSTNAME: Sara
-  LASTNAME: Lehmann
-  COMPANY: Reignite Health
-  APPOINTMENT_DATE: 2025-09-17
-  APPOINTMENT_STATUS: Seen - Client
-  DEAL_STAGE: Won
-  SOURCE: Telemarketer Campaign
-  Lists: [24, 25, 28]
+**Reignite Health (COMPLETE - 2 Contacts):**
 
-Company:
-  Name: Reignite Health
-  Domain: reignitehealth.com.au
-  Linked Contacts: [778]
+### Contact 1: Sara Lehmann (Telemarketer Lead)
 ```
+Email: sara@reignitehealth.com.au
+ID: 778
+FIRSTNAME: Sara
+LASTNAME: Lehmann
+COMPANY: Reignite Health
+APPOINTMENT_DATE: 2025-09-17
+APPOINTMENT_TIME: 10:00am
+APPOINTMENT_STATUS: Seen - Client
+DEAL_STAGE: Won
+QUALITY: Good
+FOLLOWUP_STATUS: Client
+RETELL_LOG: 09/01/2025 11:48 phone_call
+SOURCE: Telemarketer Campaign
+NOTES: Won client. Telemarketer appointment converted.
+Lists: [24, 25, 28]
+```
+
+### Contact 2: Liam Potter (Founder)
+```
+Email: liam@reignitehealth.com.au
+ID: 35494
+FIRSTNAME: Liam
+LASTNAME: Potter
+COMPANY: Reignite Health
+DEAL_STAGE: Closed Won
+SOURCE: Website Audit Client
+NOTES: Founder/Owner. Received digital audit report Dec 2025.
+Lists: [24, 25, 28]
+```
+
+### Company Record
+```
+Name: Reignite Health
+ID: 693c813d58677e43aa29b493
+Domain: reignitehealth.com.au
+Linked Contacts: [778, 35494] (Sara + Liam)
+```
+
+### Additional Data Sources Found
+- `CLIENTS/reignite-health/` - Full website audit, email draft, logo
+- `CRM/ALLIED_HEALTH_VIC_OUTREACH.md` - Marketing templates using as case study
+- Audit report addressed to Liam Potter (founder, physiotherapist)
+- Company: 11-50 employees, serves 10 aged care villages, 877 patients
 
 ---
 
