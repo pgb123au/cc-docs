@@ -1,0 +1,88 @@
+source_sheet,company,name,email,phone,date,time,status,quality,followup,retell_log
+Appts New,,Jacob,Jacob@jaeelc.com,,2025-07-16,10:00am,Reschedule,OK,,07/11/2025 12:19 phone_call
+Appts New,Capital Wealth Management,,info@capitalwealthfinance.com.au,,2025-07-24,4pm,Seen - BP Asian too small,OK,,07/17/2025 11:21 phone_call
+Appts New,JTW building group,Joe Van Stripe,Joe@jtwbuildinggroup.com.au,,2025-07-29,12:30pm,Seen - FU,Good,2026-02-01,07/22/2025 16:12 phone_call
+Appts New,Finweb,Bipin Josie,J.Bipin@gmail.com,,2025-07-31,11:30am,NO SHOW INDIAN,OK,,07/23/2025 14:28 phone_call
+Appts New,Brisbane City Landscapes,Jack Blair-Swanell,BrisbaneCityLandscapes@gmail.com,,2025-07-31,4pm,Seen - BP Too Small,OK,,07/24/2025 16:58 phone_call
+Appts New,Pinnacle Accounting Advisory,Mina Baselyous,mina@pinnacleaccountingadvisory.com.au,,2025-08-05,10:30am,Seen - FU,OK,2025-09-30,07/30/2025 13:16 phone_call
+Appts New,,David,david.butterfield@earthworm.net.au,,2025-08-14,5pm,No Show - BP - too small,Weak,,07/09/2025 13:26 phone_call
+Appts New,CLG Electrics,Chris,chris@clgelectrics.com.au,,2025-08-12,10:00am,BP,Good,,08/04/2025 17:52 phone_call
+Appts New,Western AC,Richard Sikorski,jatarelec@bigpond.com,,2025-08-13,10:00am,Seen - BP - Too small,Good,2025-09-02,08/07/2025 09:56 phone_call
+Appts New,environmentally friendly cremations,John,john@bensons.com.au,,2025-08-14,10:00am,Seen  - Client,Good,2025-09-24,08/12/2025 19:54 phone_call
+Appts New,Pradeep Chewari,,info@pradeeptiwari.com.au,,2025-08-21,11:00am,No Show - BP Indian,Poor,,08/13/2025 17:09 phone_call
+Appts New,Aaron Climate Control,Aaron,info@aaronclimatgecontrol.com.au,,2025-08-21,5pm,BP - Too small,Poor,,08/13/2025 14:58 phone_call
+Appts New,Realm Group,Robbie,robbiem@realmgroup.com.au,,2025-09-04,11:00am,No Show -FU,,2026-02-01,08/13/2025 13:09 phone_call
+Appts New,Encapsulator,Danny,danny@encapsulator.io,,2025-08-20,11:00am,Seen - BP too small,OK,,08/13/2025 11:17 phone_call
+Appts New,NLAM,Andrew Oscari,andrew@nlam.com.au,,2025-08-27,10:00am,Seen,OK,2025-10-01,08/14/2025 10:32 phone_call
+Appts New,,,Tim@marketcom.com.au,,,,Competitor,,,08/14/2025 08:51 phone_call
+Appts New,Delco Group,Dylan,admin@delcogroup.com.au,,2025-08-21,10am Perth,No Show,Good,,07/24/2025 14:01 phone_call
+Appts New,ETEL,Zach,zach@etel.com.au,,2025-08-19,12:00pm,Seen - FU,OK,2025-08-26,08/14/2025 16:35 phone_call
+Appts New,Lumiere Home Renovations,Chantelle,info@lumierehomerenovations.com.au,,2025-08-19,10:00am,Reschedule,OK,2025-08-28,08/15/2025 10:52 phone_call
+Appts New,Marketcom,,Tim@marketcom.com.au; tim@icustomer.com.au,,2025-08-19,11:00am,Seen - BP - Competitor,Competitor?,,08/15/2025 15:23 phone_call
+Appts New,,John McKinley,johnmckinley@gmail.com,,2025-08-29,10:00am,Cancelled - BP,,,08/25/2025 09:23 phone_call
+Appts New,Clearshot Digital,∙,,,2025-08-26,12:00pm,No Show,No Show,,08/25/2025 15:45 phone_call
+Appts New,Paradise Distributors,Bob Chalmers,bchalmers616@gmail.com,,2025-09-24,11:00am,Seen  - Client,OK,Client,08/25/2025 16:45 phone_call
+Appts New,Awash Care ?,∙,Hawimorke5@gmail.com,,2025-09-05,10:00am,No Show - BP - too small,OK,,08/27/2025 13:08 phone_call
+Appts New,kiwi Golden care,,KiwiGoldenCare@yahoo.com,,2025-09-11,12:00pm,No Show - BP,Poor,,08/27/2025 15:40 phone_call
+Appts New,,,ruscoijames@gmail.com,,2029-08-29,11:00am,No Show,,,
+Appts New,Being Humancare,Mandeep,info@beinghumancare.com.au,,2025-09-09,11:00am,No Show - BP,OK,,09/01/2025 18:07 phone_call
+Appts New,AJS Australia Disability Services,Shirley,shi.ajs@outlook.com.au,,2025-09-04,1:30pm,No Show  - BP - Too Small,OK,,09/01/2025 16:36 phone_call
+Appts New,Silver Fern Accounting,Cameron Gibson,cam.j.gibson@gmail.com,,2025-09-25,10:00am,Seen - FU,OK,,09/03/2025 11:10 phone_call
+Appts New,Reignite Health,Sara Lehmann,sara@reignitehealth.com.au,,2025-09-17,10:00am,Seen  - Client,Good,Client,09/01/2025 11:48 phone_call
+Appts New,iBookeep,Sam Dodgson,sam@ibookeep.com.au,,2026-02-01,10:00am,Seen - Said no - FU,Good,2025-09-19,09/06/2025 10:53 phone_call
+Appts New,VVFX,Ricky,vvfxteam@gmail.com,,2025-09-12,11:00am,No Show - BP Too small,OK,,09/08/2025 13:59 phone_call
+Appts New,PNL 4WD,Nyrie,info@pnl4wd.com.au,,2025-09-12,2pm,Booked,,2025-10-02,09/09/2025 12:34 phone_call
+Appts New,ASPG Group,John O'Toole,jot@apsggroup.com.au,,2025-09-16,9:30am,No show - FU,OK,2025-10-10,09/09/2025 16:16 phone_call
+Appts New,Cyber Probity,Graeme Boorer,graeme.b@cyberprobity.io,,2025-09-11,10:00am,Seen - FU,Good,2025-09-25,09/10/2025 11:58 phone_call
+Appts New,Cardilly Fireworks WA,Rob,rob@cardilefireworks.com.au,,,,Call to book,,2025-10-07,09/10/2025 14:43 phone_call
+Appts New,NWAR,,Ben@nwar.com.au,,2025-10-02,2pm,See - EXCELLENT!!,,,09/10/2025 14:41 phone_call
+Appts New,Snappy Removals,Kevin,snappyremovals.gb@gmail.com,,2025-09-18,3pm,Seen - BP,,,09/10/2025 13:20 phone_call
+Appts New,Alpaca Magic,,glynda@alpacamagic.com.au,,2025-09-23,10am,Seen - FU,,,09/10/2025 13:11 phone_call
+Appts New,Allure Limosuines,Matt,matt@allurelimousines.com.au,,2025-09-12,12:00:00,Seen - FU,,2025-09-23,09/08/2025 15:13 phone_call
+Appts,Cool Solutions,Mal Stanes ?,Admin@Coolsolutions.com.au,,2025-06-10,12:00pm,Cancelled by client,OK appointment,,05/27/2025 19:20 phone_call
+Appts,,,NO EMAIL !! I SMS'd him 28/5/25,,2025-06-05,11:00am,Followed Up - Call Back,Weak Appt,,05/27/2025 16:17 phone_call
+Appts,Daves Removals,Dave,Davesremovals,,2025-05-30,10:00am,CB 17/9/25,OK,,
+Appts,No Show - CB 8/6/25,Ian Kingston,Sales@tasmanhoney.com.au,,2025-06-05,1:00pm,Reschedule,OK,,05/26/2025 20:25 phone_call
+Appts,,Scott,Scott@octobergrey.com,,2025-06-13,11:00am,Seen - Follow up,Good,,05/23/2025 10:41 phone_call
+Appts,,,samgreen@bigpond.com,,2025-05-23,1pm,Paid Client,Good,,05/23/2025 16:50 phone_call
+Appts,,,ash@tkv.com.au,,2025-06-05,4:15pm,No Show - Dead,Good,,05/28/2025 12:20 phone_call
+Appts,,,amrs@amariners.com.au,,2025-06-06,10:00am,CB 1/10/25,Fair,,05/28/2025 12:02 phone_call
+Appts,,,gm@qldcovertpi.com.au,,2025-06-06,1pm,Seen - Dead,OK,,05/29/2025 11:55 phone_call
+Appts,,,Info@chillngrill.com.au,,2025-05-13,10:00am,Seen - Follow Up,OK,,06/04/2025 13:16 phone_call
+Appts,,,miamitiling-2013@hotmail.com,,2025-06-11,11:30am,No Show,OK,,06/06/2025 11:14 phone_call
+Appts,,,info@cstplumbing.com,,2025-08-07,4pm,Cancelled,OK,,06/21/2025 13:16 phone_call
+Call Backs,,Mary,revive@alignandshine.com,,,,,,,
+Call Backs,,Mark,ultramax_trailers@outlook.com,,,,,,,
+Call Backs,,,info@poolcarecompany.com.au,,,,,,,
+Call Backs,,Lawrence,LS@northstarlogistics.com.au,,,,,,,
+Call Backs,,,bonbeachhealth@optusnet.com.au,,,,,,,
+Call Backs,,Adam,info@argservices.com.au,,,,,,,
+Call Backs,,Stacie Dyer,dyerstacie@gmail.com,,,,,,,
+Call Backs,,,info@cstplumbing.com,,,,,,,
+Call Backs,,,KLN@mail.com,,,,,,,
+Call Backs New,,,marlin.david@gmail.com,,,,BP - Too small,,,
+Call Backs New,,,hpmaintenance25@gmail.com,,,,Dead - BP to small,,,
+Call Backs New,,,ruchiosingh@hotmail.com,,,,Dead,,,
+Call Backs New,,Tim,sales@kilanpowdercoating.com.au,,,,BP - Asian,,,
+Call Backs New,,Shane,admin@mapledlaneprojects.com.au,,,,Sent Info,,,
+Call Backs New,,Linda,admin@allpropertyservicesfnq.com,,,,Sent SMS,,,
+Call Backs New,,,info@memorablecare.com.au,,,,BP - Too small,,,
+Call Backs New,,Ken?,ken@fehilyadvisory.com.au,,,,Sent email 30/7/25,,,
+Call Backs New,,Nathan,evoslandscapingem@gmail.com,,,,CB,,,
+Call Backs New,,?? Aruna Colombathantri ??,aruna@australianpublicaccountants.com.au,,,,Left VM,,,
+Call Backs New,,,Indian Accountant,,,,,,,
+Call Backs New,,Danny Lopez,ddanlo@hotmail.com,,,,BP - Too small,,,
+Call Backs New,,,1959PeterHarding@gmail.com,,,,OOB,,,
+Call Backs New,,,fm.melbourne@gmail.com,,,,Indian,,,
+Call Backs New,,Ron,ron@accurateplumbing.au,,,,CB,,,
+Call Backs New,,Dean,endurancetreadmills@gmail.com,,,,Sent Info,,,
+Call Backs New,,,Happyuniverse360@gmail.com,,,,BP - Indian,,,
+Call Backs New,,Darren,dlindoorplanthire@outlook.com.au,,,,Sent Info,,,
+Call Backs New,,Alex Kuma,suptulung.pvt.ltd@Gmail.com,,,,,,,
+Call Backs New,,Mick,info@carpetcleaningworld.com.au,,,,Sent Info,,,
+Call Backs New,,Christian,hello@iact.melbourne,,,,Sent Info,,,
+Call Backs New,,John,john@jmrsupports.com.au,,,,Sent SMS,,,
+Call Backs New,,Sarah Assah,sarah_aassar@hotmail.com,,,,Sent SMS,,,
+Call Backs New,,,FPGPL2010@17mail.com ??,,,,CB,,,
+Call Backs New,,Rick,rick@betterpoolsandspas.com.au,,,,Wanted to book,,,
+Call Backs New,,George,21stcenturypainting.vic@gmail.com,,,,Wanted to book,,,

@@ -1,0 +1,18 @@
+{
+  "file": "All_Appointments_Extracted.csv",
+  "total_rows": 87,
+  "valid": 81,
+  "invalid": 6,
+  "imported": 81,
+  "duplicates": 0,
+  "errors": [
+    "Row 21: Invalid/missing email: Tim@marketcom.com.au; tim@icustomer.com.au",
+    "Row 23: Invalid/missing email: None",
+    "Row 43: Invalid/missing email: NO EMAIL !! I SMS'd him 28/5/25",
+    "Row 44: Invalid/missing email: Davesremovals",
+    "Row 73: Invalid/missing email: Indian Accountant",
+    "Row 86: Invalid/missing email: FPGPL2010@17mail.com ??"
+  ],
+  "started_at": "2025-12-12T22:23:29.521832",
+  "finished_at": "2025-12-12T22:25:09.735184"
+}

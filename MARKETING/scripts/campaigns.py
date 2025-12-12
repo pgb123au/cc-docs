@@ -192,12 +192,391 @@ EMAIL_TEMPLATES = {
     }
 }
 
+# ========== ALLIED HEALTH EMAIL TEMPLATES ==========
+
+ALLIED_HEALTH_EMAILS = {
+    "ah_problem_solution": {
+        "name": "Allied Health - Problem/Solution",
+        "subject": "Your receptionist called in sick - now what?",
+        "html": """
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .logo { font-size: 24px; font-weight: bold; margin-bottom: 20px; }
+        .logo .yes { color: #e53935; }
+        .logo .ai { color: #1565c0; }
+        ul { margin: 15px 0; }
+        li { margin: 8px 0; }
+        .cta { background: #1565c0; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block; margin: 15px 0; }
+        .footer { font-size: 12px; color: #666; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; }
+        a { color: #1565c0; }
+    </style>
+</head>
+<body>
+    <div class="logo"><span class="yes">Yes</span> <span class="ai">AI</span></div>
+
+    <p>Hi {{params.FIRSTNAME}},</p>
+
+    <p>Quick question: what happens to the calls that come in when your team is busy with patients, at lunch, or after 5pm?</p>
+
+    <p>For most allied health practices, the honest answer is... they go to voicemail. And voicemails often mean lost bookings.</p>
+
+    <p>We've just helped Reignite Health (allied health provider across 10 aged care villages) solve this with an AI receptionist that:</p>
+
+    <ul>
+        <li>Answers every call 24/7 in a natural voice</li>
+        <li>Books directly into Cliniko in real-time</li>
+        <li>Handles DVA, HCP, Medicare & NDIS funding queries</li>
+        <li>Speaks 30+ languages for diverse patient bases</li>
+    </ul>
+
+    <p>The result? No more missed calls. No more voicemail phone tag. Appointments just appear in Cliniko.</p>
+
+    <p>Would you be open to a 15-minute call to see if this could work for your practice?</p>
+
+    <a href="https://cal.com/p-b-ttzvpm/15min" class="cta">Book a 15-min Demo</a>
+
+    <p>Cheers,<br>
+    Peter Ball<br>
+    YES AI | (03) 9999 7398</p>
+
+    <p><a href="https://yesai.au/case-studies/reignite-health">See the full case study</a></p>
+
+    <div class="footer">
+        <p>Yes AI | Melbourne, Australia | hello@yesai.au<br>
+        <a href="{{unsubscribe}}">Unsubscribe</a></p>
+    </div>
+</body>
+</html>
+"""
+    },
+
+    "ah_case_study": {
+        "name": "Allied Health - Case Study",
+        "subject": "How 877 patients now book appointments without waiting on hold",
+        "html": """
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .logo { font-size: 24px; font-weight: bold; margin-bottom: 20px; }
+        .logo .yes { color: #e53935; }
+        .logo .ai { color: #1565c0; }
+        .stats { background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 20px 0; }
+        .stats li { margin: 8px 0; }
+        .cta { background: #1565c0; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block; margin: 15px 0; }
+        .footer { font-size: 12px; color: #666; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; }
+        a { color: #1565c0; }
+    </style>
+</head>
+<body>
+    <div class="logo"><span class="yes">Yes</span> <span class="ai">AI</span></div>
+
+    <p>Hi {{params.FIRSTNAME}},</p>
+
+    <p>I wanted to share something relevant for your practice.</p>
+
+    <p>We recently completed an AI voice receptionist implementation for Reignite Health, an allied health provider serving aged care residents across Sydney and the Central Coast.</p>
+
+    <p><strong>The challenge:</strong></p>
+    <ul>
+        <li>High call volume overwhelming reception</li>
+        <li>Multiple funding types (DVA, HCP, Medicare, NDIS, private)</li>
+        <li>Calls going to voicemail after hours</li>
+        <li>Staff spending hours on routine booking calls</li>
+    </ul>
+
+    <p><strong>The solution:</strong> An AI receptionist that integrates directly with Cliniko to answer calls 24/7, check real-time availability, and create bookings.</p>
+
+    <div class="stats">
+        <strong>Key stats:</strong>
+        <ul>
+            <li>10 villages served</li>
+            <li>877+ patients in the system</li>
+            <li>26 different service types</li>
+            <li>80+ features built into the AI</li>
+            <li>2,000+ classes booked per year</li>
+        </ul>
+    </div>
+
+    <p>Worth a 15-minute look?</p>
+
+    <a href="https://cal.com/p-b-ttzvpm/15min" class="cta">Book a Demo</a>
+
+    <p>Best,<br>
+    Peter Ball<br>
+    YES AI | (03) 9999 7398</p>
+
+    <p>
+        <a href="https://yesai.au/case-studies/reignite-health">Read the full case study</a> |
+        <a href="https://yesai.au/case-studies/Reignite_Health_Case_Study_2025.pdf">Download PDF</a>
+    </p>
+
+    <div class="footer">
+        <p>Yes AI | Melbourne, Australia | hello@yesai.au<br>
+        <a href="{{unsubscribe}}">Unsubscribe</a></p>
+    </div>
+</body>
+</html>
+"""
+    },
+
+    "ah_after_hours": {
+        "name": "Allied Health - After Hours",
+        "subject": "What happens when a patient calls at 7pm?",
+        "html": """
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .logo { font-size: 24px; font-weight: bold; margin-bottom: 20px; }
+        .logo .yes { color: #e53935; }
+        .logo .ai { color: #1565c0; }
+        .highlight { background: #fff3e0; padding: 15px; border-left: 4px solid #ff9800; margin: 20px 0; }
+        .cta { background: #1565c0; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block; margin: 15px 0; }
+        .footer { font-size: 12px; color: #666; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; }
+        a { color: #1565c0; }
+    </style>
+</head>
+<body>
+    <div class="logo"><span class="yes">Yes</span> <span class="ai">AI</span></div>
+
+    <p>Hi {{params.FIRSTNAME}},</p>
+
+    <div class="highlight">
+        <strong>Did you know?</strong> 23% of healthcare appointment requests come outside business hours.
+    </div>
+
+    <p>If your practice goes to voicemail after 5pm, you're almost certainly losing bookings to competitors who answer.</p>
+
+    <p>We solved this for Reignite Health with an AI receptionist that:</p>
+
+    <ul>
+        <li>Answers every call, 24/7/365</li>
+        <li>Books into Cliniko in real-time</li>
+        <li>Handles Medicare referrals, NDIS funding, HCP claims</li>
+        <li>Sounds completely natural</li>
+    </ul>
+
+    <p><strong>Their result:</strong> Zero missed calls. Appointments appearing overnight. Staff arriving to a full schedule instead of a voicemail queue.</p>
+
+    <a href="https://cal.com/p-b-ttzvpm/15min" class="cta">See it in Action</a>
+
+    <p>Peter<br>
+    YES AI | (03) 9999 7398</p>
+
+    <div class="footer">
+        <p>Yes AI | hello@yesai.au<br>
+        <a href="{{unsubscribe}}">Unsubscribe</a></p>
+    </div>
+</body>
+</html>
+"""
+    },
+
+    "ah_funding": {
+        "name": "Allied Health - Funding Complexity",
+        "subject": "DVA, HCP, Medicare, NDIS, Private - all handled automatically",
+        "html": """
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .logo { font-size: 24px; font-weight: bold; margin-bottom: 20px; }
+        .logo .yes { color: #e53935; }
+        .logo .ai { color: #1565c0; }
+        .steps { background: #e3f2fd; padding: 15px; border-radius: 8px; margin: 20px 0; }
+        .steps ol { margin: 10px 0 10px 20px; }
+        .cta { background: #1565c0; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block; margin: 15px 0; }
+        .footer { font-size: 12px; color: #666; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; }
+        a { color: #1565c0; }
+    </style>
+</head>
+<body>
+    <div class="logo"><span class="yes">Yes</span> <span class="ai">AI</span></div>
+
+    <p>Hi {{params.FIRSTNAME}},</p>
+
+    <p>The hardest thing about training a receptionist in allied health?</p>
+
+    <p>It's not the booking system. It's explaining the difference between DVA white cards, HCP packages, NDIS plan-managed vs self-managed, Medicare Enhanced Primary Care referrals, and when to ask for a claim number vs a package number.</p>
+
+    <p><strong>Our AI already knows all of this.</strong></p>
+
+    <div class="steps">
+        When a patient calls and says "I'm on a home care package through Baptist Care and I need to see the physio," the AI:
+        <ol>
+            <li>Verifies HCP funding eligibility</li>
+            <li>Checks the patient's approved services</li>
+            <li>Finds the next available physio slot</li>
+            <li>Books directly into Cliniko</li>
+            <li>Adds all the right notes for billing</li>
+        </ol>
+    </div>
+
+    <p>No training required. No mistakes. No "can I put you on hold while I check?"</p>
+
+    <p>This is what we built for Reignite Health (10 villages, 877 patients, all funding types).</p>
+
+    <a href="https://cal.com/p-b-ttzvpm/15min" class="cta">See How It Works</a>
+
+    <p>Peter Ball<br>
+    YES AI | (03) 9999 7398</p>
+
+    <div class="footer">
+        <p>Yes AI | hello@yesai.au | <a href="https://yesai.au/case-studies/reignite-health">Case Study</a><br>
+        <a href="{{unsubscribe}}">Unsubscribe</a></p>
+    </div>
+</body>
+</html>
+"""
+    },
+
+    "ah_roi": {
+        "name": "Allied Health - ROI/Numbers",
+        "subject": "The math on AI reception (it's cheaper than you think)",
+        "html": """
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .logo { font-size: 24px; font-weight: bold; margin-bottom: 20px; }
+        .logo .yes { color: #e53935; }
+        .logo .ai { color: #1565c0; }
+        .math { background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 20px 0; font-family: monospace; }
+        .result { background: #e8f5e9; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #4caf50; }
+        .cta { background: #1565c0; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block; margin: 15px 0; }
+        .footer { font-size: 12px; color: #666; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; }
+        a { color: #1565c0; }
+    </style>
+</head>
+<body>
+    <div class="logo"><span class="yes">Yes</span> <span class="ai">AI</span></div>
+
+    <p>Hi {{params.FIRSTNAME}},</p>
+
+    <p>Quick math:</p>
+
+    <div class="math">
+        Average initial physio consultation: $85-120<br>
+        Average patient lifetime value: $500-2,000+<br>
+        Calls that go to voicemail and don't return: 30-50%<br>
+        <br>
+        <strong>If you miss 5 calls/week that would have booked...</strong><br>
+        = $2,500-10,000+ potential revenue lost. Every month.
+    </div>
+
+    <p>Now compare that to an AI receptionist that:</p>
+    <ul>
+        <li>Costs a fraction of a full-time hire</li>
+        <li>Never calls in sick</li>
+        <li>Works 24/7</li>
+        <li>Books directly into Cliniko</li>
+    </ul>
+
+    <div class="result">
+        <strong>Our clients see:</strong><br>
+        30% average cost reduction | 3x typical ROI
+    </div>
+
+    <p>Reignite Health is now handling 877 patients across 10 villages with this system.</p>
+
+    <a href="https://cal.com/p-b-ttzvpm/15min" class="cta">Run the Numbers for Your Practice</a>
+
+    <p>Peter Ball<br>
+    YES AI | (03) 9999 7398</p>
+
+    <div class="footer">
+        <p><a href="https://yesai.au/case-studies/reignite-health">Full case study with numbers</a><br>
+        <a href="{{unsubscribe}}">Unsubscribe</a></p>
+    </div>
+</body>
+</html>
+"""
+    },
+
+    "ah_breakup": {
+        "name": "Allied Health - Final/Break-up",
+        "subject": "Closing the loop on AI reception",
+        "html": """
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .logo { font-size: 24px; font-weight: bold; margin-bottom: 20px; }
+        .logo .yes { color: #e53935; }
+        .logo .ai { color: #1565c0; }
+        .cta { background: #1565c0; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block; margin: 15px 0; }
+        .footer { font-size: 12px; color: #666; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; }
+        a { color: #1565c0; }
+    </style>
+</head>
+<body>
+    <div class="logo"><span class="yes">Yes</span> <span class="ai">AI</span></div>
+
+    <p>Hi {{params.FIRSTNAME}},</p>
+
+    <p>I've sent a few emails about our AI receptionist for Cliniko practices and haven't heard back - which is totally fine.</p>
+
+    <p>I don't want to keep bothering you, so this will be my last email.</p>
+
+    <p>If AI phone reception isn't the right fit for your practice right now, I completely understand. Healthcare is busy and there are a million priorities.</p>
+
+    <p>But if it ever becomes relevant - maybe you're hiring a receptionist and wondering about alternatives, or you're frustrated with after-hours voicemails - the offer stands:</p>
+
+    <p>
+        <a href="https://cal.com/p-b-ttzvpm/15min" class="cta">Book a Demo Anytime</a>
+    </p>
+
+    <p>
+        <a href="https://yesai.au/case-studies/reignite-health">View Case Study</a>
+    </p>
+
+    <p>Either way, I wish you and the team all the best.</p>
+
+    <p>Cheers,<br>
+    Peter Ball<br>
+    YES AI | (03) 9999 7398</p>
+
+    <div class="footer">
+        <p>Yes AI | hello@yesai.au<br>
+        <a href="{{unsubscribe}}">Unsubscribe</a></p>
+    </div>
+</body>
+</html>
+"""
+    }
+}
+
+# Merge Allied Health templates into main EMAIL_TEMPLATES
+EMAIL_TEMPLATES.update(ALLIED_HEALTH_EMAILS)
+
+
 # ========== SMS TEMPLATES ==========
 
 SMS_TEMPLATES = {
     "intro": "Hi {FIRSTNAME}, this is Yes AI. We help businesses automate with AI. Interested in a free consultation? Reply YES or call (03) 9999 7398",
     "followup": "Hi {FIRSTNAME}, following up on AI solutions for your business. Have 15 mins for a quick chat? Reply YES or call (03) 9999 7398 - Peter from Yes AI",
-    "demo_offer": "Hi {FIRSTNAME}, Yes AI here. We're offering free AI demos this week - see an AI phone agent in action. Reply DEMO to book. yesai.au"
+    "demo_offer": "Hi {FIRSTNAME}, Yes AI here. We're offering free AI demos this week - see an AI phone agent in action. Reply DEMO to book. yesai.au",
+
+    # Allied Health SMS Templates
+    "ah_initial": "Hi {FIRSTNAME}, Peter from YES AI. We help Cliniko practices answer every call 24/7 with AI. Just helped Reignite Health (10 villages, 877 patients) go live. 15-min demo? cal.com/p-b-ttzvpm/15min",
+    "ah_followup": "Hi {FIRSTNAME}, following up - would a short demo of the AI receptionist be useful? Books directly into Cliniko, handles DVA/HCP/Medicare/NDIS. 15 mins: cal.com/p-b-ttzvpm/15min - Peter",
+    "ah_after_hours": "Quick Q {FIRSTNAME} - how many calls does your practice miss after 5pm? Our AI answers 24/7 and books into Cliniko. Case study: yesai.au/case-studies/reignite-health - Peter",
+    "ah_case_study": "Hi {FIRSTNAME}, case study for you - Reignite Health (allied health, 10 villages) using AI to handle all booking calls. Details: yesai.au/case-studies/reignite-health - Peter, YES AI",
+    "ah_stats": "{FIRSTNAME} - our allied health AI: 877 patients, 26 service types, 80+ features, 24/7. All booking into Cliniko. 15-min demo? cal.com/p-b-ttzvpm/15min - Peter",
+    "ah_funding": "{FIRSTNAME}, our AI handles Medicare/DVA/HCP/NDIS automatically - no training. Just helped Reignite Health (10 villages) go live. Demo? cal.com/p-b-ttzvpm/15min - Peter",
+    "ah_roi": "{FIRSTNAME}, missed calls = missed revenue. Our AI catches every call 24/7 and books into Cliniko. 30% avg cost reduction. Demo: cal.com/p-b-ttzvpm/15min - Peter",
+    "ah_pdf": "Hi {FIRSTNAME}, full case study PDF on AI reception for allied health. Download: yesai.au/case-studies/Reignite_Health_Case_Study_2025.pdf - Peter, YES AI",
+    "ah_voice": '{FIRSTNAME}, "Does it sound robotic?" - #1 question we get. Short answer: patients don\'t notice. Hear a demo: cal.com/p-b-ttzvpm/15min - Peter',
+    "ah_breakup": "{FIRSTNAME}, last msg from me! If AI reception isn't right for you now, no worries. If things change: cal.com/p-b-ttzvpm/15min - Peter"
 }
 
 
