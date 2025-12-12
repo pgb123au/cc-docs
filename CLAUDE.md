@@ -25,6 +25,17 @@ Files created/modified:
 
 ---
 
+## OUTPUT FORMATTING
+
+**File paths must NEVER be broken across lines.** Always output full paths on a single line, even if long:
+- ✅ `C:\Users\peter\Downloads\CC\CLIENTS\reignite-health-case-study\Reignite_Health_Case_Study_2025.pdf`
+- ❌ `C:\Users\peter\Downloads\CC\CLIENTS\reignite-health-case-study\Reignite_Health_Case_Study_2025`
+     `.pdf`
+
+Use code formatting (backticks) for paths to prevent wrapping.
+
+---
+
 ## CRITICAL SAFETY RULES
 
 ### Test Patient (ONLY USE THIS)
