@@ -204,10 +204,22 @@ ID: 35494
 FIRSTNAME: Liam
 LASTNAME: Potter
 COMPANY: Reignite Health
+SMS: 61437160997  (from HubSpot)
 DEAL_STAGE: Closed Won
 SOURCE: Website Audit Client
 NOTES: Founder/Owner. Received digital audit report Dec 2025.
 Lists: [24, 25, 28]
+```
+
+### Contact 3: HubSpot Lead (Alt Domain)
+```
+Email: hello@reignitehealth.co
+ID: 35495
+COMPANY: Reignite Health
+SOURCE: HubSpot Scraped Lead - Aged care (AU).xlsx
+WEBSITE: reignitehealth.co
+NOTES: From HubSpot. Alt domain .co (main is .com.au)
+Lists: [24, 25]
 ```
 
 ### Company Record
@@ -215,14 +227,19 @@ Lists: [24, 25, 28]
 Name: Reignite Health
 ID: 693c813d58677e43aa29b493
 Domain: reignitehealth.com.au
-Linked Contacts: [778, 35494] (Sara + Liam)
+Linked Contacts: [778, 35494, 35495] (Sara + Liam + hello@)
+Phone: +61437160997 (on Liam's contact)
+Facebook: facebook.com/reignitehealth
 ```
 
 ### Additional Data Sources Found
 - `CLIENTS/reignite-health/` - Full website audit, email draft, logo
 - `CRM/ALLIED_HEALTH_VIC_OUTREACH.md` - Marketing templates using as case study
+- `CRM/All_Companies_2025-07-07_Cleaned_For_HubSpot.csv` - Phone +61437160997, Facebook page
+- `CRM/All_Contacts_2025_07_07_Cleaned.csv` - HubSpot contact hello@reignitehealth.co
 - Audit report addressed to Liam Potter (founder, physiotherapist)
 - Company: 11-50 employees, serves 10 aged care villages, 877 patients
+- Alt domain: reignitehealth.co (scraped from Aged care AU list)
 
 ---
 

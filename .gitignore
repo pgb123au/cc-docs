@@ -34,3 +34,4 @@ CRM/All_Contacts_*.csv
 CRM/Master_Contacts_With_Flags.csv
 CRM/Safe_To_Contact.csv
 CRM/Fresh_Leads_Never_Called.csv
+Brevo_API_Key.txt
