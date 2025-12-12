@@ -140,6 +140,7 @@ def find_call_recording(phone_numbers, timestamp_hint):
 | DEAL_STAGE | Derived from status | Won/Lost/Negotiation/etc |
 | QUALITY | Appointments | Good/OK/Poor |
 | FOLLOWUP_STATUS | Appointments | Client/Follow-up/etc |
+| FOLLOWUP_DATE | Appointments | Date type - for sorting follow-ups |
 | RETELL_LOG | Call logs | Format: `DATE DIRECTION (DURATION) - Recording: URL` |
 | SOURCE | Master CSV / derived | e.g., `Telemarketer Campaign` |
 | NOTES | Combined from all sources | Include follow-up history |
