@@ -1,7 +1,7 @@
 # Brevo CRM Import - Status Report
 
-**Last Updated:** 2025-12-13 11:30 AEDT
-**Session:** Marketing Automation Setup (Continued)
+**Last Updated:** 2025-12-13 09:35 AEDT
+**Session:** Marketing Automation Setup (Call Data Linked)
 
 ---
 
@@ -191,9 +191,9 @@ APPOINTMENT_STATUS: Seen - Client
 DEAL_STAGE: Won
 QUALITY: Good
 FOLLOWUP_STATUS: Client
-RETELL_LOG: 09/01/2025 11:48 phone_call
+RETELL_LOG: 09/01/2025 11:48 - Recording: https://dxc03zgurdly9.cloudfront.net/2ddc176248fead0e1f0ad06936d899ad266e93bfe45bf036e9c5f3e7ebd56a94/recording.wav
 SOURCE: Telemarketer Campaign
-NOTES: Won client. Telemarketer appointment converted.
+NOTES: Won client. Telemarketer appointment converted. Original call to Liam Potter's voicemail.
 Lists: [24, 25, 28]
 ```
 
@@ -207,7 +207,8 @@ COMPANY: Reignite Health
 SMS: 61437160997  (from HubSpot)
 DEAL_STAGE: Closed Won
 SOURCE: Website Audit Client
-NOTES: Founder/Owner. Received digital audit report Dec 2025.
+RETELL_LOG: 09/01/2025 11:48 - Recording: https://dxc03zgurdly9.cloudfront.net/2ddc176248fead0e1f0ad06936d899ad266e93bfe45bf036e9c5f3e7ebd56a94/recording.wav
+NOTES: Founder/Owner. Original telemarketer call went to his voicemail. Received digital audit report Dec 2025.
 Lists: [24, 25, 28]
 ```
 
@@ -263,4 +264,28 @@ Facebook: facebook.com/reignitehealth
 4. [ ] Check DNC contacts are properly blocklisted
 5. [ ] Test email campaign to small list
 6. [ ] Optionally: Clean up company names (domain -> real name)
-7. [ ] Optionally: Import Google Sheet call data (needs auth)
+7. [x] ~~Import Google Sheet call data~~ DONE - 22,000 calls exported to `CRM/call_log_sheet_export.json` and `CRM/call_log_sheet2_export.json`
+
+---
+
+## CALL DATA INTEGRATION
+
+### Google Sheets Exported
+
+| File | Records | Date Range |
+|------|---------|------------|
+| `call_log_sheet_export.json` | 15,156 | Aug-Oct 2025 |
+| `call_log_sheet2_export.json` | 6,844 | Jun-Jul 2025 |
+
+**Total:** 22,000 call records with transcripts and recording URLs.
+
+### Reignite Health Call Found
+
+```
+Call ID: call_0233f8b1ac5b37c6d76362afc9f
+Timestamp: 01/09/2025, 11:48:55
+Recording: https://dxc03zgurdly9.cloudfront.net/2ddc176248fead0e1f0ad06936d899ad266e93bfe45bf036e9c5f3e7ebd56a94/recording.wav
+Transcript: "Hi there. You've reached Liam Potter from Reignite Health. Sorry that I've missed your phone call..."
+```
+
+Recording URL added to both Sara Lehmann and Liam Potter's RETELL_LOG in Brevo.
