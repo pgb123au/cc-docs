@@ -21,7 +21,16 @@ DONE DONE DONE
 
 Files created/modified:
 • [Full absolute path]
+
+Live URLs (if applicable):
+• [Full URL on single line]
 ```
+
+**⚠️ ALWAYS list full unbroken paths/URLs at the BOTTOM of every response.**
+- Every file path and URL must be complete and on a single line - NEVER broken
+- Use backticks for paths: `C:\Users\peter\Downloads\CC\path\to\file.ext`
+- Include live web URLs when deploying to websites (e.g., `https://yesai.au/ai-callers`)
+- This is the LAST thing in the response - nothing comes after
 
 ---
 
@@ -455,4 +464,4 @@ Ask yourself:
 
 ---
 
-**Last Updated:** 2025-12-11
+**Last Updated:** 2025-12-12
