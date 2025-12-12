@@ -1,0 +1,5 @@
+source_sheet,company,name,email,phone,date,time,status,quality,followup,retell_log,status_category,email_valid,match_source,phone_from_list,was_called,company_from_list,website_from_list,location
+Appts New,PNL 4WD,Nyrie,info@pnl4wd.com.au,,2025-09-12,2pm,Booked,,2025-10-02,09/09/2025 12:34 phone_call,booked,True,,,False,,,
+Appts New,Cardilly Fireworks WA,Rob,rob@cardilefireworks.com.au,,,,Call to book,,2025-10-07,09/10/2025 14:43 phone_call,booked,True,,,False,,,
+Call Backs New,,Rick,rick@betterpoolsandspas.com.au,,,,Wanted to book,,,,booked,True,,,False,,,
+Call Backs New,,George,21stcenturypainting.vic@gmail.com,,,,Wanted to book,,,,booked,True,domain,61402213582,True,,,

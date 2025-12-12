@@ -1,0 +1,17 @@
+source_sheet,company,name,email,phone,date,time,status,quality,followup,retell_log,status_category,email_valid,match_source,phone_from_list,was_called,company_from_list,website_from_list,location
+Appts New,Capital Wealth Management,,info@capitalwealthfinance.com.au,,2025-07-24,4pm,Seen - BP Asian too small,OK,,07/17/2025 11:21 phone_call,bad_prospect_small,True,,,False,,,
+Appts New,Brisbane City Landscapes,Jack Blair-Swanell,BrisbaneCityLandscapes@gmail.com,,2025-07-31,4pm,Seen - BP Too Small,OK,,07/24/2025 16:58 phone_call,bad_prospect_small,True,domain,61402213582,True,,,
+Appts New,CLG Electrics,Chris,chris@clgelectrics.com.au,,2025-08-12,10:00am,BP,Good,,08/04/2025 17:52 phone_call,bad_prospect,True,email,61402140955,True,Clg Electrics,http://www.clgelectrics.com.au,"Doreen, VIC"
+Appts New,Western AC,Richard Sikorski,jatarelec@bigpond.com,,2025-08-13,10:00am,Seen - BP - Too small,Good,2025-09-02,08/07/2025 09:56 phone_call,bad_prospect_small,True,email,61425757530,True,The Switchboard Doctor,,"Melton West, VIC"
+Appts New,Aaron Climate Control,Aaron,info@aaronclimatgecontrol.com.au,,2025-08-21,5pm,BP - Too small,Poor,,08/13/2025 14:58 phone_call,bad_prospect_small,True,,,False,,,
+Appts New,Encapsulator,Danny,danny@encapsulator.io,,2025-08-20,11:00am,Seen - BP too small,OK,,08/13/2025 11:17 phone_call,bad_prospect_small,True,,,False,,,
+Appts New,,,Tim@marketcom.com.au,,,,Competitor,,,08/14/2025 08:51 phone_call,competitor,True,,,False,,,
+Appts New,Marketcom,,Tim@marketcom.com.au; tim@icustomer.com.au,,2025-08-19,11:00am,Seen - BP - Competitor,Competitor?,,08/15/2025 15:23 phone_call,competitor,True,,,False,,,
+Appts New,Snappy Removals,Kevin,snappyremovals.gb@gmail.com,,2025-09-18,3pm,Seen - BP,,,09/10/2025 13:20 phone_call,bad_prospect,True,domain,61402213582,True,,,
+Call Backs New,,,marlin.david@gmail.com,,,,BP - Too small,,,,bad_prospect_small,True,domain,61402213582,True,,,
+Call Backs New,,,hpmaintenance25@gmail.com,,,,Dead - BP to small,,,,bad_prospect_small,True,domain,61402213582,True,,,
+Call Backs New,,Tim,sales@kilanpowdercoating.com.au,,,,BP - Asian,,,,bad_prospect_demo,True,,,False,,,
+Call Backs New,,,info@memorablecare.com.au,,,,BP - Too small,,,,bad_prospect_small,True,email,61478753832,True,Memorable Care,,"Kingsville, Victoria"
+Call Backs New,,Danny Lopez,ddanlo@hotmail.com,,,,BP - Too small,,,,bad_prospect_small,True,email,61410615035,True,Learn What You Want Guitar & Music Lessons,http://www.learnwhatyouwant.com.au/,VIC
+Call Backs New,,,fm.melbourne@gmail.com,,,,Indian,,,,bad_prospect_demo,True,domain,61402213582,True,,,
+Call Backs New,,,Happyuniverse360@gmail.com,,,,BP - Indian,,,,bad_prospect_demo,True,domain,61402213582,True,,,

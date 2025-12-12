@@ -27,3 +27,6 @@ Desktop.ini
 *.tmp
 *_temp*
 *_backup*
+# Large data files
+CRM/All_Companies_*.csv
+CRM/All_Contacts_*.csv

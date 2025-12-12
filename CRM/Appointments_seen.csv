@@ -1,0 +1,3 @@
+source_sheet,company,name,email,phone,date,time,status,quality,followup,retell_log,status_category,email_valid,match_source,phone_from_list,was_called,company_from_list,website_from_list,location
+Appts New,NLAM,Andrew Oscari,andrew@nlam.com.au,,2025-08-27,10:00am,Seen,OK,2025-10-01,08/14/2025 10:32 phone_call,seen,True,,,False,,,
+Appts,,,gm@qldcovertpi.com.au,,2025-06-06,1pm,Seen - Dead,OK,,05/29/2025 11:55 phone_call,seen,True,email,61401553551,True,www.qldcovertpi.com.au,,

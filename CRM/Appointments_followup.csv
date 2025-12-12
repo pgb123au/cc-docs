@@ -1,0 +1,16 @@
+source_sheet,company,name,email,phone,date,time,status,quality,followup,retell_log,status_category,email_valid,match_source,phone_from_list,was_called,company_from_list,website_from_list,location
+Appts New,JTW building group,Joe Van Stripe,Joe@jtwbuildinggroup.com.au,,2025-07-29,12:30pm,Seen - FU,Good,2026-02-01,07/22/2025 16:12 phone_call,followup,True,,,False,,,
+Appts New,Pinnacle Accounting Advisory,Mina Baselyous,mina@pinnacleaccountingadvisory.com.au,,2025-08-05,10:30am,Seen - FU,OK,2025-09-30,07/30/2025 13:16 phone_call,followup,True,email,61431413530,True,Pinnacle Accounting & Advisory,,"Lyndhurst, Victoria"
+Appts New,Realm Group,Robbie,robbiem@realmgroup.com.au,,2025-09-04,11:00am,No Show -FU,,2026-02-01,08/13/2025 13:09 phone_call,followup,True,,,False,,,
+Appts New,ETEL,Zach,zach@etel.com.au,,2025-08-19,12:00pm,Seen - FU,OK,2025-08-26,08/14/2025 16:35 phone_call,followup,True,,,False,,,
+Appts New,Silver Fern Accounting,Cameron Gibson,cam.j.gibson@gmail.com,,2025-09-25,10:00am,Seen - FU,OK,,09/03/2025 11:10 phone_call,followup,True,domain,61402213582,True,,,
+Appts New,iBookeep,Sam Dodgson,sam@ibookeep.com.au,,2026-02-01,10:00am,Seen - Said no - FU,Good,2025-09-19,09/06/2025 10:53 phone_call,followup,True,,,False,,,
+Appts New,ASPG Group,John O'Toole,jot@apsggroup.com.au,,2025-09-16,9:30am,No show - FU,OK,2025-10-10,09/09/2025 16:16 phone_call,followup,True,,,False,,,
+Appts New,Cyber Probity,Graeme Boorer,graeme.b@cyberprobity.io,,2025-09-11,10:00am,Seen - FU,Good,2025-09-25,09/10/2025 11:58 phone_call,followup,True,,,False,,,
+Appts New,Alpaca Magic,,glynda@alpacamagic.com.au,,2025-09-23,10am,Seen - FU,,,09/10/2025 13:11 phone_call,followup,True,,,False,,,
+Appts New,Allure Limosuines,Matt,matt@allurelimousines.com.au,,2025-09-12,12:00:00,Seen - FU,,2025-09-23,09/08/2025 15:13 phone_call,followup,True,,,False,,,
+Appts,,,NO EMAIL !! I SMS'd him 28/5/25,,2025-06-05,11:00am,Followed Up - Call Back,Weak Appt,,05/27/2025 16:17 phone_call,followup,False,,,False,,,
+Appts,Daves Removals,Dave,Davesremovals,,2025-05-30,10:00am,CB 17/9/25,OK,,,followup,False,,,False,,,
+Appts,,Scott,Scott@octobergrey.com,,2025-06-13,11:00am,Seen - Follow up,Good,,05/23/2025 10:41 phone_call,followup,True,email,61403169727,True,https://www.octobergrey.com/,,
+Appts,,,amrs@amariners.com.au,,2025-06-06,10:00am,CB 1/10/25,Fair,,05/28/2025 12:02 phone_call,followup,True,,,False,,,
+Appts,,,Info@chillngrill.com.au,,2025-05-13,10:00am,Seen - Follow Up,OK,,06/04/2025 13:16 phone_call,followup,True,email,61499900203,True,Chill n Grill BBQ Trailers,http://chillngrillbbqtrailers.com.au,

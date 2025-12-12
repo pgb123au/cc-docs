@@ -1,0 +1,6 @@
+source_sheet,company,name,email,phone,date,time,status,quality,followup,retell_log,status_category,email_valid,match_source,phone_from_list,was_called,company_from_list,website_from_list,location
+Appts New,,Jacob,Jacob@jaeelc.com,,2025-07-16,10:00am,Reschedule,OK,,07/11/2025 12:19 phone_call,reschedule,True,,,False,,,
+Appts New,Lumiere Home Renovations,Chantelle,info@lumierehomerenovations.com.au,,2025-08-19,10:00am,Reschedule,OK,2025-08-28,08/15/2025 10:52 phone_call,reschedule,True,,,False,,,
+Appts New,,John McKinley,johnmckinley@gmail.com,,2025-08-29,10:00am,Cancelled - BP,,,08/25/2025 09:23 phone_call,reschedule,True,domain,61402213582,True,,,
+Appts,No Show - CB 8/6/25,Ian Kingston,Sales@tasmanhoney.com.au,,2025-06-05,1:00pm,Reschedule,OK,,05/26/2025 20:25 phone_call,reschedule,True,email,61418127174,True,tasmanhoney.com.au,,
+Appts,,,info@cstplumbing.com,,2025-08-07,4pm,Cancelled,OK,,06/21/2025 13:16 phone_call,reschedule,True,,,False,,,

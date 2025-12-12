@@ -1,0 +1,7 @@
+source_sheet,company,name,email,phone,date,time,status,quality,followup,retell_log,status_category,email_valid,match_source,phone_from_list,was_called,company_from_list,website_from_list,location
+Appts New,environmentally friendly cremations,John,john@bensons.com.au,,2025-08-14,10:00am,Seen  - Client,Good,2025-09-24,08/12/2025 19:54 phone_call,won,True,,,False,,,
+Appts New,Paradise Distributors,Bob Chalmers,bchalmers616@gmail.com,,2025-09-24,11:00am,Seen  - Client,OK,Client,08/25/2025 16:45 phone_call,won,True,domain,61402213582,True,,,
+Appts New,Reignite Health,Sara Lehmann,sara@reignitehealth.com.au,,2025-09-17,10:00am,Seen  - Client,Good,Client,09/01/2025 11:48 phone_call,won,True,,,False,,,
+Appts New,NWAR,,Ben@nwar.com.au,,2025-10-02,2pm,See - EXCELLENT!!,,,09/10/2025 14:41 phone_call,won,True,,,False,,,
+Appts,Cool Solutions,Mal Stanes ?,Admin@Coolsolutions.com.au,,2025-06-10,12:00pm,Cancelled by client,OK appointment,,05/27/2025 19:20 phone_call,won,True,email,61404610402,True,Cool Solutions Shade Sails,http://coolsolutions.com.au,
+Appts,,,samgreen@bigpond.com,,2025-05-23,1pm,Paid Client,Good,,05/23/2025 16:50 phone_call,won,True,email,61412564404,True,https://www.mrmusicman.com/contact-sam/,,
