@@ -199,9 +199,14 @@ def display_menu(scripts: Dict[str, List[Tuple[str, str, str]]], config: dict):
 
     # Claude Code shortcuts
     print(f"{Colors.BOLD}{Colors.BLUE}Run Claude Code:{Colors.ENDC}")
-    print(f"  {Colors.CYAN}cc.{Colors.ENDC}  Run Claude in C:\\Users\\peter\\Downloads\\CC\\")
-    print(f"  {Colors.CYAN}ccr.{Colors.ENDC} Run Claude in C:\\Users\\peter\\Downloads\\CC\\retell\\")
-    print(f"  {Colors.CYAN}ccn.{Colors.ENDC} Run Claude in C:\\Users\\peter\\Downloads\\CC\\n8n\\")
+    print(f"  {Colors.CYAN}cc.{Colors.ENDC}   Run Claude in C:\\Users\\peter\\Downloads\\CC\\")
+    print(f"  {Colors.CYAN}ccr.{Colors.ENDC}  Run Claude in C:\\Users\\peter\\Downloads\\CC\\retell\\")
+    print(f"  {Colors.CYAN}ccn.{Colors.ENDC}  Run Claude in C:\\Users\\peter\\Downloads\\CC\\n8n\\")
+    print(f"  {Colors.CYAN}cccrm.{Colors.ENDC}Run Claude in C:\\Users\\peter\\Downloads\\CC\\CRM\\")
+    print(f"  {Colors.CYAN}ccm.{Colors.ENDC}  Run Claude in C:\\Users\\peter\\Downloads\\CC\\MARKETING\\")
+    print(f"  {Colors.CYAN}ccc.{Colors.ENDC}  Run Claude in C:\\Users\\peter\\Downloads\\CC\\CLIENTS\\")
+    print(f"  {Colors.CYAN}ccw.{Colors.ENDC}  Run Claude in C:\\Users\\peter\\Downloads\\CC\\websites\\")
+    print(f"  {Colors.CYAN}ccs.{Colors.ENDC}  Run Claude in C:\\Users\\peter\\Downloads\\CC\\SERVERS\\")
     print()
 
     # Telco Manager
@@ -370,6 +375,36 @@ def main():
             continue
         elif choice == 'ccn':
             claude_dir = r"C:\Users\peter\Downloads\CC\n8n"
+            print(f"\n{Colors.GREEN}Opening Claude in {claude_dir}...{Colors.ENDC}\n")
+            subprocess.run(["claude"], cwd=claude_dir, check=False)
+            input(f"{Colors.YELLOW}Press Enter to continue...{Colors.ENDC}")
+            continue
+        elif choice == 'cccrm':
+            claude_dir = r"C:\Users\peter\Downloads\CC\CRM"
+            print(f"\n{Colors.GREEN}Opening Claude in {claude_dir}...{Colors.ENDC}\n")
+            subprocess.run(["claude"], cwd=claude_dir, check=False)
+            input(f"{Colors.YELLOW}Press Enter to continue...{Colors.ENDC}")
+            continue
+        elif choice == 'ccm':
+            claude_dir = r"C:\Users\peter\Downloads\CC\MARKETING"
+            print(f"\n{Colors.GREEN}Opening Claude in {claude_dir}...{Colors.ENDC}\n")
+            subprocess.run(["claude"], cwd=claude_dir, check=False)
+            input(f"{Colors.YELLOW}Press Enter to continue...{Colors.ENDC}")
+            continue
+        elif choice == 'ccc':
+            claude_dir = r"C:\Users\peter\Downloads\CC\CLIENTS"
+            print(f"\n{Colors.GREEN}Opening Claude in {claude_dir}...{Colors.ENDC}\n")
+            subprocess.run(["claude"], cwd=claude_dir, check=False)
+            input(f"{Colors.YELLOW}Press Enter to continue...{Colors.ENDC}")
+            continue
+        elif choice == 'ccw':
+            claude_dir = r"C:\Users\peter\Downloads\CC\websites"
+            print(f"\n{Colors.GREEN}Opening Claude in {claude_dir}...{Colors.ENDC}\n")
+            subprocess.run(["claude"], cwd=claude_dir, check=False)
+            input(f"{Colors.YELLOW}Press Enter to continue...{Colors.ENDC}")
+            continue
+        elif choice == 'ccs':
+            claude_dir = r"C:\Users\peter\Downloads\CC\SERVERS"
             print(f"\n{Colors.GREEN}Opening Claude in {claude_dir}...{Colors.ENDC}\n")
             subprocess.run(["claude"], cwd=claude_dir, check=False)
             input(f"{Colors.YELLOW}Press Enter to continue...{Colors.ENDC}")
