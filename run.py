@@ -207,6 +207,7 @@ def display_menu(scripts: Dict[str, List[Tuple[str, str, str]]], config: dict):
     print(f"  {Colors.CYAN}ccc.{Colors.ENDC}  Run Claude in C:\\Users\\peter\\Downloads\\CC\\CLIENTS\\")
     print(f"  {Colors.CYAN}ccw.{Colors.ENDC}  Run Claude in C:\\Users\\peter\\Downloads\\CC\\websites\\")
     print(f"  {Colors.CYAN}ccs.{Colors.ENDC}  Run Claude in C:\\Users\\peter\\Downloads\\CC\\SERVERS\\")
+    print(f"  {Colors.CYAN}cct.{Colors.ENDC}  Run Claude in C:\\Users\\peter\\Downloads\\CC\\Telcos\\")
     print()
 
     # Telco Manager
@@ -405,6 +406,12 @@ def main():
             continue
         elif choice == 'ccs':
             claude_dir = r"C:\Users\peter\Downloads\CC\SERVERS"
+            print(f"\n{Colors.GREEN}Opening Claude in {claude_dir}...{Colors.ENDC}\n")
+            subprocess.run(["claude"], cwd=claude_dir, check=False)
+            input(f"{Colors.YELLOW}Press Enter to continue...{Colors.ENDC}")
+            continue
+        elif choice == 'cct':
+            claude_dir = r"C:\Users\peter\Downloads\CC\Telcos"
             print(f"\n{Colors.GREEN}Opening Claude in {claude_dir}...{Colors.ENDC}\n")
             subprocess.run(["claude"], cwd=claude_dir, check=False)
             input(f"{Colors.YELLOW}Press Enter to continue...{Colors.ENDC}")
