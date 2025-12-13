@@ -14,13 +14,17 @@ import requests
 from datetime import datetime
 from pathlib import Path
 
-# Load API key from file (CC/Brevo_API_Key.txt - 4 levels up from scripts/)
-API_KEY_PATH = Path(__file__).parent.parent.parent.parent / "Brevo_API_Key.txt"
+# Load API key from file - search multiple locations
+API_KEY_PATHS = [
+    Path(__file__).parent.parent / "Brevo_API_Key.txt",  # CRM/Brevo/
+    Path(__file__).parent.parent.parent.parent / "Brevo_API_Key.txt",  # CC/
+]
 
 def get_api_key():
     """Load Brevo API key from file."""
-    if API_KEY_PATH.exists():
-        return API_KEY_PATH.read_text().strip()
+    for path in API_KEY_PATHS:
+        if path.exists():
+            return path.read_text().strip()
 
     # Try environment variable as fallback
     key = os.environ.get("BREVO_API_KEY")
@@ -29,7 +33,7 @@ def get_api_key():
 
     raise ValueError(
         f"Brevo API key not found!\n"
-        f"Please create: {API_KEY_PATH}\n"
+        f"Please create one of: {[str(p) for p in API_KEY_PATHS]}\n"
         f"Or set BREVO_API_KEY environment variable"
     )
 
