@@ -99,19 +99,24 @@ If audit shows errors:
 |------|---------|
 | `MARKETING/scripts/brevo_api.py` | Brevo API client |
 | `MARKETING/scripts/brevo_audit_detailed.py` | Comprehensive audit |
-| `MARKETING/scripts/import_3_companies_v3.py` | Import script (v3) |
+| `MARKETING/scripts/import_3_companies_v4.py` | Import script (v4) |
+| `MARKETING/scripts/brevo_audit_v4.py` | Comprehensive audit (v4) |
+| `MARKETING/BREVO_FIELD_MAPPING_REPORT.md` | Field mapping report |
 | `MARKETING/scripts/delete_brevo_data.py` | Data cleanup |
 | `MARKETING/IMPORT_PLAN_COMPREHENSIVE.md` | Full import plan |
 
-## V3 Fixes Applied
+## V4 Fixes Applied
 
-1. **WAS_CALLED** attribute - tracks if contact was called
-2. **EMAIL_VALID** attribute - tracks email validation status
-3. **MATCH_SOURCE** attribute - tracks how phone was matched
-4. **Phone reliability** - only use SMS for email matches, PHONE_2 for domain matches
-5. **SOURCE_SHEET** tracking - tracks original data source
-6. **EXACT matching only** - no partial or domain matching
-7. **Phone validation fallback** - retry without phone if Brevo rejects
+1. **EMAIL_VALIDATION** attribute - fixed name (was EMAIL_VALID)
+2. **MATCH_SOURCE** attribute - now created and stores correctly
+3. **HubSpot enrichment flows to contacts** - COMPANY_DOMAIN, INDUSTRY, BUSINESS_TYPE, etc.
+4. **All HubSpot fields mapped** - social links, reviews, business description
+5. **HUBSPOT_COMPANY_META** - stores legacy_id and contact_ids for linking
+6. **WAS_CALLED** attribute - tracks if contact was called
+7. **Phone reliability** - only use SMS for email matches, PHONE_2 for domain matches
+8. **SOURCE_SHEET** tracking - tracks original data source
+9. **EXACT matching only** - no partial or domain matching
+10. **Phone validation fallback** - retry without phone if Brevo rejects
 
 ## Test Companies
 

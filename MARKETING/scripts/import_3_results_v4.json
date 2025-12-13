@@ -1,0 +1,42 @@
+{
+  "companies": [
+    {
+      "name": "reignite health",
+      "id": "693d0e7858677e43aa29bb76",
+      "source": "hubspot"
+    },
+    {
+      "name": "paradise distributors",
+      "id": "693d0e7c58677e43aa29bb77",
+      "source": "appointment"
+    },
+    {
+      "name": "jtw building group",
+      "id": "693d0e7f58677e43aa29bb78",
+      "source": "appointment"
+    }
+  ],
+  "contacts": [
+    {
+      "email": "sara@reignitehealth.com.au",
+      "name": "Sara Lehmann",
+      "id": 35700,
+      "company_id": "693d0e7858677e43aa29bb76",
+      "hubspot_enriched": true
+    },
+    {
+      "email": "bchalmers616@gmail.com",
+      "name": "Bob Chalmers",
+      "id": 35701,
+      "company_id": "693d0e7c58677e43aa29bb77",
+      "hubspot_enriched": false
+    },
+    {
+      "email": "Joe@jtwbuildinggroup.com.au",
+      "name": "Joe Van Stripe",
+      "id": 35702,
+      "company_id": "693d0e7f58677e43aa29bb78",
+      "hubspot_enriched": false
+    }
+  ]
+}
