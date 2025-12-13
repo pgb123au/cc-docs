@@ -33,10 +33,33 @@ After running a test import of 200 records, the following corrections were ident
 ### 4. Company Matching for Appointments
 **❌ WRONG:** Use COMPANY field from appointments directly
 **✅ CORRECT:**
-1. Look up company in HubSpot Companies file
-2. If found → create company from HubSpot data
-3. If NOT found → flag as COMPANY_MATCH_STATUS = "Not Found"
-4. Never create a company from just an appointment row
+1. Look up company in HubSpot Companies file (EXACT match only)
+2. If found → create company from HubSpot data (domain, industry, etc.)
+3. If NOT found → create company using appointment's company name (not domain)
+4. Never create a company from a domain or URL
+
+### 5. Company Name Matching Rules (v2 - Critical)
+**Problems found in v1:**
+- Partial matching too loose ("Aaron Climate Control" matched "Climate Control")
+- Email domain matching pulled records where company name = domain
+- Single-letter company names matched everything
+
+**✅ CORRECT Matching Rules:**
+1. **EXACT match only** for company names (case-insensitive)
+2. **NO partial matching** - too error-prone with 363K records
+3. **NO email domain matching** - HubSpot has domains as company names
+4. If no exact match → create company from appointment data using the COMPANY field
+
+### 6. Phone Validation for Companies
+**Problem:** HubSpot phone numbers often fail Brevo validation
+**Solution:** Try with phone first, if validation fails, retry without phone
+
+### 7. Company Linking
+**CRITICAL:** Always link contacts to company entities
+- Create company FIRST
+- Get company_id from response
+- Create contact
+- Link contact to company using: `PATCH /companies/link-unlink/{company_id}`
 
 ---
 
