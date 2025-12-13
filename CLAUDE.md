@@ -13,6 +13,17 @@
 
 ---
 
+## ALWAYS PROPER FIX
+
+**NEVER ask "quick fix or proper fix?" - ALWAYS implement the proper fix.**
+
+- Do not propose workarounds when a real solution exists
+- Do not ask about trade-offs between quick hacks and correct implementations
+- If a proper fix requires more investigation, investigate first
+- Fix issues at the source, not with band-aids downstream
+
+---
+
 ## MANDATORY COMPLETION FORMAT
 
 **After EVERY completed task**, end your response with:
@@ -341,6 +352,20 @@ requests.put(f'{BASE_URL}/workflows/{wf_id}', headers=HEADERS,
 
 **⚠️ NEVER use docs from `n8n/Webhooks Docs/archive/` - they're outdated and WILL cause bugs.**
 
+**Read BEFORE working on Brevo CRM:**
+
+| File | Why |
+|------|-----|
+| `CRM/Brevo/BREVO_FIELD_MAPPING_REPORT.md` | Source-to-Brevo field mapping, all available columns |
+| `CRM/Brevo/IMPORT_PLAN_COMPREHENSIVE.md` | Full import strategy and rules |
+| `CRM/Brevo/README.md` | Overview of Brevo integration |
+
+**Brevo scripts:** `CRM/Brevo/scripts/`
+- `brevo_api.py` - API client
+- `import_3_companies_v4.py` - Latest import script
+- `brevo_audit_v4.py` - Comprehensive data audit
+- Use `/brevo-import-fix` slash command for iterative fixing
+
 ---
 
 ## FILE LOCATIONS
@@ -351,6 +376,9 @@ requests.put(f'{BASE_URL}/workflows/{wf_id}', headers=HEADERS,
 | **Production agent** | `retell/agents/` (only latest stable) |
 | **n8n workflows** | `n8n/JSON/active_workflows/` |
 | **Webhook specs** | `n8n/Webhooks Docs/RETELLAI_WEBHOOKS_CURRENT.md` |
+| **Brevo CRM docs** | `CRM/Brevo/` |
+| **Brevo scripts** | `CRM/Brevo/scripts/` |
+| **CRM source data** | `CRM/` (appointments, call logs, HubSpot exports) |
 
 **Agent Naming:** `Reignite_AI_Mega_Receptionist_vX.XX_CC.json`
 
@@ -386,6 +414,7 @@ python run.py
 | n8n Diagnostics | `n8n/Python/Diagnose-n8n-Errors/` |
 | RetellAI Scripts | `retell/scripts/` |
 | Telco Manager | `Telcos/telco.py` |
+| Brevo CRM | `CRM/Brevo/scripts/` |
 
 **Don't reinvent the wheel** - search existing scripts before creating new ones.
 
@@ -464,4 +493,4 @@ Ask yourself:
 
 ---
 
-**Last Updated:** 2025-12-12
+**Last Updated:** 2025-12-13

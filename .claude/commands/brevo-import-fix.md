@@ -4,7 +4,7 @@ Iterative process to fix and verify Brevo CRM data imports until perfect.
 
 ## Prerequisites
 
-- Brevo API credentials configured in `MARKETING/scripts/brevo_api.py`
+- Brevo API credentials configured in `CRM/Brevo/scripts/brevo_api.py`
 - Source files available:
   - `C:\Users\peter\Documents\HS\All_Companies_2025-07-07_Cleaned_For_HubSpot.csv` (HubSpot companies)
   - `C:\Users\peter\Downloads\CC\CRM\Appointments_Enriched.csv` (appointments data)
@@ -16,7 +16,7 @@ Iterative process to fix and verify Brevo CRM data imports until perfect.
 Run comprehensive audit to identify ALL errors and omissions:
 
 ```bash
-cd /c/Users/peter/Downloads/CC/MARKETING/scripts && python brevo_audit_detailed.py
+cd /c/Users/peter/Downloads/CC/CRM/Brevo/scripts && python brevo_audit_v4.py
 ```
 
 Review output for:
@@ -41,12 +41,12 @@ Common error patterns to check:
 If errors found, delete ALL test data in Brevo:
 
 ```bash
-cd /c/Users/peter/Downloads/CC/MARKETING/scripts && python delete_brevo_data.py
+cd /c/Users/peter/Downloads/CC/CRM/Brevo/scripts && python delete_brevo_data.py
 ```
 
 ### Step 4: Update Import Script
 
-Edit `import_3_companies_v3.py` based on errors found. Key rules:
+Edit `import_3_companies_v4.py` based on errors found. Key rules:
 
 **Company Matching:**
 - EXACT name match only from HubSpot file
@@ -58,7 +58,7 @@ Edit `import_3_companies_v3.py` based on errors found. Key rules:
 - FIRSTNAME, LASTNAME, COMPANY
 - APPOINTMENT_DATE, APPOINTMENT_TIME, APPOINTMENT_STATUS
 - DEAL_STAGE, QUALITY, FOLLOWUP_STATUS
-- RETELL_LOG, WAS_CALLED, EMAIL_VALID
+- RETELL_LOG, WAS_CALLED, EMAIL_VALIDATION
 - MATCH_SOURCE (data quality tracking)
 - SOURCE, IMPORT_BATCH (tracking)
 
@@ -70,7 +70,7 @@ Edit `import_3_companies_v3.py` based on errors found. Key rules:
 ### Step 5: Re-import Data
 
 ```bash
-cd /c/Users/peter/Downloads/CC/MARKETING/scripts && python import_3_companies_v3.py
+cd /c/Users/peter/Downloads/CC/CRM/Brevo/scripts && python import_3_companies_v4.py
 ```
 
 ### Step 6: Verify Data
@@ -78,7 +78,7 @@ cd /c/Users/peter/Downloads/CC/MARKETING/scripts && python import_3_companies_v3
 Run audit again:
 
 ```bash
-cd /c/Users/peter/Downloads/CC/MARKETING/scripts && python brevo_audit_detailed.py
+cd /c/Users/peter/Downloads/CC/CRM/Brevo/scripts && python brevo_audit_v4.py
 ```
 
 **Expected result:** "STATUS: ALL DATA PERFECT!"
@@ -97,13 +97,12 @@ If audit shows errors:
 
 | File | Purpose |
 |------|---------|
-| `MARKETING/scripts/brevo_api.py` | Brevo API client |
-| `MARKETING/scripts/brevo_audit_detailed.py` | Comprehensive audit |
-| `MARKETING/scripts/import_3_companies_v4.py` | Import script (v4) |
-| `MARKETING/scripts/brevo_audit_v4.py` | Comprehensive audit (v4) |
-| `MARKETING/BREVO_FIELD_MAPPING_REPORT.md` | Field mapping report |
-| `MARKETING/scripts/delete_brevo_data.py` | Data cleanup |
-| `MARKETING/IMPORT_PLAN_COMPREHENSIVE.md` | Full import plan |
+| `CRM/Brevo/scripts/brevo_api.py` | Brevo API client |
+| `CRM/Brevo/scripts/brevo_audit_v4.py` | Comprehensive audit (v4) |
+| `CRM/Brevo/scripts/import_3_companies_v4.py` | Import script (v4) |
+| `CRM/Brevo/scripts/delete_brevo_data.py` | Data cleanup |
+| `CRM/Brevo/BREVO_FIELD_MAPPING_REPORT.md` | Field mapping report |
+| `CRM/Brevo/IMPORT_PLAN_COMPREHENSIVE.md` | Full import plan |
 
 ## V4 Fixes Applied
 
