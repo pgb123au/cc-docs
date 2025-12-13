@@ -2,17 +2,17 @@
   "companies": [
     {
       "name": "Reignite Health",
-      "id": "693d36967401fb2953b748cc",
+      "id": "693d3c9e7401fb2953b748fe",
       "source": "hubspot"
     },
     {
       "name": "Paradise Distributors",
-      "id": "693d369d58677e43aa29bc55",
+      "id": "693d3ca77401fb2953b748ff",
       "source": "hubspot"
     },
     {
       "name": "JTW building group",
-      "id": "693d36ab58677e43aa29bc56",
+      "id": "693d3cb458677e43aa29bc86",
       "source": "appointment"
     }
   ],
@@ -20,23 +20,26 @@
     {
       "email": "sara@reignitehealth.com.au",
       "name": "Sara Lehmann",
-      "id": 35712,
-      "company_id": "693d36967401fb2953b748cc",
-      "hubspot_enriched": true
+      "id": 35724,
+      "company_id": "693d3c9e7401fb2953b748fe",
+      "hubspot_company_enriched": true,
+      "hubspot_contact_enriched": false
     },
     {
       "email": "bchalmers616@gmail.com",
       "name": "Bob Chalmers",
-      "id": 35713,
-      "company_id": "693d369d58677e43aa29bc55",
-      "hubspot_enriched": true
+      "id": 35725,
+      "company_id": "693d3ca77401fb2953b748ff",
+      "hubspot_company_enriched": true,
+      "hubspot_contact_enriched": false
     },
     {
       "email": "Joe@jtwbuildinggroup.com.au",
       "name": "Joe Van Stripe",
-      "id": 35714,
-      "company_id": "693d36ab58677e43aa29bc56",
-      "hubspot_enriched": false
+      "id": 35726,
+      "company_id": "693d3cb458677e43aa29bc86",
+      "hubspot_company_enriched": false,
+      "hubspot_contact_enriched": false
     }
   ]
 }

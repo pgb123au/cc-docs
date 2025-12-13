@@ -24,6 +24,7 @@ from brevo_api import BrevoClient, normalize_australian_mobile
 sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 
 HUBSPOT_COMPANIES = Path(r"C:\Users\peter\Documents\HS\All_Companies_2025-07-07_Cleaned_For_HubSpot.csv")
+HUBSPOT_CONTACTS = Path(r"C:\Users\peter\Documents\HS\All_Contacts_2025_07_07_Cleaned.csv")
 APPOINTMENTS = Path(r"C:\Users\peter\Downloads\CC\CRM\Appointments_Enriched.csv")
 CALL_LOG_1 = Path(r"C:\Users\peter\Downloads\CC\CRM\call_log_sheet_export.json")
 CALL_LOG_2 = Path(r"C:\Users\peter\Downloads\CC\CRM\call_log_sheet2_export.json")
@@ -109,6 +110,20 @@ def find_hubspot_company(target_name):
         for row in reader:
             name = row.get('Company name', '').strip()
             if name.lower() == target_lower:
+                return row
+    return None
+
+
+def find_hubspot_contact(email):
+    """Find contact by email in HubSpot Contacts CSV and return ALL available fields."""
+    if not email:
+        return None
+    target_email = email.lower().strip()
+    with open(HUBSPOT_CONTACTS, 'r', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            row_email = row.get('Email', '').strip().lower()
+            if row_email == target_email:
                 return row
     return None
 
@@ -276,8 +291,8 @@ def create_company_from_appointment(appt_data):
     return None, None, result.get('error', 'Unknown error')
 
 
-def create_contact(appt_data, company_id, company_name, source_type, hubspot_data=None, all_calls=None):
-    """Create Brevo contact with ALL fields from all sources."""
+def create_contact(appt_data, company_id, company_name, source_type, hubspot_data=None, hubspot_contact_data=None, all_calls=None):
+    """Create Brevo contact with ALL fields from all sources (Company + Contact CSVs)."""
     email = appt_data.get('email', '').strip()
     if not email or '@' not in email:
         return None, "Invalid email"
@@ -543,6 +558,216 @@ def create_contact(appt_data, company_id, company_name, source_type, hubspot_dat
         if raw_json:
             attributes['HUBSPOT_RAW_JSON'] = raw_json[:2000]  # Brevo text limit
 
+    # === HUBSPOT CONTACT ENRICHMENT (v4.2 - ALL 46 contact fields) ===
+    if hubspot_contact_data:
+        # Identity (only if not already set from appointment)
+        if 'FIRSTNAME' not in attributes:
+            fname = hubspot_contact_data.get('First Name', '').strip()
+            if fname:
+                attributes['FIRSTNAME'] = fname
+        if 'LASTNAME' not in attributes:
+            lname = hubspot_contact_data.get('Last Name', '').strip()
+            if lname:
+                attributes['LASTNAME'] = lname
+        if 'COMPANY' not in attributes:
+            co_name = hubspot_contact_data.get('Company Name', '').strip()
+            if co_name:
+                attributes['COMPANY'] = co_name
+
+        # HubSpot Contact ID
+        hs_contact_id = hubspot_contact_data.get('Legacy  Record ID', '').strip()
+        if hs_contact_id:
+            attributes['HUBSPOT_CONTACT_ID'] = hs_contact_id
+
+        # Phone numbers from HubSpot Contacts (fill in gaps)
+        if 'SMS' not in attributes:
+            mobile = hubspot_contact_data.get('Mobile Phone Number', '').strip()
+            if mobile:
+                normalized = normalize_australian_mobile(mobile)
+                if normalized:
+                    attributes['SMS'] = normalized
+
+        phone1 = hubspot_contact_data.get('Phone Number 1', '').strip()
+        if phone1:
+            normalized = normalize_australian_mobile(phone1)
+            if normalized and normalized != attributes.get('SMS'):
+                attributes['PHONE_1'] = normalized
+
+        if 'PHONE_2' not in attributes:
+            mobile2 = hubspot_contact_data.get('Mobile Phone 2', '').strip()
+            if mobile2:
+                normalized = normalize_australian_mobile(mobile2)
+                if normalized:
+                    attributes['PHONE_2'] = normalized
+
+        if 'PHONE_3' not in attributes:
+            mobile3 = hubspot_contact_data.get('Mobile Phone 3', '').strip()
+            if mobile3:
+                normalized = normalize_australian_mobile(mobile3)
+                if normalized:
+                    attributes['PHONE_3'] = normalized
+
+        # Email validation from HubSpot
+        hs_email_valid = hubspot_contact_data.get('Email Validation', '').strip()
+        if hs_email_valid and 'EMAIL_VALIDATION' not in attributes:
+            attributes['EMAIL_VALIDATION'] = hs_email_valid
+
+        neverbounce = hubspot_contact_data.get('NeverBounce Validation Result', '').strip()
+        if neverbounce:
+            attributes['NEVERBOUNCE_RESULT'] = neverbounce
+
+        # Location (fill gaps if not from company)
+        if 'CITY' not in attributes:
+            city = hubspot_contact_data.get('City', '').strip()
+            if city:
+                attributes['CITY'] = city
+        if 'STATE_REGION' not in attributes:
+            state = hubspot_contact_data.get('State/Region', '').strip()
+            if state:
+                attributes['STATE_REGION'] = state
+        if 'POSTAL_CODE' not in attributes:
+            postal = hubspot_contact_data.get('Postal Code', '').strip()
+            if postal:
+                attributes['POSTAL_CODE'] = postal
+        if 'STREET_ADDRESS' not in attributes:
+            street = hubspot_contact_data.get('Street Address', '').strip()
+            if street:
+                attributes['STREET_ADDRESS'] = street
+        if 'COUNTRY' not in attributes:
+            country = hubspot_contact_data.get('Country', '').strip()
+            if country:
+                attributes['COUNTRY'] = country
+
+        # Work info
+        job_title = hubspot_contact_data.get('Job Title', '').strip()
+        if job_title:
+            attributes['JOBTITLE'] = job_title  # Note: JOB_TITLE is reserved by Brevo
+
+        work_email = hubspot_contact_data.get('Work email', '').strip()
+        if work_email:
+            attributes['WORK_EMAIL'] = work_email
+
+        website = hubspot_contact_data.get('Website URL', '').strip()
+        if website and 'WEBSITE' not in attributes:
+            attributes['WEBSITE'] = website
+
+        # Contact owner / team
+        owner = hubspot_contact_data.get('Biz- Contact owner', '').strip()
+        if owner:
+            attributes['CONTACT_OWNER'] = owner
+
+        team = hubspot_contact_data.get('Biz- Team', '').strip()
+        if team:
+            attributes['HUBSPOT_TEAM'] = team
+
+        # Lead info
+        lead_source = hubspot_contact_data.get('Biz- Lead Source', '').strip()
+        if lead_source:
+            attributes['LEAD_SOURCE'] = lead_source
+
+        lead_status = hubspot_contact_data.get('Biz- lead Status', '').strip()
+        if lead_status:
+            attributes['LEAD_STATUS'] = lead_status
+
+        lead_type = hubspot_contact_data.get('Biz- Lead Type', '').strip()
+        if lead_type:
+            attributes['LEAD_TYPE'] = lead_type
+
+        # Original source (contact-level)
+        contact_orig = hubspot_contact_data.get('Biz- Original Source', '').strip()
+        if contact_orig:
+            attributes['CONTACT_ORIGINAL_SOURCE'] = contact_orig
+
+        contact_orig_1 = hubspot_contact_data.get('Biz- Original Source Drill-Down 1', '').strip()
+        if contact_orig_1:
+            attributes['CONTACT_ORIGINAL_SOURCE_1'] = contact_orig_1
+
+        contact_orig_2 = hubspot_contact_data.get('Biz- Original Source Drill-Down 2', '').strip()
+        if contact_orig_2:
+            attributes['CONTACT_ORIGINAL_SOURCE_2'] = contact_orig_2
+
+        # Record source (contact-level)
+        contact_rec_src = hubspot_contact_data.get('Biz- Record source', '').strip()
+        if contact_rec_src:
+            attributes['CONTACT_RECORD_SOURCE'] = contact_rec_src
+
+        contact_rec_detail = hubspot_contact_data.get('Biz- Record source detail 1', '').strip()
+        if contact_rec_detail:
+            attributes['CONTACT_RECORD_SOURCE_DETAIL'] = contact_rec_detail
+
+        # Dates
+        contact_create = hubspot_contact_data.get('Biz- Create Date-Time', '').strip()
+        if contact_create:
+            attributes['HUBSPOT_CONTACT_CREATE_DATE'] = contact_create
+
+        last_activity = hubspot_contact_data.get('Biz- Last Activity Date-Time', '').strip()
+        if last_activity:
+            attributes['LAST_ACTIVITY_DATE'] = last_activity
+
+        created_by = hubspot_contact_data.get('Biz- Created by user ID', '').strip()
+        if created_by:
+            attributes['HUBSPOT_CONTACT_CREATED_BY'] = created_by
+
+        # Social / online
+        twitter = hubspot_contact_data.get('Twitter Profile', '').strip()
+        if twitter:
+            attributes['TWITTER_PROFILE'] = twitter
+
+        google_page = hubspot_contact_data.get('Biz- Google Page URL', '').strip()
+        if google_page:
+            attributes['GOOGLE_PAGE_URL'] = google_page
+
+        # Additional fields
+        email_domain = hubspot_contact_data.get('Email Domain', '').strip()
+        if email_domain:
+            attributes['EMAIL_DOMAIN'] = email_domain
+
+        bounce_reason = hubspot_contact_data.get('Biz- Email hard bounce reason', '').strip()
+        if bounce_reason:
+            attributes['EMAIL_BOUNCE_REASON'] = bounce_reason
+
+        score_active = hubspot_contact_data.get('Biz- Score ACTIVE', '').strip()
+        if score_active:
+            attributes['HUBSPOT_SCORE_ACTIVE'] = score_active
+
+        ip_country = hubspot_contact_data.get('IP Country Code', '').strip()
+        if ip_country:
+            attributes['IP_COUNTRY_CODE'] = ip_country
+
+        country_origin = hubspot_contact_data.get('Country of Origin', '').strip()
+        if country_origin:
+            attributes['COUNTRY_OF_ORIGIN'] = country_origin
+
+        tag = hubspot_contact_data.get('Biz- Tag', '').strip()
+        if tag:
+            attributes['HUBSPOT_TAG'] = tag
+
+        # HubSpot association IDs
+        hs_company_ids = hubspot_contact_data.get('Biz - Associated Company IDs', '').strip()
+        if hs_company_ids:
+            attributes['HUBSPOT_COMPANY_IDS'] = hs_company_ids
+
+        hs_primary_company = hubspot_contact_data.get('Biz- Associated Company IDs (Primary)', '').strip()
+        if hs_primary_company:
+            attributes['HUBSPOT_PRIMARY_COMPANY_ID'] = hs_primary_company
+
+        hs_sequence_ids = hubspot_contact_data.get('Biz- Associated Sequence enrollment IDs', '').strip()
+        if hs_sequence_ids:
+            attributes['HUBSPOT_SEQUENCE_IDS'] = hs_sequence_ids
+
+        hs_task_ids = hubspot_contact_data.get('Biz- Associated Task IDs', '').strip()
+        if hs_task_ids:
+            attributes['HUBSPOT_TASK_IDS'] = hs_task_ids
+
+        hs_email_ids = hubspot_contact_data.get('Biz- Associated Email IDs', '').strip()
+        if hs_email_ids:
+            attributes['HUBSPOT_EMAIL_IDS'] = hs_email_ids
+
+        # Legacy import info
+        legacy_import = hubspot_contact_data.get('Legacy Import (concatenated)', '').strip()
+        if legacy_import:
+            attributes['HUBSPOT_LEGACY_IMPORT'] = legacy_import[:2000]
+
     # === APPOINTMENT EXTRA FIELDS ===
     website = appt_data.get('website_from_list', '').strip()
     if website:
@@ -627,15 +852,13 @@ def create_contact(appt_data, company_id, company_name, source_type, hubspot_dat
 
 def main():
     print("=" * 70)
-    print("IMPORT 3 COMPANIES - V4 COMPLETE")
+    print("IMPORT 3 COMPANIES - V4.2 (ALL HUBSPOT DATA)")
     print("=" * 70)
     print()
-    print("Fixes from v3:")
-    print("  + EMAIL_VALIDATION (was wrong attribute name)")
-    print("  + MATCH_SOURCE (now exists)")
-    print("  + HubSpot enrichment flows to contacts")
-    print("  + Enhanced RETELL_LOG with call details")
-    print("  + All HubSpot fields mapped")
+    print("v4.2 adds:")
+    print("  + HubSpot Contacts CSV lookup (207K contacts)")
+    print("  + ALL 46 contact fields mapped")
+    print("  + 30+ new Brevo attributes for contact data")
     print()
 
     # Load call logs for enhanced RETELL_LOG
@@ -702,11 +925,22 @@ def main():
             else:
                 print(f"  ERROR: {error}")
 
-        # Create contact with HubSpot enrichment
-        print(f"\n  Creating contact...")
+        # Look up contact in HubSpot Contacts CSV
+        contact_email = appt.get('email', '').strip()
+        hubspot_contact_data = find_hubspot_contact(contact_email)
+        if hubspot_contact_data:
+            print(f"\n  FOUND in HubSpot Contacts CSV!")
+            print(f"    Job Title: {hubspot_contact_data.get('Job Title', 'N/A')}")
+            print(f"    Lead Source: {hubspot_contact_data.get('Biz- Lead Source', 'N/A')}")
+            print(f"    Lead Status: {hubspot_contact_data.get('Biz- lead Status', 'N/A')}")
+        else:
+            print(f"\n  NOT in HubSpot Contacts CSV")
+
+        # Create contact with HubSpot enrichment (Company + Contact data)
+        print(f"  Creating contact...")
         contact_id, error = create_contact(
             appt, company_id, appt.get('company', '').strip(),
-            source_type, hubspot_data, all_calls
+            source_type, hubspot_data, hubspot_contact_data, all_calls
         )
 
         if contact_id:
@@ -718,7 +952,8 @@ def main():
                 'name': appt.get('name', ''),
                 'id': contact_id,
                 'company_id': company_id,
-                'hubspot_enriched': hubspot_data is not None
+                'hubspot_company_enriched': hubspot_data is not None,
+                'hubspot_contact_enriched': hubspot_contact_data is not None
             })
         else:
             print(f"  ERROR: {error}")
@@ -735,7 +970,12 @@ def main():
     print(f"\nContacts: {len(results['contacts'])}")
     for c in results['contacts']:
         linked = "linked" if c['company_id'] else "NOT linked"
-        enriched = "+ HubSpot enriched" if c.get('hubspot_enriched') else ""
+        enrichments = []
+        if c.get('hubspot_company_enriched'):
+            enrichments.append("Company")
+        if c.get('hubspot_contact_enriched'):
+            enrichments.append("Contact")
+        enriched = f"+ HubSpot: {', '.join(enrichments)}" if enrichments else ""
         print(f"  - {c['email']} ({linked}) {enriched}")
 
     # Save results

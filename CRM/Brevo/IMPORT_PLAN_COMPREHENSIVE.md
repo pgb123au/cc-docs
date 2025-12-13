@@ -1,7 +1,7 @@
 # Comprehensive Brevo Import Plan
 
 **Created:** 2025-12-13
-**Updated:** 2025-12-13 (v4.1 with ALL HubSpot fields + call linking)
+**Updated:** 2025-12-13 (v4.2 with ALL HubSpot Company + Contact fields)
 **Status:** READY FOR APPROVAL
 **Approach:** Layer-by-layer import (contacts first, then enrich with appointments/calls)
 
@@ -32,8 +32,8 @@ The ONLY exception: Do not overwrite existing good data with worse/empty data.
 4. **Never leave a field empty if data exists somewhere**
 
 ### Merge Priority (when data exists in multiple sources):
-1. HubSpot Companies (most complete)
-2. HubSpot Contacts
+1. HubSpot Companies CSV (363K companies - most complete company data)
+2. HubSpot Contacts CSV (207K contacts - contact-level enrichment)
 3. Appointments Enriched
 4. Call Logs
 5. Master Contacts
@@ -328,7 +328,7 @@ After running a test import of 200 records, the following corrections were ident
 **Duration:** 5 minutes
 **Risk:** Low
 
-### New Attributes to Create (63 total)
+### New Attributes to Create (89 total)
 
 ```
 CONTACT ATTRIBUTES BY CATEGORY:
@@ -404,7 +404,7 @@ JSON Metadata (4 new):
   - SOCIAL_LINKS_JSON (text) - Backup of all social links
   - LOCATION_JSON (text) - Full address as JSON
 
-HubSpot Complete Import (14 new - v4.1):
+HubSpot Companies Import (14 new - v4.1):
   - TIMEZONE (text) - Company timezone (e.g., Australia/Brisbane)
   - HUBSPOT_CREATE_DATE (text) - When record was created in HubSpot
   - HUBSPOT_MODIFIED_DATE (text) - Last modification date in HubSpot
@@ -419,15 +419,67 @@ HubSpot Complete Import (14 new - v4.1):
   - HUBSPOT_RECORD_SOURCE (text) - How record entered HubSpot
   - HUBSPOT_UPDATED_BY (text) - User who last updated in HubSpot
   - HUBSPOT_RAW_JSON (text) - Complete raw JSON from HubSpot export
+
+HubSpot Contacts Import (26 new - v4.2):
+  Source: All_Contacts_2025_07_07_Cleaned.csv (207,277 contacts)
+
+  Identity & Contact:
+  - HUBSPOT_CONTACT_ID (text) - Legacy Record ID from HubSpot
+  - PHONE_1 (text) - Phone Number 1
+  - JOBTITLE (text) - Job Title (Note: JOB_TITLE is reserved by Brevo)
+  - WORK_EMAIL (text) - Work email address
+
+  Lead Management:
+  - CONTACT_OWNER (text) - Biz- Contact owner
+  - HUBSPOT_TEAM (text) - Biz- Team
+  - LEAD_SOURCE (text) - Biz- Lead Source
+  - LEAD_STATUS (text) - Biz- lead Status
+  - LEAD_TYPE (text) - Biz- Lead Type
+
+  Source Tracking (Contact-Level):
+  - CONTACT_ORIGINAL_SOURCE (text) - Biz- Original Source
+  - CONTACT_ORIGINAL_SOURCE_1 (text) - Biz- Original Source Drill-Down 1
+  - CONTACT_ORIGINAL_SOURCE_2 (text) - Biz- Original Source Drill-Down 2
+  - CONTACT_RECORD_SOURCE (text) - Biz- Record source
+  - CONTACT_RECORD_SOURCE_DETAIL (text) - Biz- Record source detail 1
+
+  Dates & Activity:
+  - HUBSPOT_CONTACT_CREATE_DATE (text) - Biz- Create Date-Time
+  - LAST_ACTIVITY_DATE (text) - Biz- Last Activity Date-Time
+  - HUBSPOT_CONTACT_CREATED_BY (text) - Biz- Created by user ID
+
+  Online Presence:
+  - TWITTER_PROFILE (text) - Twitter Profile URL
+  - GOOGLE_PAGE_URL (text) - Biz- Google Page URL
+
+  Email & Data Quality:
+  - EMAIL_DOMAIN (text) - Email Domain
+  - EMAIL_BOUNCE_REASON (text) - Biz- Email hard bounce reason
+  - HUBSPOT_SCORE_ACTIVE (text) - Biz- Score ACTIVE
+
+  Geographic:
+  - IP_COUNTRY_CODE (text) - IP Country Code
+  - COUNTRY_OF_ORIGIN (text) - Country of Origin
+
+  Tags & Metadata:
+  - HUBSPOT_TAG (text) - Biz- Tag
+
+  HubSpot Associations:
+  - HUBSPOT_COMPANY_IDS (text) - Biz - Associated Company IDs
+  - HUBSPOT_PRIMARY_COMPANY_ID (text) - Biz- Associated Company IDs (Primary)
+  - HUBSPOT_SEQUENCE_IDS (text) - Biz- Associated Sequence enrollment IDs
+  - HUBSPOT_TASK_IDS (text) - Biz- Associated Task IDs
+  - HUBSPOT_EMAIL_IDS (text) - Biz- Associated Email IDs
+  - HUBSPOT_LEGACY_IMPORT (text) - Legacy Import (concatenated)
 ```
 
 ### Script Required
-`create_brevo_attributes.py` - Creates all 63 attributes via API
+`create_brevo_attributes.py` - Creates all 89 attributes via API
 
 ### Verification
-- [ ] All 63 attributes created
+- [ ] All 89 attributes created
 - [ ] Correct types assigned (text, number, date, boolean)
-- [ ] Total attributes = 86
+- [ ] Total attributes = 112 (including built-in)
 
 ---
 
