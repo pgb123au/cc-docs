@@ -1,0 +1,81 @@
+{
+  "companies": [
+    {
+      "name": "Reignite Health",
+      "id": "693dcd347401fb2953b7502a",
+      "source": "hubspot"
+    },
+    {
+      "name": "Paradise Distributors",
+      "id": "693dcd3d7401fb2953b7502e",
+      "source": "hubspot"
+    },
+    {
+      "name": "JTW building group",
+      "id": "693dcd4d58677e43aa29c3d7",
+      "source": "appointment"
+    },
+    {
+      "name": "Lumiere Home Renovations",
+      "id": "693dcd5458677e43aa29c3da",
+      "source": "hubspot"
+    },
+    {
+      "name": "CLG Electrics",
+      "id": "693dcd6258677e43aa29c3db",
+      "source": "appointment"
+    }
+  ],
+  "contacts": [
+    {
+      "email": "sara@reignitehealth.com.au",
+      "name": "Sara Lehmann",
+      "id": 35732,
+      "company_id": "693dcd347401fb2953b7502a",
+      "excel_phone": null,
+      "retell_calls": false,
+      "hubspot_company_enriched": true,
+      "hubspot_contact_enriched": false
+    },
+    {
+      "email": "bchalmers616@gmail.com",
+      "name": "Bob Chalmers",
+      "id": 35733,
+      "company_id": "693dcd3d7401fb2953b7502e",
+      "excel_phone": "+61408687109",
+      "retell_calls": true,
+      "hubspot_company_enriched": true,
+      "hubspot_contact_enriched": false
+    },
+    {
+      "email": "Joe@jtwbuildinggroup.com.au",
+      "name": "Joe Van Stripe",
+      "id": 35734,
+      "company_id": "693dcd4d58677e43aa29c3d7",
+      "excel_phone": "+61424023677",
+      "retell_calls": true,
+      "hubspot_company_enriched": false,
+      "hubspot_contact_enriched": false
+    },
+    {
+      "email": "info@lumierehomerenovations.com.au",
+      "name": "Chantelle",
+      "id": 35735,
+      "company_id": "693dcd5458677e43aa29c3da",
+      "excel_phone": "+61423238679",
+      "retell_calls": true,
+      "hubspot_company_enriched": true,
+      "hubspot_contact_enriched": true
+    },
+    {
+      "email": "chris@clgelectrics.com.au",
+      "name": "Chris",
+      "id": 35736,
+      "company_id": "693dcd6258677e43aa29c3db",
+      "excel_phone": "+61402140955",
+      "retell_calls": true,
+      "hubspot_company_enriched": false,
+      "hubspot_contact_enriched": true
+    }
+  ]
+}

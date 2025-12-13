@@ -1,9 +1,43 @@
 # Comprehensive Brevo Import Plan
 
 **Created:** 2025-12-13
-**Updated:** 2025-12-13 (v4.2 with ALL HubSpot Company + Contact fields)
-**Status:** READY FOR APPROVAL
-**Approach:** Layer-by-layer import (contacts first, then enrich with appointments/calls)
+**Updated:** 2025-12-14 (v5 - Complete with Excel Phone + Full Retell Call Data)
+**Status:** TESTED AND VERIFIED
+**Approach:** All-in-one import from 5 data sources
+
+---
+
+## v5 Changes (2025-12-14)
+
+### New Data Sources Added:
+1. **Excel Appointments** (`AI Appointments Set 2025.xlsx`)
+   - Phone numbers extracted from "Phone Call" rows (e.g., `Phone Call : +61424023677 -> +61399997398`)
+   - 39 phone numbers extracted from actual call records
+
+2. **Full Retell Call Data** (not just logs)
+   - `RETELL_CALL_ID` - Unique call identifier
+   - `RETELL_RECORDING_URL` - Clickable link to WAV recording
+   - `RETELL_PUBLIC_LOG_URL` - Clickable link to call log
+   - `RETELL_TRANSCRIPT` - Full conversation text
+   - `RETELL_CALL_DIRECTION` - INBOUND or OUTBOUND
+   - `RETELL_CALL_DURATION` - Human-readable (e.g., "1m 43s")
+   - `RETELL_CALL_STATUS` - ended, etc.
+   - `RETELL_DISCONNECT_REASON` - user_hangup, agent_hangup, etc.
+   - `RETELL_CALL_COST` - Cost in dollars
+   - `RETELL_CALL_COUNT` - Total calls with this contact
+
+### Test Results (5 Companies):
+| Contact | Total Fields | Sources Used |
+|---------|--------------|--------------|
+| Reignite Health | 23 | HubSpot Company |
+| Paradise Distributors | 46 | HubSpot Co + Excel + Retell |
+| JTW Building Group | 24 | Excel + Retell |
+| Lumiere Home Renovations | 38 | HubSpot Co + Contact + Excel + Retell |
+| CLG Electrics | 25 | HubSpot Contact + Excel + Retell |
+
+### Scripts:
+- `import_3_companies_v5.py` - Main import script (all 5 sources)
+- `enrich_retell_calls.py` - Standalone Retell enrichment (for existing contacts)
 
 ---
 
@@ -32,11 +66,12 @@ The ONLY exception: Do not overwrite existing good data with worse/empty data.
 4. **Never leave a field empty if data exists somewhere**
 
 ### Merge Priority (when data exists in multiple sources):
-1. HubSpot Companies CSV (363K companies - most complete company data)
-2. HubSpot Contacts CSV (207K contacts - contact-level enrichment)
-3. Appointments Enriched
-4. Call Logs
-5. Master Contacts
+1. **Excel Appointments** - Phone numbers from "Phone Call" rows (most reliable - actual call records)
+2. **HubSpot Companies CSV** (363K companies - most complete company data)
+3. **HubSpot Contacts CSV** (207K contacts - contact-level enrichment)
+4. **Appointments Enriched CSV** - Appointment data, location
+5. **Retell Call Logs JSON** (22K calls) - Recording URLs, transcripts, call metadata
+6. Master Contacts (future)
 
 ---
 
