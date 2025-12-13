@@ -17,35 +17,54 @@ Before running import:
 
 ## DATA SOURCES - FULL PATHS
 
-### Original Source Files (HubSpot Exports)
+### ORIGINAL SOURCE FILES (Raw Data)
 
-These are the MASTER data sources - the original HubSpot CRM exports:
+#### HubSpot CRM Exports (2025-07-07)
 
-| Source | Full Path | Records | Original From |
-|--------|-----------|---------|---------------|
-| **HubSpot Companies** | `C:\Users\peter\Documents\HS\All_Companies_2025-07-07_Cleaned_For_HubSpot.csv` | 363,517 | HubSpot CRM Export |
-| **HubSpot Contacts** | `C:\Users\peter\Documents\HS\All_Contacts_2025_07_07_Cleaned.csv` | 207,278 | HubSpot CRM Export |
+| Source | Original File Path | Records | Key Fields |
+|--------|-------------------|---------|------------|
+| **HubSpot Companies** | `C:\Users\peter\Documents\HS\All_Companies_2025-07-07_Cleaned_For_HubSpot.csv` | 363,517 | Company name, Domain, Email, Phone (1-3), Address, Google reviews, Business type, Industry |
+| **HubSpot Contacts** | `C:\Users\peter\Documents\HS\All_Contacts_2025_07_07_Cleaned.csv` | 207,278 | First Name, Last Name, Email, Phone, Company Name, Website, Job Title, City, State |
 
-**Key Fields in HubSpot Companies:**
-- Company name, Domain, Email, Phone (up to 3), Address
-- Google profile, reviews, rating
-- Business type, Industry, Description
-- Associated Contact IDs
+#### Telemarketer Dialer Original Files
 
-**Key Fields in HubSpot Contacts:**
-- First Name, Last Name, Email, Phone
-- Company Name, Website
-- Job Title, City, State
+| Source | Original File Path | Purpose |
+|--------|-------------------|---------|
+| **Massive List - Main** | `C:\Users\peter\retell-dialer\massive_list.csv` | Primary contact list (general Australia) |
+| **Massive List - Victoria** | `C:\Users\peter\retell-dialer\massive_list_vic.csv` | Victoria-specific contacts |
+| **Pakenham Companies** | `C:\Users\peter\retell-dialer\companies_pakenham.csv` | Pakenham area company list |
+| **Called Log (Text)** | `C:\Users\peter\retell-dialer\called_log.txt` | Phone numbers called (text format) |
+| **Called Log (Backup)** | `C:\Users\peter\retell-dialer\called_log_backup.txt` | Backup of called numbers |
+| **Called Numbers (JSON)** | `C:\Users\peter\retell-dialer\called_numbers.json` | Called numbers with timestamps |
+| **Do Not Call List** | `C:\Users\peter\retell-dialer\do_not_call.txt` | Phone numbers (852 entries - MISNAMED, see note below) |
+| **Invalid Numbers** | `C:\Users\peter\retell-dialer\invalid_numbers.txt` | Phone numbers flagged as invalid |
 
-### Primary Working Files (CRM Folder)
+#### Appointments Original Source
 
-| Source | Full Path | Records | Derived From |
-|--------|-----------|---------|--------------|
-| **Appointments** | `C:\Users\peter\Downloads\CC\CRM\Appointments_Enriched.csv` | 87 | Manual data collection |
-| **Call Logs 1** | `C:\Users\peter\Downloads\CC\CRM\call_log_sheet_export.json` | 15,156 | Retell API export |
-| **Call Logs 2** | `C:\Users\peter\Downloads\CC\CRM\call_log_sheet2_export.json` | 6,844 | Retell API export |
-| **Master Contacts** | `C:\Users\peter\Downloads\CC\CRM\Master_Contacts_With_Flags.csv` | 54,086 | HubSpot + Campaign data |
-| **Fresh Leads** | `C:\Users\peter\Downloads\CC\CRM\Fresh_Leads_Never_Called.csv` | ~30,000 | Master minus called |
+| Source | Original File Path | Records | Source |
+|--------|-------------------|---------|--------|
+| **Appointments Raw** | `C:\Users\peter\Downloads\CC\CRM\All_Appointments_Extracted.csv` | 87 | Google Sheet "Appts New" tab |
+
+#### Retell API Exports (Call Logs)
+
+| Source | Original File Path | Records | Date Range |
+|--------|-------------------|---------|------------|
+| **Call Log Export 1** | `C:\Users\peter\Downloads\CC\CRM\call_log_sheet_export.json` | 15,156 | Aug-Oct 2025 |
+| **Call Log Export 2** | `C:\Users\peter\Downloads\CC\CRM\call_log_sheet2_export.json` | 6,844 | Jun-Jul 2025 |
+
+---
+
+### DERIVED/PROCESSED FILES (Created from originals)
+
+| Derived File | Full Path | Records | Created From |
+|--------------|-----------|---------|--------------|
+| **Master Contacts With Flags** | `C:\Users\peter\Downloads\CC\CRM\Master_Contacts_With_Flags.csv` | 54,086 | massive_list + massive_list_vic + called_log + do_not_call |
+| **Fresh Leads Never Called** | `C:\Users\peter\Downloads\CC\CRM\Fresh_Leads_Never_Called.csv` | 24,335 | Master minus called contacts |
+| **Safe To Contact** | `C:\Users\peter\Downloads\CC\CRM\Safe_To_Contact.csv` | 21,693 | Called contacts minus DNC |
+| **DO NOT CALL Master** | `C:\Users\peter\Downloads\CC\CRM\DO_NOT_CALL_Master.csv` | 852 | do_not_call.txt deduplicated (MISNAMED - see note) |
+| **DNC Contacts With Details** | `C:\Users\peter\Downloads\CC\CRM\DNC_Contacts_With_Details.csv` | 812 | Master filtered by is_dnc flag |
+| **Appointments Enriched** | `C:\Users\peter\Downloads\CC\CRM\Appointments_Enriched.csv` | 87 | All_Appointments_Extracted + massive_lists cross-reference |
+| **Brevo Import Filtered** | `C:\Users\peter\Downloads\CC\CRM\Brevo_Import_Filtered.csv` | 755 | All_Contacts + All_Companies with quality filters |
 
 ### Appointment Sub-files (by Status)
 
