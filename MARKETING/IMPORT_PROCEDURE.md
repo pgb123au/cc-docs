@@ -15,74 +15,75 @@ Before running import:
 
 ---
 
-## DATA SOURCES - FULL PATHS
+## DATA SOURCES - COMPLETE FILE INVENTORY
 
-### ORIGINAL SOURCE FILES (Raw Data)
+### HubSpot CRM Exports (Original Source)
 
-#### HubSpot CRM Exports (2025-07-07)
+| File | Path | Records | Key Fields |
+|------|------|---------|------------|
+| **HubSpot Companies** | `C:\Users\peter\Documents\HS\All_Companies_2025-07-07_Cleaned_For_HubSpot.csv` | 363,516 | Company name, Domain, Email, Phone (1-3), Address, City, Postal Code, State, Country, Google reviews, GBP rating, Business type, Industry, Year Founded, Website URL, Business Description, Social links (FB, Twitter, LinkedIn, Instagram, YouTube) |
+| **HubSpot Contacts** | `C:\Users\peter\Documents\HS\All_Contacts_2025_07_07_Cleaned.csv` | 207,277 | First Name, Last Name, Email, Phone Number 1, Mobile Phone Number, Company Name, Website URL, Job Title, City, Postal Code, State/Region, Street Address, Country, Email Domain, NeverBounce Validation Result |
 
-| Source | Original File Path | Records | Key Fields |
-|--------|-------------------|---------|------------|
-| **HubSpot Companies** | `C:\Users\peter\Documents\HS\All_Companies_2025-07-07_Cleaned_For_HubSpot.csv` | 363,517 | Company name, Domain, Email, Phone (1-3), Address, Google reviews, Business type, Industry |
-| **HubSpot Contacts** | `C:\Users\peter\Documents\HS\All_Contacts_2025_07_07_Cleaned.csv` | 207,278 | First Name, Last Name, Email, Phone, Company Name, Website, Job Title, City, State |
+### Telemarketer Dialer Original Files
 
-#### Telemarketer Dialer Original Files
+| File | Original Path | Derived Path | Records | Key Fields |
+|------|---------------|--------------|---------|------------|
+| **Massive List - Main** | `C:\Users\peter\retell-dialer\massive_list.csv` | (source for Master_Contacts) | 47,086 | First Name, Last Name, Mobile Phone Number, Email, Company Name, Website URL, Industry, Email Domain, City, Associated Company |
+| **Massive List - Victoria** | `C:\Users\peter\retell-dialer\massive_list_vic.csv` | (source for Master_Contacts) | 19,238 | Same as above |
+| **Pakenham Companies** | `C:\Users\peter\retell-dialer\companies_pakenham.csv` | (source for Master_Contacts) | 196 | Same as above |
+| **Called Log (Text)** | `C:\Users\peter\retell-dialer\called_log.txt` | (source for was_called flag) | 27,786 | Phone numbers called |
+| **Called Numbers (JSON)** | `C:\Users\peter\retell-dialer\called_numbers.json` | (source for call counts) | 27,799 | Phone numbers with timestamps |
 
-| Source | Original File Path | Purpose |
-|--------|-------------------|---------|
-| **Massive List - Main** | `C:\Users\peter\retell-dialer\massive_list.csv` | Primary contact list (general Australia) |
-| **Massive List - Victoria** | `C:\Users\peter\retell-dialer\massive_list_vic.csv` | Victoria-specific contacts |
-| **Pakenham Companies** | `C:\Users\peter\retell-dialer\companies_pakenham.csv` | Pakenham area company list |
-| **Called Log (Text)** | `C:\Users\peter\retell-dialer\called_log.txt` | Phone numbers called (text format) |
-| **Called Log (Backup)** | `C:\Users\peter\retell-dialer\called_log_backup.txt` | Backup of called numbers |
-| **Called Numbers (JSON)** | `C:\Users\peter\retell-dialer\called_numbers.json` | Called numbers with timestamps |
-| **Do Not Call List** | `C:\Users\peter\retell-dialer\do_not_call.txt` | Phone numbers (852 entries - MISNAMED, see note below) |
-| **Invalid Numbers** | `C:\Users\peter\retell-dialer\invalid_numbers.txt` | Phone numbers flagged as invalid |
+### Derived/Processed Files
 
-#### Appointments Original Source
-
-| Source | Original File Path | Records | Source |
-|--------|-------------------|---------|--------|
-| **Appointments Raw** | `C:\Users\peter\Downloads\CC\CRM\All_Appointments_Extracted.csv` | 87 | Google Sheet "Appts New" tab |
-
-#### Retell API Exports (Call Logs)
-
-| Source | Original File Path | Records | Date Range |
-|--------|-------------------|---------|------------|
-| **Call Log Export 1** | `C:\Users\peter\Downloads\CC\CRM\call_log_sheet_export.json` | 15,156 | Aug-Oct 2025 |
-| **Call Log Export 2** | `C:\Users\peter\Downloads\CC\CRM\call_log_sheet2_export.json` | 6,844 | Jun-Jul 2025 |
-
----
-
-### DERIVED/PROCESSED FILES (Created from originals)
-
-| Derived File | Full Path | Records | Created From |
-|--------------|-----------|---------|--------------|
-| **Master Contacts With Flags** | `C:\Users\peter\Downloads\CC\CRM\Master_Contacts_With_Flags.csv` | 54,086 | massive_list + massive_list_vic + called_log + do_not_call |
+| File | Path | Records | Created From |
+|------|------|---------|--------------|
+| **Master Contacts With Flags** | `C:\Users\peter\Downloads\CC\CRM\Master_Contacts_With_Flags.csv` | 54,086 | massive_list + massive_list_vic + companies_pakenham + called_log |
 | **Fresh Leads Never Called** | `C:\Users\peter\Downloads\CC\CRM\Fresh_Leads_Never_Called.csv` | 24,335 | Master minus called contacts |
-| **Safe To Contact** | `C:\Users\peter\Downloads\CC\CRM\Safe_To_Contact.csv` | 21,693 | Called contacts minus DNC |
-| **DO NOT CALL Master** | `C:\Users\peter\Downloads\CC\CRM\DO_NOT_CALL_Master.csv` | 852 | do_not_call.txt deduplicated (MISNAMED - see note) |
-| **DNC Contacts With Details** | `C:\Users\peter\Downloads\CC\CRM\DNC_Contacts_With_Details.csv` | 812 | Master filtered by is_dnc flag |
-| **Appointments Enriched** | `C:\Users\peter\Downloads\CC\CRM\Appointments_Enriched.csv` | 87 | All_Appointments_Extracted + massive_lists cross-reference |
+| **Safe To Contact** | `C:\Users\peter\Downloads\CC\CRM\Safe_To_Contact.csv` | 21,693 | Called contacts ready for re-engagement |
 | **Brevo Import Filtered** | `C:\Users\peter\Downloads\CC\CRM\Brevo_Import_Filtered.csv` | 755 | All_Contacts + All_Companies with quality filters |
 
-### Appointment Sub-files (by Status)
+### Appointments - 4 Source Tabs
 
-| File | Full Path | Purpose |
-|------|-----------|---------|
-| Won | `C:\Users\peter\Downloads\CC\CRM\Appointments_won.csv` | Won clients |
-| Followup | `C:\Users\peter\Downloads\CC\CRM\Appointments_followup.csv` | Follow-up needed |
-| Booked | `C:\Users\peter\Downloads\CC\CRM\Appointments_booked.csv` | Upcoming appointments |
-| No Show | `C:\Users\peter\Downloads\CC\CRM\Appointments_no_show.csv` | Missed appointments |
-| Bad Prospect | `C:\Users\peter\Downloads\CC\CRM\Appointments_bad_prospect.csv` | Not suitable |
+The appointments data comes from a Google Sheet with **4 tabs**:
 
-### IMPORTANT: DNC List Clarification
+| Tab Name | Type | Description |
+|----------|------|-------------|
+| **Appts** | Appointments | Original appointments (older entries) |
+| **Appts New** | Appointments | Newer appointment entries |
+| **Call Backs** | Follow-ups | Original follow-up/callback entries |
+| **Call Backs New** | Follow-ups | Newer follow-up entries |
 
-**The file `DO_NOT_CALL_Master.csv` is MISNAMED.** It contains 852 contacts that were CALLED, not contacts that requested Do-Not-Call.
+### Appointment Files (Combined & By Status)
 
-**Actual DNC:** Only 1 person ever requested not to be called. This should be handled manually.
+| File | Path | Records | Source |
+|------|------|---------|--------|
+| **All Appointments (Combined)** | `C:\Users\peter\Downloads\CC\CRM\All_Appointments_Extracted.csv` | 87 | All 4 tabs combined |
+| **Appointments Enriched** | `C:\Users\peter\Downloads\CC\CRM\Appointments_Enriched.csv` | 87 | Above + cross-reference with massive_lists |
 
-**The `is_dnc` flag in Master_Contacts_With_Flags.csv is also incorrect** - it's set for "already called" contacts, not actual DNC requests.
+**By Status Category:**
+
+| File | Path | Records |
+|------|------|---------|
+| Won | `C:\Users\peter\Downloads\CC\CRM\Appointments_won.csv` | 6 |
+| Follow-up | `C:\Users\peter\Downloads\CC\CRM\Appointments_followup.csv` | 15 |
+| Booked | `C:\Users\peter\Downloads\CC\CRM\Appointments_booked.csv` | 4 |
+| Contacted | `C:\Users\peter\Downloads\CC\CRM\Appointments_contacted.csv` | 10 |
+| Seen | `C:\Users\peter\Downloads\CC\CRM\Appointments_seen.csv` | 2 |
+| No Show | `C:\Users\peter\Downloads\CC\CRM\Appointments_no_show.csv` | 13 |
+| Reschedule | `C:\Users\peter\Downloads\CC\CRM\Appointments_reschedule.csv` | 5 |
+| Bad Prospect | `C:\Users\peter\Downloads\CC\CRM\Appointments_bad_prospect.csv` | 16 |
+| Dead | `C:\Users\peter\Downloads\CC\CRM\Appointments_dead.csv` | 1 |
+
+### Retell API Call Logs
+
+| File | Path | Records | Date Range |
+|------|------|---------|------------|
+| **Call Log Export 1** | `C:\Users\peter\Downloads\CC\CRM\call_log_sheet_export.json` | 15,156 | Aug-Oct 2025 |
+| **Call Log Export 2** | `C:\Users\peter\Downloads\CC\CRM\call_log_sheet2_export.json` | 6,844 | Jun-Jul 2025 |
+| **Total** | | **22,000** | Jun-Oct 2025 |
+
+**Note:** These exports may have gaps. For complete data, query Retell API directly.
 
 ---
 
@@ -108,7 +109,6 @@ Before running import:
 |---------|------|---------|
 | 24 | All Telemarketer Contacts | Everyone imported |
 | 25 | Safe to Contact | Available for campaigns |
-| 27 | DO NOT CALL | Manual additions only (verified DNC requests) |
 | 28 | Had Appointments | Has appointment data |
 | 29 | Previously Called | Called but no appointment |
 
@@ -122,7 +122,6 @@ client = BrevoClient()
 lists = [
     ('All Telemarketer Contacts', 24),
     ('Safe to Contact', 25),
-    ('DO NOT CALL', 27),
     ('Had Appointments', 28),
     ('Previously Called', 29),
 ]
@@ -192,8 +191,8 @@ for name, expected_id in lists:
 **NEVER search transcripts** - causes massive false positives! (e.g., "etel" matches "completely")
 
 **Call Log Files (from Retell export):**
-- `C:\Users\peter\Downloads\CC\CRM\call_log_sheet_export.json` (Aug-Oct 2025)
-- `C:\Users\peter\Downloads\CC\CRM\call_log_sheet2_export.json` (Jun-Jul 2025)
+- `C:\Users\peter\Downloads\CC\CRM\call_log_sheet_export.json` (15,156 records, Aug-Oct 2025)
+- `C:\Users\peter\Downloads\CC\CRM\call_log_sheet2_export.json` (6,844 records, Jun-Jul 2025)
 
 **IMPORTANT:** These exports may have gaps. For complete data, query Retell API directly:
 ```bash
@@ -256,27 +255,42 @@ print(f'With Recordings: {has_recording}')
 ## PHASE 3: Import Bulk Contacts (Batched)
 
 ### 3.1 Source File
-`C:\Users\peter\Downloads\CC\CRM\Master_Contacts_With_Flags.csv`
+`C:\Users\peter\Downloads\CC\CRM\Master_Contacts_With_Flags.csv` (54,086 records)
 
 ### 3.2 Fields to Import
-- email (required)
-- first_name, last_name → FIRSTNAME, LASTNAME
-- company → COMPANY
-- phone → SMS (if valid, not already in use)
-- source_list → SOURCE
-- was_called → determines list assignment
 
-### 3.3 List Assignment Logic (CORRECTED)
+From Master_Contacts_With_Flags.csv:
+- `phone` - Phone number (primary key for matching)
+- `first_name` -> FIRSTNAME
+- `last_name` -> LASTNAME
+- `email` -> email (required)
+- `company` -> COMPANY
+- `website` -> (for company enrichment)
+- `city`, `state` -> Location info
+- `source_list` -> SOURCE
+- `was_called` -> determines list assignment
+- `call_count` -> NOTES (call history)
 
-**Note:** The `is_dnc` flag is incorrect in the source data. Do NOT use it for DNC assignment.
+**Additional fields to enrich from HubSpot files:**
+From All_Contacts_2025_07_07_Cleaned.csv:
+- Job Title
+- Street Address
+- Postal Code
+- NeverBounce Validation Result
+
+From All_Companies_2025-07-07_Cleaned_For_HubSpot.csv:
+- Google reviews, GBP rating
+- Industry, Business type
+- Business Description
+- Social media links
+
+### 3.3 List Assignment Logic
 
 ```python
 if was_called:
     lists = [24, 25, 29]  # All + Safe + Previously Called
 else:
     lists = [24, 25]  # All + Safe (Fresh leads)
-
-# DNC is MANUAL ONLY - add known DNC contacts individually
 ```
 
 ### 3.4 Batch Import Command
@@ -299,16 +313,16 @@ After each batch, verify quality before continuing.
 **Create companies from ALL these sources:**
 
 1. **Appointment Data** (highest quality - verified real names)
-   - `C:\Users\peter\Downloads\CC\CRM\Appointments_Enriched.csv`
+   - `C:\Users\peter\Downloads\CC\CRM\Appointments_Enriched.csv` (87 records)
    - Use `company` field directly
 
 2. **HubSpot Companies Export** (verified business data)
-   - `C:\Users\peter\Documents\HS\All_Companies_2025-07-07_Cleaned_For_HubSpot.csv`
+   - `C:\Users\peter\Documents\HS\All_Companies_2025-07-07_Cleaned_For_HubSpot.csv` (363,516 records)
    - Use `Company name` field
    - Rich data: phone, address, Google reviews, industry
 
 3. **HubSpot Contacts Export** (if company name present)
-   - `C:\Users\peter\Documents\HS\All_Contacts_2025_07_07_Cleaned.csv`
+   - `C:\Users\peter\Documents\HS\All_Contacts_2025_07_07_Cleaned.csv` (207,277 records)
    - Use `Company Name` field
 
 **NEVER create companies from:**
@@ -393,7 +407,7 @@ result = client.get_contacts(limit=1)
 print(f'Total contacts: {result[\"data\"][\"count\"]}')
 
 # List counts
-lists = [(24, 'All'), (25, 'Safe'), (27, 'DNC'), (28, 'Appointments'), (29, 'Called')]
+lists = [(24, 'All'), (25, 'Safe'), (28, 'Appointments'), (29, 'Called')]
 for lid, name in lists:
     result = client._request('GET', f'contacts/lists/{lid}')
     count = result['data'].get('totalSubscribers', 0) if result.get('success') else 0
@@ -409,9 +423,8 @@ print(f'Companies: {len(result.get(\"data\", {}).get(\"items\", []))}')
 
 | Metric | Expected |
 |--------|----------|
-| Total contacts | ~35,000 |
-| Appointment contacts (list 28) | ~87 |
-| DNC contacts (list 27) | ~1 (manual only) |
+| Total contacts | ~54,000 |
+| Appointment contacts (list 28) | 87 |
 | Companies | ~50-100 (from appointments + HubSpot) |
 | Contacts with names | 100% of appointments, ~10% of bulk |
 | Contacts with recordings | 70%+ of appointments |
@@ -437,7 +450,6 @@ print(f'Companies: {len(result.get(\"data\", {}).get(\"items\", []))}')
 - [ ] `bulk_import_appointments.py` - Does NOT use transcript search
 - [ ] `bulk_import_appointments.py` - Uses phone matching for name enrichment
 - [ ] `bulk_import_appointments.py` - Searches large HubSpot files for missing data
-- [ ] `bulk_import_contacts.py` - Does NOT use is_dnc flag for DNC list
 - [ ] `bulk_import_contacts.py` - Supports batch-size parameter
 - [ ] `create_companies_from_appointments.py` - Uses all data sources (not just appointments)
 - [ ] `create_companies_from_appointments.py` - Properly rejects URL-like names
@@ -449,19 +461,17 @@ print(f'Companies: {len(result.get(\"data\", {}).get(\"items\", []))}')
 ### Data Quality Issues (from previous import)
 
 1. **93% of bulk contacts had no name** - This is expected (raw email lists)
-2. **DNC flag was incorrect** - is_dnc flag meant "already called", not real DNC
-3. **48/87 companies had URL-like names** - From using domain as name
-4. **Transcript search caused false positives** - "etel" matched "completely"
-5. **Name enrichment was incomplete** - Didn't search large HubSpot files
+2. **48/87 companies had URL-like names** - From using domain as name
+3. **Transcript search caused false positives** - "etel" matched "completely"
+4. **Name enrichment was incomplete** - Didn't search large HubSpot files
 
 ### Rules to Prevent Issues
 
 1. **Names:** Only expect names on appointment contacts; bulk is email-only
-2. **DNC:** MANUAL ONLY - don't trust is_dnc flag in source data
-3. **Companies:** Use multiple sources, but require real business names
-4. **Domains:** Never use personal email domains (gmail, hotmail, etc.)
-5. **Call search:** Phone + timestamp ONLY, never transcript
-6. **Enrichment:** Search ALL large datasets before flagging for manual review
+2. **Companies:** Use multiple sources, but require real business names
+3. **Domains:** Never use personal email domains (gmail, hotmail, etc.)
+4. **Call search:** Phone + timestamp ONLY, never transcript
+5. **Enrichment:** Search ALL large datasets before flagging for manual review
 
 ---
 
