@@ -1,32 +1,83 @@
 # Comprehensive Brevo Import Plan
 
 **Created:** 2025-12-13
-**Updated:** 2025-12-14 (v5 - Complete with Excel Phone + Full Retell Call Data)
+**Updated:** 2025-12-14 (v6 - Telco Warehouse PostgreSQL Integration)
 **Status:** TESTED AND VERIFIED
-**Approach:** All-in-one import from 5 data sources
+**Approach:** All-in-one import from 6 data sources
 
 ---
 
-## v5 Changes (2025-12-14)
+## v6 Changes (2025-12-14)
 
-### New Data Sources Added:
+### NEW: Telco Warehouse PostgreSQL Database
+
+**Reference:** `C:\Users\peter\Downloads\CC\Telcos\TELCO_WAREHOUSE_CRM_HANDOFF.md`
+
+The Telco Warehouse is a PostgreSQL database containing **74,107 voice calls** from ALL providers:
+- **Retell AI:** 37,715 calls (AI-powered conversations with full transcripts)
+- **Zadarma:** 35,690 calls (SIP/VoIP calls)
+- **Telnyx:** 702 calls (SIP/VoIP calls)
+- **SMS Messages:** 8 (MobileMessage)
+
+**Connection Details:**
+```
+Host:     96.47.238.189
+Port:     5432
+Database: telco_warehouse
+User:     telco_sync
+Password: TelcoSync2024!
+Schema:   telco
+```
+
+**Key Tables:**
+- `telco.calls` - All voice calls with transcripts, recordings, sentiment
+- `telco.messages` - SMS messages
+- `telco.providers` - Provider lookup (1=zadarma, 2=telnyx, 3=retell, 4=mobilemessage)
+
+**Why v6 is Better Than v5:**
+1. **More calls:** 74K calls vs 22K from JSON files
+2. **Multiple providers:** Retell + Zadarma + Telnyx (not just Retell)
+3. **Real-time queryable:** SQL instead of static JSON files
+4. **Richer data:** Full transcripts, sentiment analysis, call_analysis JSONB
+
+### New Brevo Attributes (v6):
+- `TELCO_PROVIDER` - Which provider (retell, zadarma, telnyx)
+- `TELCO_TOTAL_CALLS` - Total calls across ALL providers
+- `TELCO_CALL_SUMMARY` - AI-generated call summary (Retell only)
+- `TELCO_SENTIMENT` - User sentiment (Retell only)
+- `ZADARMA_CALL_COUNT` - Zadarma-specific call count
+- `TELNYX_CALL_COUNT` - Telnyx-specific call count
+
+### Existing Retell Attributes (kept from v5):
+- `RETELL_CALL_ID` - Unique call identifier
+- `RETELL_RECORDING_URL` - Clickable link to WAV recording
+- `RETELL_PUBLIC_LOG_URL` - Clickable link to call log
+- `RETELL_TRANSCRIPT` - Full conversation text
+- `RETELL_CALL_DIRECTION` - INBOUND or OUTBOUND
+- `RETELL_CALL_DURATION` - Human-readable (e.g., "1m 43s")
+- `RETELL_CALL_STATUS` - ended, etc.
+- `RETELL_DISCONNECT_REASON` - user_hangup, agent_hangup, etc.
+- `RETELL_CALL_COST` - Cost in dollars
+- `RETELL_CALL_COUNT` - Total Retell calls with this contact
+
+### Scripts:
+- `import_3_companies_v6.py` - Main import script (uses Telco Warehouse PostgreSQL)
+- `import_3_companies_v5.py` - Previous version (JSON-based, kept for reference)
+- `enrich_retell_calls.py` - Standalone Retell enrichment (for existing contacts)
+
+---
+
+## v5 Changes (2025-12-14) - SUPERSEDED BY V6
+
+### Data Sources (v5 - now replaced by v6):
 1. **Excel Appointments** (`AI Appointments Set 2025.xlsx`)
    - Phone numbers extracted from "Phone Call" rows (e.g., `Phone Call : +61424023677 -> +61399997398`)
    - 39 phone numbers extracted from actual call records
 
-2. **Full Retell Call Data** (not just logs)
-   - `RETELL_CALL_ID` - Unique call identifier
-   - `RETELL_RECORDING_URL` - Clickable link to WAV recording
-   - `RETELL_PUBLIC_LOG_URL` - Clickable link to call log
-   - `RETELL_TRANSCRIPT` - Full conversation text
-   - `RETELL_CALL_DIRECTION` - INBOUND or OUTBOUND
-   - `RETELL_CALL_DURATION` - Human-readable (e.g., "1m 43s")
-   - `RETELL_CALL_STATUS` - ended, etc.
-   - `RETELL_DISCONNECT_REASON` - user_hangup, agent_hangup, etc.
-   - `RETELL_CALL_COST` - Cost in dollars
-   - `RETELL_CALL_COUNT` - Total calls with this contact
+2. **Full Retell Call Data** (from JSON - now superseded by Telco Warehouse)
+   - Call data from `call_log_sheet_export.json` and `call_log_sheet2_export.json`
 
-### Test Results (5 Companies):
+### Test Results (5 Companies - v5):
 | Contact | Total Fields | Sources Used |
 |---------|--------------|--------------|
 | Reignite Health | 23 | HubSpot Company |
@@ -34,10 +85,6 @@
 | JTW Building Group | 24 | Excel + Retell |
 | Lumiere Home Renovations | 38 | HubSpot Co + Contact + Excel + Retell |
 | CLG Electrics | 25 | HubSpot Contact + Excel + Retell |
-
-### Scripts:
-- `import_3_companies_v5.py` - Main import script (all 5 sources)
-- `enrich_retell_calls.py` - Standalone Retell enrichment (for existing contacts)
 
 ---
 
@@ -272,14 +319,25 @@ After running a test import of 200 records, the following corrections were ident
 
 **IMPORTANT:** The `do_not_call.txt` file is MISNAMED. It contains numbers that were called (for dialer deduplication), NOT actual DNC requests. Only 1 person ever requested DNC - handle manually.
 
-#### Retell API Call Logs
+#### Telco Warehouse PostgreSQL Database (v6 - Primary Source)
+
+| Data | Location | Records | Used In Plan? |
+|------|----------|---------|---------------|
+| **All Voice Calls** | `telco.calls` on 96.47.238.189:5432 | 74,107 | YES - v6 primary |
+| **SMS Messages** | `telco.messages` on 96.47.238.189:5432 | 8 | YES - v6 |
+
+**Reference:** `C:\Users\peter\Downloads\CC\Telcos\TELCO_WAREHOUSE_CRM_HANDOFF.md`
+
+**Total call records:** 74,107 calls covering May-Dec 2025 (Retell + Zadarma + Telnyx)
+
+#### Retell API Call Logs (v5 - Legacy, superseded by Telco Warehouse)
 
 | File | Full Path | Records | Used In Plan? |
 |------|-----------|---------|---------------|
-| **Call Log Export 1** | `C:\Users\peter\Downloads\CC\CRM\call_log_sheet_export.json` | 15,156 | YES - Phase 5 RETELL_LOG |
-| **Call Log Export 2** | `C:\Users\peter\Downloads\CC\CRM\call_log_sheet2_export.json` | 6,844 | YES - Phase 5 RETELL_LOG |
+| **Call Log Export 1** | `C:\Users\peter\Downloads\CC\CRM\call_log_sheet_export.json` | 15,156 | NO - replaced by Telco Warehouse |
+| **Call Log Export 2** | `C:\Users\peter\Downloads\CC\CRM\call_log_sheet2_export.json` | 6,844 | NO - replaced by Telco Warehouse |
 
-**Total call records:** 22,000 calls covering Jun-Oct 2025
+**Total call records (legacy):** 22,000 calls - now superseded by Telco Warehouse (74K)
 
 ---
 
@@ -727,20 +785,25 @@ if len(new_name) > len(existing_name):
 
 ---
 
-## PHASE 5: Add Call Log Data (RETELL_LOG)
+## PHASE 5: Add Call Log Data (Telco Warehouse)
 
 **Duration:** 30 minutes
 **Risk:** Low
 
 ### Match Call Logs to Contacts
 
-**Sources:**
-- `C:\Users\peter\Downloads\CC\CRM\call_log_sheet_export.json` (15,156 calls)
-- `C:\Users\peter\Downloads\CC\CRM\call_log_sheet2_export.json` (6,844 calls)
+**Source (v6):** Telco Warehouse PostgreSQL Database
+- **Connection:** `96.47.238.189:5432` / `telco_warehouse` / `telco_sync`
+- **Reference:** `C:\Users\peter\Downloads\CC\Telcos\TELCO_WAREHOUSE_CRM_HANDOFF.md`
+
+**Available Data:**
+- 74,107 total calls (Retell: 37,715 + Zadarma: 35,690 + Telnyx: 702)
+- Full transcripts, recording URLs, sentiment analysis
+- Call cost, duration, direction, disposition
 
 **Matching Method:**
-1. Phone number match (last 9 digits of to_number)
-2. 22,000 calls → 19,470 unique phones
+1. Phone number match (last 9 digits of from_number or to_number)
+2. Query: `SELECT * FROM telco.calls WHERE from_number LIKE '%phone9digits%' OR to_number LIKE '%phone9digits%'`
 
 **RETELL_LOG Format:**
 ```

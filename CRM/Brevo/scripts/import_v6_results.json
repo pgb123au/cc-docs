@@ -1,0 +1,81 @@
+{
+  "companies": [
+    {
+      "name": "Reignite Health",
+      "id": "693de27858677e43aa29c453",
+      "source": "hubspot"
+    },
+    {
+      "name": "Paradise Distributors",
+      "id": "693de2817401fb2953b750b8",
+      "source": "hubspot"
+    },
+    {
+      "name": "JTW building group",
+      "id": "693de2917401fb2953b750b9",
+      "source": "appointment"
+    },
+    {
+      "name": "Lumiere Home Renovations",
+      "id": "693de29a58677e43aa29c454",
+      "source": "hubspot"
+    },
+    {
+      "name": "CLG Electrics",
+      "id": "693de2a858677e43aa29c455",
+      "source": "appointment"
+    }
+  ],
+  "contacts": [
+    {
+      "email": "sara@reignitehealth.com.au",
+      "name": "Sara Lehmann",
+      "id": 35742,
+      "company_id": "693de27858677e43aa29c453",
+      "excel_phone": null,
+      "telco_calls": 0,
+      "hubspot_company_enriched": true,
+      "hubspot_contact_enriched": false
+    },
+    {
+      "email": "bchalmers616@gmail.com",
+      "name": "Bob Chalmers",
+      "id": 35743,
+      "company_id": "693de2817401fb2953b750b8",
+      "excel_phone": "+61408687109",
+      "telco_calls": 1,
+      "hubspot_company_enriched": true,
+      "hubspot_contact_enriched": false
+    },
+    {
+      "email": "Joe@jtwbuildinggroup.com.au",
+      "name": "Joe Van Stripe",
+      "id": 35744,
+      "company_id": "693de2917401fb2953b750b9",
+      "excel_phone": "+61424023677",
+      "telco_calls": 1,
+      "hubspot_company_enriched": false,
+      "hubspot_contact_enriched": false
+    },
+    {
+      "email": "info@lumierehomerenovations.com.au",
+      "name": "Chantelle",
+      "id": 35745,
+      "company_id": "693de29a58677e43aa29c454",
+      "excel_phone": "+61423238679",
+      "telco_calls": 1,
+      "hubspot_company_enriched": true,
+      "hubspot_contact_enriched": true
+    },
+    {
+      "email": "chris@clgelectrics.com.au",
+      "name": "Chris",
+      "id": 35746,
+      "company_id": "693de2a858677e43aa29c455",
+      "excel_phone": "+61402140955",
+      "telco_calls": 1,
+      "hubspot_company_enriched": false,
+      "hubspot_contact_enriched": true
+    }
+  ]
+}
