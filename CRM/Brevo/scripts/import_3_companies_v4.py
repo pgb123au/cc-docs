@@ -124,6 +124,37 @@ def find_appointment(company_name):
     return None
 
 
+def try_phone_formats(phone):
+    """Generate different phone formats to try with Brevo."""
+    if not phone:
+        return []
+
+    # Clean to digits only
+    digits = ''.join(c for c in phone if c.isdigit())
+
+    formats = []
+
+    # If starts with 61 (Australia)
+    if digits.startswith('61') and len(digits) >= 11:
+        # +61XXXXXXXXX
+        formats.append('+' + digits)
+        # Without plus
+        formats.append(digits)
+        # With spaces: +61 4XX XXX XXX
+        if len(digits) == 11:
+            formats.append(f'+{digits[:2]} {digits[2:5]} {digits[5:8]} {digits[8:]}')
+    elif digits.startswith('0') and len(digits) == 10:
+        # Australian format starting with 0
+        formats.append('+61' + digits[1:])
+        formats.append('61' + digits[1:])
+    else:
+        # Just use what we have
+        formats.append(phone)
+        formats.append(digits)
+
+    return formats
+
+
 def create_company_from_hubspot(hubspot_data):
     """Create Brevo company from HubSpot data with ALL available fields."""
     name = hubspot_data.get('Company name', '').strip()
@@ -133,13 +164,6 @@ def create_company_from_hubspot(hubspot_data):
     domain = hubspot_data.get('Company Domain Name', '').strip()
     if domain and not domain.startswith('http') and '/' not in domain:
         attributes["domain"] = domain
-
-    # Phone - with retry on failure
-    phone = hubspot_data.get('Company Phone Number', '').strip()
-    if phone:
-        cleaned = ''.join(c for c in phone if c.isdigit() or c == '+')
-        if len(cleaned) >= 8:
-            attributes["phone_number"] = phone
 
     # Industry
     industry = hubspot_data.get('Industry', '').strip()
@@ -153,40 +177,105 @@ def create_company_from_hubspot(hubspot_data):
         location = ', '.join(filter(None, [city, state]))
         attributes["city"] = location
 
-    result = client._request('POST', 'companies', {"attributes": attributes})
+    # Phone - try multiple formats
+    phone = hubspot_data.get('Company Phone Number', '').strip()
+    phone_formats = try_phone_formats(phone) if phone else []
 
-    if result.get('success'):
-        return result['data'].get('id'), hubspot_data, None
-
-    # Retry without phone if validation failed
-    error = result.get('error', '')
-    if 'phone_number' in str(error) and 'phone_number' in attributes:
-        print(f"    Retrying without phone (validation failed)...")
-        del attributes['phone_number']
+    for phone_fmt in phone_formats:
+        attributes["phone_number"] = phone_fmt
         result = client._request('POST', 'companies', {"attributes": attributes})
         if result.get('success'):
-            return result['data'].get('id'), hubspot_data, "Created without phone"
+            print(f"    Phone accepted in format: {phone_fmt}")
+            return result['data'].get('id'), hubspot_data, None
+        error = result.get('error', '')
+        print(f"    Phone format {phone_fmt} failed: {error}")
+
+    # Try without phone if all formats failed
+    if 'phone_number' in attributes:
+        del attributes['phone_number']
+
+    result = client._request('POST', 'companies', {"attributes": attributes})
+    if result.get('success'):
+        return result['data'].get('id'), hubspot_data, f"Created without phone (tried: {phone})"
 
     return None, None, result.get('error', 'Unknown error')
 
 
+def extract_domain_from_email(email):
+    """Extract business domain from email (skip personal email providers)."""
+    if not email or '@' not in email:
+        return None
+    domain = email.split('@')[1].lower()
+    # Skip personal email providers
+    personal_domains = ['gmail.com', 'hotmail.com', 'yahoo.com', 'outlook.com',
+                       'icloud.com', 'live.com', 'msn.com', 'bigpond.com',
+                       'optusnet.com.au', 'mail.com', 'aol.com']
+    if domain in personal_domains:
+        return None
+    return domain
+
+
 def create_company_from_appointment(appt_data):
-    """Create Brevo company from appointment data."""
+    """Create Brevo company from appointment data with ALL available fields."""
     name = appt_data.get('company', '').strip()
     if not name:
         return None, None, "No company name"
 
     attributes = {"name": name}
 
+    # Domain - extract from email if business email
+    email = appt_data.get('email', '').strip()
+    domain = extract_domain_from_email(email)
+    if domain:
+        attributes["domain"] = domain
+
+    # Website from website_from_list
+    website = appt_data.get('website_from_list', '').strip()
+    if website:
+        # Clean up website to get domain if needed
+        if website.startswith('http'):
+            # Extract domain from URL for company domain if we don't have one
+            if 'domain' not in attributes:
+                import re
+                match = re.search(r'https?://(?:www\.)?([^/]+)', website)
+                if match:
+                    attributes["domain"] = match.group(1)
+
     # Location if available
     location = appt_data.get('location', '').strip()
     if location:
         attributes["city"] = location
 
-    result = client._request('POST', 'companies', {"attributes": attributes})
+    # Company from list might be different/better
+    company_from_list = appt_data.get('company_from_list', '').strip()
+    if company_from_list and company_from_list.lower() != name.lower():
+        # Store as additional info - might be alternate name
+        pass  # Could add as note if Brevo supports
 
+    print(f"    Company attributes (before phone): {attributes}")
+
+    # Phone - try multiple formats
+    phone_from_list = appt_data.get('phone_from_list', '').strip()
+    phone_formats = try_phone_formats(phone_from_list) if phone_from_list else []
+
+    for phone_fmt in phone_formats:
+        attributes["phone_number"] = phone_fmt
+        result = client._request('POST', 'companies', {"attributes": attributes})
+        if result.get('success'):
+            print(f"    Phone accepted in format: {phone_fmt}")
+            return result['data'].get('id'), None, None
+        error = result.get('error', '')
+        print(f"    Phone format {phone_fmt} failed: {error}")
+
+    # Try without phone if all formats failed or no phone
+    if 'phone_number' in attributes:
+        del attributes['phone_number']
+
+    result = client._request('POST', 'companies', {"attributes": attributes})
     if result.get('success'):
-        return result['data'].get('id'), None, None
+        warning = f"Created without phone (tried: {phone_from_list})" if phone_from_list else None
+        return result['data'].get('id'), None, warning
+
     return None, None, result.get('error', 'Unknown error')
 
 
@@ -393,6 +482,28 @@ def create_contact(appt_data, company_id, company_name, source_type, hubspot_dat
     website = appt_data.get('website_from_list', '').strip()
     if website:
         attributes['WEBSITE'] = website
+
+    # Location from appointments (if no HubSpot enrichment)
+    if 'CITY' not in attributes:
+        location = appt_data.get('location', '').strip()
+        if location:
+            # Parse "Suburb, State" format
+            if ',' in location:
+                parts = [p.strip() for p in location.split(',')]
+                if parts[0]:
+                    attributes['SUBURB'] = parts[0]
+                if len(parts) > 1 and parts[1]:
+                    # Could be "VIC" or "Victoria"
+                    attributes['STATE_REGION'] = parts[1]
+            else:
+                attributes['CITY'] = location
+
+    # Domain from email (if no HubSpot enrichment)
+    if 'COMPANY_DOMAIN' not in attributes:
+        email = appt_data.get('email', '').strip()
+        domain = extract_domain_from_email(email)
+        if domain:
+            attributes['COMPANY_DOMAIN'] = domain
 
     # === SOURCE TRACKING ===
     source_sheet = appt_data.get('source_sheet', '').strip()

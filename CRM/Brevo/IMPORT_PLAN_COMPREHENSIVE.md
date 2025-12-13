@@ -1,9 +1,52 @@
 # Comprehensive Brevo Import Plan
 
 **Created:** 2025-12-13
-**Updated:** 2025-12-13 (v2 with corrections)
+**Updated:** 2025-12-13 (v3 with mandatory data rule)
 **Status:** READY FOR APPROVAL
 **Approach:** Layer-by-layer import (contacts first, then enrich with appointments/calls)
+
+---
+
+## ⚠️ MANDATORY DATA IMPORT RULE (v3)
+
+**ALL COMPANY AND CONTACT DATA AND ALL OTHER RELATED DATA MUST COME INTO BREVO!**
+
+The ONLY exception: Do not overwrite existing good data with worse/empty data.
+
+### What This Means:
+
+1. **Every available field must be imported** - If it exists in source data, it goes into Brevo
+2. **Companies must have ALL available attributes:**
+   - Domain (from HubSpot or email domain)
+   - Industry (from HubSpot)
+   - Phone (from HubSpot, appointments, or contact)
+   - City/Location (from HubSpot or appointments `location` field)
+   - Website (from appointments `website_from_list` field)
+   - All social links (from HubSpot)
+   - All business intelligence (revenue, employees, etc.)
+3. **Contacts must have ALL available attributes:**
+   - All phone numbers (SMS, PHONE_2, PHONE_3)
+   - All location fields (city, state, suburb, postal code)
+   - All enrichment data from HubSpot match
+   - All call log data
+4. **Never leave a field empty if data exists somewhere**
+
+### Merge Priority (when data exists in multiple sources):
+1. HubSpot Companies (most complete)
+2. HubSpot Contacts
+3. Appointments Enriched
+4. Call Logs
+5. Master Contacts
+
+### Example - Company Must Have:
+```
+Company: Paradise Distributors
+  - name: Paradise Distributors ✅
+  - domain: (extract from contact email if no HubSpot match)
+  - phone_number: (from contact's phone if available)
+  - city: (from location field if available)
+  - website: (from website_from_list if available)
+```
 
 ---
 

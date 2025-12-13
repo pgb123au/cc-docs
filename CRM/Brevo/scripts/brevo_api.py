@@ -14,8 +14,8 @@ import requests
 from datetime import datetime
 from pathlib import Path
 
-# Load API key from file
-API_KEY_PATH = Path(__file__).parent.parent.parent / "Brevo_API_Key.txt"
+# Load API key from file (CC/Brevo_API_Key.txt - 4 levels up from scripts/)
+API_KEY_PATH = Path(__file__).parent.parent.parent.parent / "Brevo_API_Key.txt"
 
 def get_api_key():
     """Load Brevo API key from file."""
