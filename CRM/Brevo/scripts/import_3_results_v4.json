@@ -2,17 +2,27 @@
   "companies": [
     {
       "name": "Reignite Health",
-      "id": "693d3c9e7401fb2953b748fe",
+      "id": "693db7d77401fb2953b74e51",
       "source": "hubspot"
     },
     {
       "name": "Paradise Distributors",
-      "id": "693d3ca77401fb2953b748ff",
+      "id": "693db7e058677e43aa29c1dc",
       "source": "hubspot"
     },
     {
       "name": "JTW building group",
-      "id": "693d3cb458677e43aa29bc86",
+      "id": "693db7ee7401fb2953b74e54",
+      "source": "appointment"
+    },
+    {
+      "name": "Lumiere Home Renovations",
+      "id": "693db7f558677e43aa29c1de",
+      "source": "hubspot"
+    },
+    {
+      "name": "CLG Electrics",
+      "id": "693db8017401fb2953b74e57",
       "source": "appointment"
     }
   ],
@@ -20,26 +30,42 @@
     {
       "email": "sara@reignitehealth.com.au",
       "name": "Sara Lehmann",
-      "id": 35724,
-      "company_id": "693d3c9e7401fb2953b748fe",
+      "id": 35727,
+      "company_id": "693db7d77401fb2953b74e51",
       "hubspot_company_enriched": true,
       "hubspot_contact_enriched": false
     },
     {
       "email": "bchalmers616@gmail.com",
       "name": "Bob Chalmers",
-      "id": 35725,
-      "company_id": "693d3ca77401fb2953b748ff",
+      "id": 35728,
+      "company_id": "693db7e058677e43aa29c1dc",
       "hubspot_company_enriched": true,
       "hubspot_contact_enriched": false
     },
     {
       "email": "Joe@jtwbuildinggroup.com.au",
       "name": "Joe Van Stripe",
-      "id": 35726,
-      "company_id": "693d3cb458677e43aa29bc86",
+      "id": 35729,
+      "company_id": "693db7ee7401fb2953b74e54",
       "hubspot_company_enriched": false,
       "hubspot_contact_enriched": false
+    },
+    {
+      "email": "info@lumierehomerenovations.com.au",
+      "name": "Chantelle",
+      "id": 35730,
+      "company_id": "693db7f558677e43aa29c1de",
+      "hubspot_company_enriched": true,
+      "hubspot_contact_enriched": true
+    },
+    {
+      "email": "chris@clgelectrics.com.au",
+      "name": "Chris",
+      "id": 35731,
+      "company_id": "693db8017401fb2953b74e57",
+      "hubspot_company_enriched": false,
+      "hubspot_contact_enriched": true
     }
   ]
 }

@@ -1,18 +1,18 @@
 """
-Import 3 companies - V4 COMPLETE
-Fixes ALL field mapping issues identified in the mapping report.
+Import 5 companies - V4.2 COMPLETE
+Imports from ALL sources: HubSpot Companies + HubSpot Contacts + Appointments + Call Logs
 
-FIXES FROM V3:
-1. EMAIL_VALIDATION (was EMAIL_VALID - wrong name)
-2. MATCH_SOURCE now exists and stores
-3. HubSpot enrichment flows to contacts (COMPANY_DOMAIN, INDUSTRY, etc.)
-4. Enhanced RETELL_LOG with call duration, direction, recording
-5. All available HubSpot fields mapped
+V4.2 ADDS:
+- HubSpot Contacts CSV lookup (207K contacts, 46 fields)
+- 26 new contact-level attributes
+- 5 test companies (was 3)
 
 Companies:
-- Reignite Health (in HubSpot - full enrichment)
-- Paradise Distributors (not in HubSpot)
-- JTW Building Group (not in HubSpot)
+- Reignite Health (HubSpot Company + Appointment)
+- Paradise Distributors (HubSpot Company + Appointment)
+- JTW Building Group (Appointment only)
+- Lumiere Home Renovations (HubSpot Company + HubSpot Contact + Appointment) - FULL ENRICHMENT
+- CLG Electrics (HubSpot Contact + Appointment)
 """
 
 import csv
@@ -36,7 +36,9 @@ client = BrevoClient()
 TARGETS = [
     'Reignite Health',
     'Paradise Distributors',
-    'JTW building group'
+    'JTW building group',
+    'Lumiere Home Renovations',  # v4.2: Has HubSpot Company + Contact + Appointment
+    'CLG Electrics'              # v4.2: Has HubSpot Contact + Appointment (no company)
 ]
 
 
@@ -852,13 +854,14 @@ def create_contact(appt_data, company_id, company_name, source_type, hubspot_dat
 
 def main():
     print("=" * 70)
-    print("IMPORT 3 COMPANIES - V4.2 (ALL HUBSPOT DATA)")
+    print("IMPORT 5 COMPANIES - V4.2 (ALL HUBSPOT DATA)")
     print("=" * 70)
     print()
-    print("v4.2 adds:")
-    print("  + HubSpot Contacts CSV lookup (207K contacts)")
-    print("  + ALL 46 contact fields mapped")
-    print("  + 30+ new Brevo attributes for contact data")
+    print("v4.2 sources:")
+    print("  + HubSpot Companies CSV (363K companies)")
+    print("  + HubSpot Contacts CSV (207K contacts)")
+    print("  + Appointments Enriched")
+    print("  + Call Logs (22K calls)")
     print()
 
     # Load call logs for enhanced RETELL_LOG
