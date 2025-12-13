@@ -172,13 +172,37 @@ class TelnyxAPI:
         resp = requests.get(f"{self.base_url}{endpoint}", headers=headers, params=params)
         return resp.json()
 
+    def request_url(self, url):
+        """Request a full URL (for pagination)"""
+        headers = {"Authorization": f"Bearer {self.api_key}"}
+        resp = requests.get(url, headers=headers)
+        return resp.json()
+
     def get_balance(self):
         return self.request("/balance")
 
     def get_numbers(self):
         return self.request("/phone_numbers")
 
+    def get_call_events_all(self, max_pages=50):
+        """Get ALL call events with pagination"""
+        all_events = []
+        page = 1
+        while page <= max_pages:
+            result = self.request("/call_events", {"page[size]": 250, "page[number]": page})
+            if "data" not in result or not result["data"]:
+                break
+            all_events.extend(result["data"])
+            # Check if there are more pages
+            meta = result.get("meta", {})
+            total_pages = meta.get("total_pages", 1)
+            if page >= total_pages:
+                break
+            page += 1
+        return {"data": all_events}
+
     def get_call_events(self, limit=50):
+        """Legacy method - use get_call_events_all for full sync"""
         return self.request("/call_events", {"page[size]": limit})
 
     def get_fqdn_connections(self):
@@ -201,6 +225,22 @@ class TelnyxAPI:
 
     def get_porting_orders(self, limit=50):
         return self.request("/porting_orders", {"page[size]": limit})
+
+    def get_messages_all(self, max_pages=50):
+        """Get ALL SMS/MMS messages with pagination"""
+        all_messages = []
+        page = 1
+        while page <= max_pages:
+            result = self.request("/messages", {"page[size]": 250, "page[number]": page})
+            if "data" not in result or not result["data"]:
+                break
+            all_messages.extend(result["data"])
+            meta = result.get("meta", {})
+            total_pages = meta.get("total_pages", 1)
+            if page >= total_pages:
+                break
+            page += 1
+        return {"data": all_messages}
 
     def get_messages(self, limit=50):
         """Get SMS/MMS messages"""
@@ -557,11 +597,12 @@ def sync_telnyx(conn):
         conn.commit()
         print(f"  [OK] {len(numbers.get('data', []))} numbers synced")
 
-    # CDRs from call_events (NEW - item 8)
+    # CDRs from call_events - NOW WITH FULL PAGINATION
     print("\n[Call Events/CDRs]")
-    events = api.get_call_events(limit=50)
+    events = api.get_call_events_all(max_pages=100)  # Get ALL events
     if "data" in events and events["data"]:
         count = 0
+        inserted = 0
         for e in events["data"]:
             event_id = e.get('id', '')
             with conn.cursor() as cur:
@@ -574,17 +615,20 @@ def sync_telnyx(conn):
                 """, (provider_id, event_id, e.get('from', ''), e.get('to', ''),
                       e.get('direction', ''), e.get('occurred_at'),
                       e.get('event_type', ''), Json(e)))
+                if cur.rowcount > 0:
+                    inserted += 1
             count += 1
         conn.commit()
-        print(f"  [OK] {count} call events synced")
+        print(f"  [OK] {count} call events checked, {inserted} new records inserted")
     else:
         print("  [INFO] No call events found")
 
-    # SMS Messages (NEW - item 9)
+    # SMS Messages - NOW WITH FULL PAGINATION
     print("\n[SMS Messages]")
-    messages = api.get_messages(limit=50)
+    messages = api.get_messages_all(max_pages=100)  # Get ALL messages
     if "data" in messages and messages["data"]:
         count = 0
+        inserted = 0
         for m in messages["data"]:
             msg_id = m.get('id', '')
             with conn.cursor() as cur:
@@ -606,9 +650,11 @@ def sync_telnyx(conn):
                       m.get('cost', {}).get('currency', 'USD') if isinstance(m.get('cost'), dict) else 'USD',
                       m.get('sent_at'),
                       Json(m)))
+                if cur.rowcount > 0:
+                    inserted += 1
             count += 1
         conn.commit()
-        print(f"  [OK] {count} messages synced")
+        print(f"  [OK] {count} messages checked, {inserted} new records inserted")
     else:
         print("  [INFO] No messages found")
 
