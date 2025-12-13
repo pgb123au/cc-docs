@@ -534,9 +534,16 @@ def sync_zadarma(conn):
     # Call history
     print("\n[Call History]")
     if stats.get("status") == "success":
-        calls = stats.get("stats", [])[:50]
+        calls = stats.get("stats", [])
         for c in calls:
             call_id = c.get('id', c.get('callid', str(hash(str(c)))))
+            # Zadarma uses 'from'/'to'/'callstart' while some APIs use 'src'/'dst'/'calldate'
+            from_num = c.get('from') or c.get('src')
+            to_num = c.get('to') or c.get('dst')
+            call_start = c.get('callstart') or c.get('calldate')
+            duration = c.get('billseconds') or c.get('duration', 0)
+            billable = c.get('billseconds') or c.get('billsec', 0)
+
             with conn.cursor() as cur:
                 cur.execute("""
                     INSERT INTO telco.calls
@@ -544,13 +551,21 @@ def sync_zadarma(conn):
                      started_at, duration_seconds, billable_seconds, status, disposition,
                      cost, currency, has_recording, raw_data)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                    ON CONFLICT (provider_id, external_call_id) DO NOTHING
-                """, (provider_id, str(call_id), c.get('src'), c.get('dst'),
+                    ON CONFLICT (provider_id, external_call_id) DO UPDATE SET
+                        from_number = COALESCE(EXCLUDED.from_number, telco.calls.from_number),
+                        to_number = COALESCE(EXCLUDED.to_number, telco.calls.to_number),
+                        started_at = COALESCE(EXCLUDED.started_at, telco.calls.started_at),
+                        duration_seconds = COALESCE(EXCLUDED.duration_seconds, telco.calls.duration_seconds),
+                        billable_seconds = COALESCE(EXCLUDED.billable_seconds, telco.calls.billable_seconds),
+                        disposition = COALESCE(EXCLUDED.disposition, telco.calls.disposition),
+                        raw_data = EXCLUDED.raw_data
+                """, (provider_id, str(call_id), str(from_num) if from_num else None,
+                      str(to_num) if to_num else None,
                       'outbound' if c.get('direction') == 'outgoing' else 'inbound',
-                      c.get('calldate'), c.get('duration', 0), c.get('billsec', 0),
+                      call_start, duration, billable,
                       c.get('disposition'), c.get('disposition'),
                       c.get('cost', 0), c.get('currency', 'USD'),
-                      bool(c.get('recording')), Json(c)))
+                      bool(c.get('recording') or c.get('is_recorded')), Json(c)))
         conn.commit()
         print(f"  [OK] {len(calls)} calls synced")
 
