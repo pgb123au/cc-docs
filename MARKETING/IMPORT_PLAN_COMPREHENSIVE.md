@@ -37,6 +37,120 @@
 
 ---
 
+## DATA FILES INVENTORY
+
+### ORIGINAL SOURCE FILES (Raw Data)
+
+#### HubSpot CRM Exports (2025-07-07)
+
+| File | Full Path | Records | Used In Plan? |
+|------|-----------|---------|---------------|
+| **HubSpot Companies** | `C:\Users\peter\Documents\HS\All_Companies_2025-07-07_Cleaned_For_HubSpot.csv` | 363,516 | YES - Phase 3 company enrichment |
+| **HubSpot Contacts** | `C:\Users\peter\Documents\HS\All_Contacts_2025_07_07_Cleaned.csv` | 207,277 | YES - Phase 1B + enrichment |
+
+**Note:** Copies also exist at `C:\Users\peter\Downloads\CC\CRM\` - identical files, use either location.
+
+#### Telemarketer Dialer Original Files
+
+| File | Full Path | Records | Used In Plan? |
+|------|-----------|---------|---------------|
+| **Massive List - Main** | `C:\Users\peter\retell-dialer\massive_list.csv` | 47,086 | NO - superseded by Master_Contacts |
+| **Massive List - Victoria** | `C:\Users\peter\retell-dialer\massive_list_vic.csv` | 19,238 | NO - superseded by Master_Contacts |
+| **Pakenham Companies** | `C:\Users\peter\retell-dialer\companies_pakenham.csv` | 196 | NO - merged into Master_Contacts |
+| **Called Log (Text)** | `C:\Users\peter\retell-dialer\called_log.txt` | 27,785 | NO - superseded by call_log JSON |
+| **Called Log (Backup)** | `C:\Users\peter\retell-dialer\called_log_backup.txt` | 13,455 | NO - backup only |
+| **Called Numbers (JSON)** | `C:\Users\peter\retell-dialer\called_numbers.json` | 27,799 | NO - use Retell call logs instead |
+| **Do Not Call List** | `C:\Users\peter\retell-dialer\do_not_call.txt` | 1,051 | NO - MISNAMED (see note below) |
+| **Invalid Numbers** | `C:\Users\peter\retell-dialer\invalid_numbers.txt` | 12,511 | NO - reference only |
+
+**IMPORTANT:** The `do_not_call.txt` file is MISNAMED. It contains numbers that were called (for dialer deduplication), NOT actual DNC requests. Only 1 person ever requested DNC - handle manually.
+
+#### Retell API Call Logs
+
+| File | Full Path | Records | Used In Plan? |
+|------|-----------|---------|---------------|
+| **Call Log Export 1** | `C:\Users\peter\Downloads\CC\CRM\call_log_sheet_export.json` | 15,156 | YES - Phase 5 RETELL_LOG |
+| **Call Log Export 2** | `C:\Users\peter\Downloads\CC\CRM\call_log_sheet2_export.json` | 6,844 | YES - Phase 5 RETELL_LOG |
+
+**Total call records:** 22,000 calls covering Jun-Oct 2025
+
+---
+
+### DERIVED/PROCESSED FILES (Created from originals)
+
+#### Master Contact Files
+
+| File | Full Path | Records | Created From | Used In Plan? |
+|------|-----------|---------|--------------|---------------|
+| **Master Contacts With Flags** | `C:\Users\peter\Downloads\CC\CRM\Master_Contacts_With_Flags.csv` | 54,086 | massive_list + massive_list_vic + call logs | YES - Phase 1A primary import |
+| **Fresh Leads Never Called** | `C:\Users\peter\Downloads\CC\CRM\Fresh_Leads_Never_Called.csv` | 24,335 | Master minus called contacts | NO - subset of Master |
+| **Safe To Contact** | `C:\Users\peter\Downloads\CC\CRM\Safe_To_Contact.csv` | 21,693 | Called contacts (was mislabeled) | NO - subset of Master |
+| **DO NOT CALL Master** | `C:\Users\peter\Downloads\CC\CRM\DO_NOT_CALL_Master.csv` | 852 | do_not_call.txt deduplicated | NO - MISNAMED, delete |
+| **Brevo Import Filtered** | `C:\Users\peter\Downloads\CC\CRM\Brevo_Import_Filtered.csv` | 754 | All_Contacts + All_Companies filtered | NO - old partial export |
+
+#### Appointment Files
+
+| File | Full Path | Records | Source | Used In Plan? |
+|------|-----------|---------|--------|---------------|
+| **All Appointments Extracted** | `C:\Users\peter\Downloads\CC\CRM\All_Appointments_Extracted.csv` | 87 | Google Sheet (all 4 tabs) | NO - superseded by Enriched |
+| **Appointments Enriched** | `C:\Users\peter\Downloads\CC\CRM\Appointments_Enriched.csv` | 87 | All_Appointments + phone matching | YES - Phase 4 primary |
+| **Retell Matched** | `C:\Users\peter\Downloads\CC\CRM\retell_matched_20251213_054522.json` | 84 | Appointments matched to calls | Reference only |
+
+#### Appointment Sub-files (by Status)
+
+| File | Full Path | Records | Used In Plan? |
+|------|-----------|---------|---------------|
+| **Appointments Won** | `C:\Users\peter\Downloads\CC\CRM\Appointments_won.csv` | 6 | Reference - status in Enriched |
+| **Appointments Followup** | `C:\Users\peter\Downloads\CC\CRM\Appointments_followup.csv` | 15 | Reference - status in Enriched |
+| **Appointments Booked** | `C:\Users\peter\Downloads\CC\CRM\Appointments_booked.csv` | 4 | Reference - status in Enriched |
+| **Appointments No Show** | `C:\Users\peter\Downloads\CC\CRM\Appointments_no_show.csv` | 13 | Reference - status in Enriched |
+| **Appointments Bad Prospect** | `C:\Users\peter\Downloads\CC\CRM\Appointments_bad_prospect.csv` | 16 | Reference - status in Enriched |
+| **Appointments Contacted** | `C:\Users\peter\Downloads\CC\CRM\Appointments_contacted.csv` | 10 | Reference - status in Enriched |
+| **Appointments Dead** | `C:\Users\peter\Downloads\CC\CRM\Appointments_dead.csv` | 1 | Reference - status in Enriched |
+| **Appointments Reschedule** | `C:\Users\peter\Downloads\CC\CRM\Appointments_reschedule.csv` | 5 | Reference - status in Enriched |
+| **Appointments Seen** | `C:\Users\peter\Downloads\CC\CRM\Appointments_seen.csv` | 2 | Reference - status in Enriched |
+
+**Note:** Appointment sub-files are reference only. All status data is consolidated in `Appointments_Enriched.csv`.
+
+---
+
+### FILES NOT USED IN THIS PLAN
+
+| File | Path | Records | Reason Not Used |
+|------|------|---------|-----------------|
+| massive_list.csv | `C:\Users\peter\retell-dialer\` | 47,086 | Superseded by Master_Contacts_With_Flags |
+| massive_list_vic.csv | `C:\Users\peter\retell-dialer\` | 19,238 | Superseded by Master_Contacts_With_Flags |
+| companies_pakenham.csv | `C:\Users\peter\retell-dialer\` | 196 | Merged into Master_Contacts |
+| called_log.txt | `C:\Users\peter\retell-dialer\` | 27,785 | Use Retell JSON exports instead (richer data) |
+| called_log_backup.txt | `C:\Users\peter\retell-dialer\` | 13,455 | Backup only |
+| called_numbers.json | `C:\Users\peter\retell-dialer\` | 27,799 | Use Retell call_log exports (have recordings) |
+| do_not_call.txt | `C:\Users\peter\retell-dialer\` | 1,051 | MISNAMED - not actual DNC |
+| invalid_numbers.txt | `C:\Users\peter\retell-dialer\` | 12,511 | Reference only |
+| DO_NOT_CALL_Master.csv | `C:\Users\peter\Downloads\CC\CRM\` | 852 | MISNAMED - should be deleted |
+| Fresh_Leads_Never_Called.csv | `C:\Users\peter\Downloads\CC\CRM\` | 24,335 | Subset of Master - use Master directly |
+| Safe_To_Contact.csv | `C:\Users\peter\Downloads\CC\CRM\` | 21,693 | Subset of Master - use Master directly |
+| Brevo_Import_Filtered.csv | `C:\Users\peter\Downloads\CC\CRM\` | 754 | Old partial export - outdated |
+| All_Appointments_Extracted.csv | `C:\Users\peter\Downloads\CC\CRM\` | 87 | Superseded by Appointments_Enriched |
+| Appointment sub-files (9 files) | `C:\Users\peter\Downloads\CC\CRM\` | 72 total | Status data in Enriched file |
+
+---
+
+### SUMMARY: FILES ACTUALLY USED
+
+| Phase | File | Path | Records |
+|-------|------|------|---------|
+| 1A | Master_Contacts_With_Flags.csv | `C:\Users\peter\Downloads\CC\CRM\` | 54,086 (34,796 with email) |
+| 1B | All_Contacts_2025_07_07_Cleaned.csv | `C:\Users\peter\Documents\HS\` | 207,277 |
+| 2 | All_Contacts_2025_07_07_Cleaned.csv | (same as 1B) | For enrichment |
+| 3 | All_Companies_2025-07-07_Cleaned_For_HubSpot.csv | `C:\Users\peter\Documents\HS\` | 363,516 |
+| 4 | Appointments_Enriched.csv | `C:\Users\peter\Downloads\CC\CRM\` | 87 (82 with email) |
+| 5 | call_log_sheet_export.json | `C:\Users\peter\Downloads\CC\CRM\` | 15,156 |
+| 5 | call_log_sheet2_export.json | `C:\Users\peter\Downloads\CC\CRM\` | 6,844 |
+
+**Total unique source files used:** 5 files
+
+---
+
 ## PHASE 0: Create Brevo Attributes
 
 **Duration:** 5 minutes
