@@ -45,7 +45,11 @@ DB_CONFIG = {
 
 def load_credentials():
     """Load API credentials from .credentials file"""
-    cred_file = Path(__file__).parent.parent / ".credentials"
+    # On server: /opt/telco_sync/.credentials (same dir as script)
+    # Local: parent.parent would be CC/.credentials
+    cred_file = Path(__file__).parent / ".credentials"
+    if not cred_file.exists():
+        cred_file = Path(__file__).parent.parent / ".credentials"
     creds = {}
     if cred_file.exists():
         with open(cred_file) as f:
@@ -788,223 +792,392 @@ def sync_telnyx(conn):
         print(f"  [OK] {count} number orders synced")
 
 
-def sync_retell(conn):
-    """Sync all Retell data"""
-    print("\n" + "=" * 60)
-    print("SYNCING RETELL (EXPANDED)")
-    print("=" * 60)
+def get_retell_workspaces(conn):
+    """Get all active Retell workspaces from database"""
+    workspaces = []
+    with conn.cursor() as cur:
+        cur.execute("""
+            SELECT workspace_id, workspace_name, api_key_full
+            FROM telco.retell_workspaces
+            WHERE is_active = TRUE
+        """)
+        for row in cur.fetchall():
+            workspaces.append({
+                'workspace_id': row[0],
+                'workspace_name': row[1],
+                'api_key': row[2]
+            })
+    return workspaces
 
-    api_key = load_retell_api_key()
-    if not api_key:
-        print("  [SKIP] No Retell API key")
-        return
+
+def sync_retell_workspace_calls(conn, provider_id, workspace_id, workspace_name, api_key, agent_map):
+    """Sync ALL calls from a single Retell workspace using timestamp pagination"""
+    from retell import Retell
+
+    client = Retell(api_key=api_key)
+
+    # Get the oldest call timestamp we already have for this workspace
+    with conn.cursor() as cur:
+        cur.execute("""
+            SELECT MIN(started_at) FROM telco.calls
+            WHERE provider_id = %s AND workspace_id = %s
+        """, (provider_id, workspace_id))
+        result = cur.fetchone()
+        existing_oldest = result[0] if result and result[0] else None
+
+    # Also get newest to check for new calls
+    with conn.cursor() as cur:
+        cur.execute("""
+            SELECT MAX(started_at) FROM telco.calls
+            WHERE provider_id = %s AND workspace_id = %s
+        """, (provider_id, workspace_id))
+        result = cur.fetchone()
+        existing_newest = result[0] if result and result[0] else None
+
+    total_synced = 0
+    total_new = 0
+
+    # Strategy: Get new calls (after newest) and old calls (before oldest)
+
+    # 1. Get NEW calls (if any existing data)
+    if existing_newest:
+        newest_ts = int(existing_newest.timestamp() * 1000) + 1
+        print(f"    Checking for new calls after {existing_newest}...")
+        batch_count = 0
+        while batch_count < 100:
+            try:
+                calls = client.call.list(
+                    limit=1000,
+                    sort_order='ascending',
+                    filter_criteria={'start_timestamp': {'lower_threshold': newest_ts}}
+                )
+                if not calls:
+                    break
+
+                for c in calls:
+                    call_dict = make_json_serializable(c.__dict__) if hasattr(c, '__dict__') else {}
+                    inserted = sync_single_retell_call(conn, provider_id, workspace_id, workspace_name,
+                                                       call_dict, agent_map)
+                    total_synced += 1
+                    if inserted:
+                        total_new += 1
+
+                    ts = getattr(c, 'start_timestamp', None)
+                    if ts and ts > newest_ts:
+                        newest_ts = ts + 1
+
+                conn.commit()
+                batch_count += 1
+
+                if len(calls) < 1000:
+                    break
+
+            except Exception as e:
+                print(f"    [ERROR] {e}")
+                break
+
+    # 2. Get OLD historical calls (before oldest or all if no existing)
+    if existing_oldest:
+        oldest_ts = int(existing_oldest.timestamp() * 1000) - 1
+        print(f"    Backfilling calls before {existing_oldest}...")
+    else:
+        oldest_ts = None
+        print(f"    Initial sync - fetching all historical calls...")
+
+    batch_count = 0
+    while batch_count < 100:  # Safety limit
+        try:
+            filter_criteria = {}
+            if oldest_ts:
+                filter_criteria = {'start_timestamp': {'upper_threshold': oldest_ts}}
+
+            calls = client.call.list(
+                limit=1000,
+                sort_order='descending',
+                filter_criteria=filter_criteria
+            )
+
+            if not calls:
+                break
+
+            for c in calls:
+                call_dict = make_json_serializable(c.__dict__) if hasattr(c, '__dict__') else {}
+                inserted = sync_single_retell_call(conn, provider_id, workspace_id, workspace_name,
+                                                   call_dict, agent_map)
+                total_synced += 1
+                if inserted:
+                    total_new += 1
+
+                ts = getattr(c, 'start_timestamp', None)
+                if ts:
+                    if oldest_ts is None or ts < oldest_ts:
+                        oldest_ts = ts - 1
+
+            conn.commit()
+            batch_count += 1
+            print(f"      Batch {batch_count}: {len(calls)} calls (total new: {total_new})")
+
+            if len(calls) < 1000:
+                break
+
+        except Exception as e:
+            print(f"    [ERROR] {e}")
+            break
+
+    return total_synced, total_new
+
+
+def sync_single_retell_call(conn, provider_id, workspace_id, workspace_name, c, agent_map):
+    """Sync a single Retell call to database. Returns True if inserted (new)."""
+    agent_name = agent_map.get(c.get('agent_id'), c.get('agent_id', ''))
+    duration_sec = (c.get('duration_ms') or 0) // 1000
+
+    started_at = None
+    ended_at = None
+    if c.get('start_timestamp'):
+        started_at = datetime.fromtimestamp(c['start_timestamp'] / 1000)
+    if c.get('end_timestamp'):
+        ended_at = datetime.fromtimestamp(c['end_timestamp'] / 1000)
+
+    transcript = c.get('transcript', '')
+    transcript_words = len(transcript.split()) if transcript else 0
+
+    with conn.cursor() as cur:
+        cur.execute("""
+            INSERT INTO telco.calls
+            (provider_id, external_call_id, from_number, to_number, direction,
+             started_at, ended_at, duration_seconds, status,
+             retell_agent_id, retell_agent_name, transcript, full_transcript, transcript_words,
+             has_recording, recording_url, workspace_id, workspace_name, raw_data)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            ON CONFLICT (provider_id, external_call_id) DO UPDATE SET
+                from_number = COALESCE(NULLIF(EXCLUDED.from_number, ''), telco.calls.from_number),
+                to_number = COALESCE(NULLIF(EXCLUDED.to_number, ''), telco.calls.to_number),
+                direction = COALESCE(NULLIF(EXCLUDED.direction, ''), telco.calls.direction),
+                ended_at = COALESCE(EXCLUDED.ended_at, telco.calls.ended_at),
+                duration_seconds = COALESCE(EXCLUDED.duration_seconds, telco.calls.duration_seconds),
+                status = EXCLUDED.status,
+                transcript = COALESCE(NULLIF(EXCLUDED.transcript, ''), telco.calls.transcript),
+                full_transcript = COALESCE(NULLIF(EXCLUDED.full_transcript, ''), telco.calls.full_transcript),
+                transcript_words = GREATEST(EXCLUDED.transcript_words, telco.calls.transcript_words),
+                has_recording = EXCLUDED.has_recording OR telco.calls.has_recording,
+                recording_url = COALESCE(NULLIF(EXCLUDED.recording_url, ''), telco.calls.recording_url),
+                workspace_id = COALESCE(EXCLUDED.workspace_id, telco.calls.workspace_id),
+                workspace_name = COALESCE(EXCLUDED.workspace_name, telco.calls.workspace_name),
+                raw_data = EXCLUDED.raw_data
+        """, (provider_id, c.get('call_id'), c.get('from_number') or None, c.get('to_number') or None,
+              c.get('direction') or None, started_at, ended_at, duration_sec,
+              c.get('call_status'), c.get('agent_id'), agent_name,
+              transcript[:500] if transcript else None,
+              transcript,
+              transcript_words,
+              bool(c.get('recording_url')),
+              c.get('recording_url'),
+              workspace_id, workspace_name,
+              Json(c)))
+        inserted = cur.rowcount > 0
+
+    # Insert call analysis if present
+    analysis = c.get('call_analysis')
+    if analysis:
+        with conn.cursor() as cur:
+            cur.execute("""
+                INSERT INTO telco.call_analysis
+                (call_id, provider_id, agent_id, agent_name, call_summary,
+                 call_sentiment, user_sentiment, call_successful, in_voicemail,
+                 custom_analysis, latency_stats, raw_analysis)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                ON CONFLICT (call_id) DO UPDATE SET
+                    call_summary = EXCLUDED.call_summary,
+                    call_sentiment = EXCLUDED.call_sentiment
+            """, (c.get('call_id'), provider_id, c.get('agent_id'), agent_name,
+                  analysis.get('call_summary', ''),
+                  analysis.get('call_sentiment', ''),
+                  analysis.get('user_sentiment', ''),
+                  analysis.get('call_successful'),
+                  analysis.get('in_voicemail'),
+                  Json(analysis.get('custom_analysis_data', {})),
+                  Json(c.get('latency', {})),
+                  Json(analysis)))
+
+    return inserted
+
+
+def sync_retell(conn):
+    """Sync all Retell data from ALL workspaces"""
+    print("\n" + "=" * 60)
+    print("SYNCING RETELL (MULTI-WORKSPACE)")
+    print("=" * 60)
 
     if not RETELL_AVAILABLE:
         print("  [SKIP] retell-sdk not installed")
         return
 
-    api = RetellAPI(api_key)
     provider_id = get_provider_id(conn, "retell")
 
-    # Agents
-    print("\n[Agents]")
-    agents = api.get_agents()
+    # Get all active workspaces
+    workspaces = get_retell_workspaces(conn)
+    if not workspaces:
+        # Fallback to single API key from credentials
+        api_key = load_retell_api_key()
+        if api_key:
+            workspaces = [{'workspace_id': 'ws_primary', 'workspace_name': 'Primary', 'api_key': api_key}]
+        else:
+            print("  [SKIP] No Retell workspaces or API key configured")
+            return
+
+    print(f"  Found {len(workspaces)} workspace(s)")
+
+    # Build global agent map from all workspaces
     agent_map = {}
-    for a in agents[:50]:
-        agent_map[a['agent_id']] = a['agent_name']
-        with conn.cursor() as cur:
-            cur.execute("""
-                INSERT INTO telco.retell_agents
-                (agent_id, agent_name, voice_id, language, webhook_url, last_synced)
-                VALUES (%s, %s, %s, %s, %s, NOW())
-                ON CONFLICT (agent_id) DO UPDATE SET
-                    agent_name = EXCLUDED.agent_name, webhook_url = EXCLUDED.webhook_url, last_synced = NOW()
-            """, (a['agent_id'], a['agent_name'], a.get('voice_id'),
-                  a.get('language'), a.get('webhook_url')))
-    conn.commit()
-    print(f"  [OK] {len(agents)} agents synced")
 
-    # Phone numbers
-    print("\n[Phone Numbers]")
-    numbers = api.get_numbers()
-    for n in numbers:
-        phone = n.get("phone_number", "")
-        agent_name = agent_map.get(n.get('inbound_agent_id'), '')
-        with conn.cursor() as cur:
-            cur.execute("""
-                INSERT INTO telco.phone_numbers
-                (provider_id, phone_number, phone_number_e164, nickname,
-                 retell_agent_id, retell_agent_name, last_synced)
-                VALUES (%s, %s, %s, %s, %s, %s, NOW())
-                ON CONFLICT (provider_id, phone_number) DO UPDATE SET
-                    retell_agent_id = EXCLUDED.retell_agent_id,
-                    retell_agent_name = EXCLUDED.retell_agent_name,
-                    last_synced = NOW()
-            """, (provider_id, phone, phone, n.get('nickname'),
-                  n.get('inbound_agent_id'), agent_name))
-    conn.commit()
-    print(f"  [OK] {len(numbers)} numbers synced")
+    for ws in workspaces:
+        print(f"\n  --- Workspace: {ws['workspace_name']} ---")
 
-    # Recent calls with full transcripts (NEW - items 17, 18)
-    # Increased limit to get more historical calls for searching
-    print("\n[Calls + Analysis + Transcripts]")
-    calls = api.get_calls(limit=500)
-    for c in calls:
-        agent_name = agent_map.get(c.get('agent_id'), c.get('agent_id', ''))
-        duration_sec = (c.get('duration_ms') or 0) // 1000
+        try:
+            api = RetellAPI(ws['api_key'])
 
-        started_at = None
-        ended_at = None
-        if c.get('start_timestamp'):
-            started_at = datetime.fromtimestamp(c['start_timestamp'] / 1000)
-        if c.get('end_timestamp'):
-            ended_at = datetime.fromtimestamp(c['end_timestamp'] / 1000)
+            # Sync agents for this workspace
+            agents = api.get_agents()
+            for a in agents:
+                agent_map[a['agent_id']] = a['agent_name']
+                with conn.cursor() as cur:
+                    cur.execute("""
+                        INSERT INTO telco.retell_agents
+                        (agent_id, agent_name, voice_id, language, webhook_url, last_synced)
+                        VALUES (%s, %s, %s, %s, %s, NOW())
+                        ON CONFLICT (agent_id) DO UPDATE SET
+                            agent_name = EXCLUDED.agent_name, webhook_url = EXCLUDED.webhook_url, last_synced = NOW()
+                    """, (a['agent_id'], a['agent_name'], a.get('voice_id'),
+                          a.get('language'), a.get('webhook_url')))
+            conn.commit()
+            print(f"    [OK] {len(agents)} agents synced")
 
-        transcript = c.get('transcript', '')
-        transcript_words = len(transcript.split()) if transcript else 0
+            # Sync phone numbers
+            numbers = api.get_numbers()
+            for n in numbers:
+                phone = n.get("phone_number", "")
+                agent_name_for_num = agent_map.get(n.get('inbound_agent_id'), '')
+                with conn.cursor() as cur:
+                    cur.execute("""
+                        INSERT INTO telco.phone_numbers
+                        (provider_id, phone_number, phone_number_e164, nickname,
+                         retell_agent_id, retell_agent_name, last_synced)
+                        VALUES (%s, %s, %s, %s, %s, %s, NOW())
+                        ON CONFLICT (provider_id, phone_number) DO UPDATE SET
+                            retell_agent_id = EXCLUDED.retell_agent_id,
+                            retell_agent_name = EXCLUDED.retell_agent_name,
+                            last_synced = NOW()
+                    """, (provider_id, phone, phone, n.get('nickname'),
+                          n.get('inbound_agent_id'), agent_name_for_num))
+            conn.commit()
+            print(f"    [OK] {len(numbers)} numbers synced")
 
-        # Insert/update call
-        # Use COALESCE to preserve existing phone numbers if new values are NULL/empty
-        with conn.cursor() as cur:
-            cur.execute("""
-                INSERT INTO telco.calls
-                (provider_id, external_call_id, from_number, to_number, direction,
-                 started_at, ended_at, duration_seconds, status,
-                 retell_agent_id, retell_agent_name, transcript, full_transcript, transcript_words,
-                 has_recording, recording_url, raw_data)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                ON CONFLICT (provider_id, external_call_id) DO UPDATE SET
-                    from_number = COALESCE(NULLIF(EXCLUDED.from_number, ''), telco.calls.from_number),
-                    to_number = COALESCE(NULLIF(EXCLUDED.to_number, ''), telco.calls.to_number),
-                    direction = COALESCE(NULLIF(EXCLUDED.direction, ''), telco.calls.direction),
-                    ended_at = COALESCE(EXCLUDED.ended_at, telco.calls.ended_at),
-                    duration_seconds = COALESCE(EXCLUDED.duration_seconds, telco.calls.duration_seconds),
-                    status = EXCLUDED.status,
-                    transcript = COALESCE(NULLIF(EXCLUDED.transcript, ''), telco.calls.transcript),
-                    full_transcript = COALESCE(NULLIF(EXCLUDED.full_transcript, ''), telco.calls.full_transcript),
-                    transcript_words = GREATEST(EXCLUDED.transcript_words, telco.calls.transcript_words),
-                    has_recording = EXCLUDED.has_recording OR telco.calls.has_recording,
-                    recording_url = COALESCE(NULLIF(EXCLUDED.recording_url, ''), telco.calls.recording_url),
-                    raw_data = EXCLUDED.raw_data
-            """, (provider_id, c.get('call_id'), c.get('from_number') or None, c.get('to_number') or None,
-                  c.get('direction') or None, started_at, ended_at, duration_sec,
-                  c.get('call_status'), c.get('agent_id'), agent_name,
-                  transcript[:500] if transcript else None,  # Short version
-                  transcript,  # Full version
-                  transcript_words,
-                  bool(c.get('recording_url')),
-                  c.get('recording_url'), Json(make_json_serializable(c))))
+            # Sync ALL calls with pagination
+            print(f"    [Syncing calls...]")
+            total, new = sync_retell_workspace_calls(
+                conn, provider_id, ws['workspace_id'], ws['workspace_name'],
+                ws['api_key'], agent_map
+            )
+            print(f"    [OK] {total} calls checked, {new} new records")
 
-        # Insert call analysis (NEW - item 17)
-        analysis = c.get('call_analysis')
-        if analysis:
+            # Update workspace stats
             with conn.cursor() as cur:
                 cur.execute("""
-                    INSERT INTO telco.call_analysis
-                    (call_id, provider_id, agent_id, agent_name, call_summary,
-                     call_sentiment, user_sentiment, call_successful, in_voicemail,
-                     custom_analysis, latency_stats, raw_analysis)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                    ON CONFLICT (call_id) DO UPDATE SET
-                        call_summary = EXCLUDED.call_summary,
-                        call_sentiment = EXCLUDED.call_sentiment
-                """, (c.get('call_id'), provider_id, c.get('agent_id'), agent_name,
-                      analysis.get('call_summary', ''),
-                      analysis.get('call_sentiment', ''),
-                      analysis.get('user_sentiment', ''),
-                      analysis.get('call_successful'),
-                      analysis.get('in_voicemail'),
-                      Json(analysis.get('custom_analysis_data', {})),
-                      Json(c.get('latency', {})),
-                      Json(analysis)))
+                    UPDATE telco.retell_workspaces
+                    SET last_synced = NOW(),
+                        total_calls = (SELECT COUNT(*) FROM telco.calls WHERE workspace_id = %s)
+                    WHERE workspace_id = %s
+                """, (ws['workspace_id'], ws['workspace_id']))
+            conn.commit()
 
-    conn.commit()
-    print(f"  [OK] {len(calls)} calls with analysis synced")
+        except Exception as e:
+            print(f"    [ERROR] {e}")
+            continue
 
-    # Knowledge Bases (NEW - item 19)
-    print("\n[Knowledge Bases]")
-    kbs = api.get_knowledge_bases()
-    if kbs:
-        count = 0
-        for kb in kbs:
-            kb_id = kb.get('knowledge_base_id', kb.get('id', ''))
+    # Sync shared resources from primary workspace
+    api_key = load_retell_api_key()
+    if api_key:
+        api = RetellAPI(api_key)
+
+        # Knowledge Bases
+        print("\n[Knowledge Bases]")
+        kbs = api.get_knowledge_bases()
+        if kbs:
+            count = 0
+            for kb in kbs:
+                kb_id = kb.get('knowledge_base_id', kb.get('id', ''))
+                with conn.cursor() as cur:
+                    cur.execute("""
+                        INSERT INTO telco.knowledge_bases
+                        (provider_id, kb_id, kb_name, description, last_synced)
+                        VALUES (%s, %s, %s, %s, NOW())
+                        ON CONFLICT (kb_id) DO UPDATE SET
+                            kb_name = EXCLUDED.kb_name, last_synced = NOW()
+                    """, (provider_id, kb_id, kb.get('knowledge_base_name', kb.get('name', '')),
+                          kb.get('description', '')))
+                count += 1
+            conn.commit()
+            print(f"  [OK] {count} knowledge bases synced")
+
+        # LLM Configs
+        print("\n[LLM Configurations]")
+        llms = api.get_llms()
+        if llms:
+            count = 0
+            for llm in llms:
+                llm_id = llm.get('llm_id', llm.get('id', ''))
+                with conn.cursor() as cur:
+                    cur.execute("""
+                        INSERT INTO telco.llm_configs
+                        (provider_id, llm_id, llm_name, model, temperature, metadata, last_synced)
+                        VALUES (%s, %s, %s, %s, %s, %s, NOW())
+                        ON CONFLICT (llm_id) DO UPDATE SET
+                            llm_name = EXCLUDED.llm_name, last_synced = NOW()
+                    """, (provider_id, llm_id, llm.get('llm_name', ''),
+                          llm.get('model', ''), llm.get('general_temperature'),
+                          Json(llm)))
+                count += 1
+            conn.commit()
+            print(f"  [OK] {count} LLM configs synced")
+
+        # Voice Configs
+        print("\n[Voice Configurations]")
+        voices = api.get_voices()
+        if voices:
+            count = 0
+            for v in voices:
+                voice_id = v.get('voice_id', v.get('id', ''))
+                with conn.cursor() as cur:
+                    cur.execute("""
+                        INSERT INTO telco.voice_configs
+                        (provider_id, voice_id, voice_name, provider_voice, language, gender, accent, metadata, last_synced)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW())
+                        ON CONFLICT (voice_id) DO UPDATE SET
+                            voice_name = EXCLUDED.voice_name, last_synced = NOW()
+                    """, (provider_id, voice_id, v.get('voice_name', ''),
+                          v.get('provider', ''), v.get('language', ''),
+                          v.get('gender', ''), v.get('accent', ''), Json(v)))
+                count += 1
+            conn.commit()
+            print(f"  [OK] {count} voices synced")
+
+        # Concurrency Stats
+        print("\n[Concurrency Stats]")
+        conc = api.get_concurrency()
+        if conc:
             with conn.cursor() as cur:
                 cur.execute("""
-                    INSERT INTO telco.knowledge_bases
-                    (provider_id, kb_id, kb_name, description, last_synced)
-                    VALUES (%s, %s, %s, %s, NOW())
-                    ON CONFLICT (kb_id) DO UPDATE SET
-                        kb_name = EXCLUDED.kb_name, last_synced = NOW()
-                """, (provider_id, kb_id, kb.get('knowledge_base_name', kb.get('name', '')),
-                      kb.get('description', '')))
-            count += 1
-        conn.commit()
-        print(f"  [OK] {count} knowledge bases synced")
-    else:
-        print("  [INFO] No knowledge bases found")
-
-    # LLM Configs (NEW - item 20)
-    print("\n[LLM Configurations]")
-    llms = api.get_llms()
-    if llms:
-        count = 0
-        for llm in llms:
-            llm_id = llm.get('llm_id', llm.get('id', ''))
-            with conn.cursor() as cur:
-                cur.execute("""
-                    INSERT INTO telco.llm_configs
-                    (provider_id, llm_id, llm_name, model, temperature, metadata, last_synced)
-                    VALUES (%s, %s, %s, %s, %s, %s, NOW())
-                    ON CONFLICT (llm_id) DO UPDATE SET
-                        llm_name = EXCLUDED.llm_name, last_synced = NOW()
-                """, (provider_id, llm_id, llm.get('llm_name', ''),
-                      llm.get('model', ''), llm.get('general_temperature'),
-                      Json(llm)))
-            count += 1
-        conn.commit()
-        print(f"  [OK] {count} LLM configs synced")
-    else:
-        print("  [INFO] No LLM configs found")
-
-    # Voice Configs (NEW - item 21)
-    print("\n[Voice Configurations]")
-    voices = api.get_voices()
-    if voices:
-        count = 0
-        for v in voices:
-            voice_id = v.get('voice_id', v.get('id', ''))
-            with conn.cursor() as cur:
-                cur.execute("""
-                    INSERT INTO telco.voice_configs
-                    (provider_id, voice_id, voice_name, provider_voice, language, gender, accent, metadata, last_synced)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW())
-                    ON CONFLICT (voice_id) DO UPDATE SET
-                        voice_name = EXCLUDED.voice_name, last_synced = NOW()
-                """, (provider_id, voice_id, v.get('voice_name', ''),
-                      v.get('provider', ''), v.get('language', ''),
-                      v.get('gender', ''), v.get('accent', ''), Json(v)))
-            count += 1
-        conn.commit()
-        print(f"  [OK] {count} voices synced")
-    else:
-        print("  [INFO] No voices found (or API not available)")
-
-    # Concurrency Stats (NEW - item 24)
-    print("\n[Concurrency Stats]")
-    conc = api.get_concurrency()
-    if conc:
-        with conn.cursor() as cur:
-            cur.execute("""
-                INSERT INTO telco.concurrency_stats
-                (provider_id, current_concurrent, max_concurrent, calls_in_progress, metadata)
-                VALUES (%s, %s, %s, %s, %s)
-            """, (provider_id, conc.get('current_concurrency', 0),
-                  conc.get('concurrency_limit', 0),
-                  conc.get('current_concurrency', 0), Json(conc)))
-        conn.commit()
-        print(f"  [OK] Concurrency: {conc.get('current_concurrency', 0)}/{conc.get('concurrency_limit', 0)}")
-    else:
-        print("  [INFO] Concurrency API not available")
+                    INSERT INTO telco.concurrency_stats
+                    (provider_id, current_concurrent, max_concurrent, calls_in_progress, metadata)
+                    VALUES (%s, %s, %s, %s, %s)
+                """, (provider_id, conc.get('current_concurrency', 0),
+                      conc.get('concurrency_limit', 0),
+                      conc.get('current_concurrency', 0), Json(conc)))
+            conn.commit()
+            print(f"  [OK] Concurrency: {conc.get('current_concurrency', 0)}/{conc.get('concurrency_limit', 0)}")
+        else:
+            print("  [INFO] Concurrency API not available")
 
 
 # ============================================================================
