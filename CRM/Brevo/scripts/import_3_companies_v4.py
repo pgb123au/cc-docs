@@ -30,12 +30,13 @@ CALL_LOG_2 = Path(r"C:\Users\peter\Downloads\CC\CRM\call_log_sheet2_export.json"
 
 client = BrevoClient()
 
-# Target companies
-TARGETS = {
-    'reignite health': 'hubspot',
-    'paradise distributors': 'appointment',
-    'jtw building group': 'appointment'
-}
+# Target companies - ALWAYS check HubSpot first for ALL companies
+# Only use 'appointment' as fallback if not found in HubSpot
+TARGETS = [
+    'Reignite Health',
+    'Paradise Distributors',
+    'JTW building group'
+]
 
 
 def load_call_logs():
@@ -170,12 +171,9 @@ def create_company_from_hubspot(hubspot_data):
     if industry:
         attributes["industry"] = industry
 
-    # Location - combine city and state
-    city = hubspot_data.get('City', '').strip()
-    state = hubspot_data.get('State/Region', '').strip()
-    if city or state:
-        location = ', '.join(filter(None, [city, state]))
-        attributes["city"] = location
+    # Note: Brevo companies don't have built-in city/location fields
+    # Location data will be stored on the contact instead
+    # We could create custom company attributes but for now skip on company
 
     # Phone - try multiple formats
     phone = hubspot_data.get('Company Phone Number', '').strip()
@@ -198,7 +196,8 @@ def create_company_from_hubspot(hubspot_data):
     if result.get('success'):
         return result['data'].get('id'), hubspot_data, f"Created without phone (tried: {phone})"
 
-    return None, None, result.get('error', 'Unknown error')
+    # Return hubspot_data even on failure so contact can still be enriched
+    return None, hubspot_data, result.get('error', 'Unknown error')
 
 
 def extract_domain_from_email(email):
@@ -241,10 +240,8 @@ def create_company_from_appointment(appt_data):
                 if match:
                     attributes["domain"] = match.group(1)
 
-    # Location if available
-    location = appt_data.get('location', '').strip()
-    if location:
-        attributes["city"] = location
+    # Note: Brevo companies don't have built-in city/location fields
+    # Location data will be stored on the contact instead
 
     # Company from list might be different/better
     company_from_list = appt_data.get('company_from_list', '').strip()
@@ -565,7 +562,7 @@ def main():
 
     results = {'companies': [], 'contacts': []}
 
-    for company_name, source_type in TARGETS.items():
+    for company_name in TARGETS:
         print(f"\n{'=' * 50}")
         print(f"PROCESSING: {company_name.upper()}")
         print(f"{'=' * 50}")
@@ -584,32 +581,35 @@ def main():
         print(f"  Match Source: {appt.get('match_source', 'N/A')}")
         print(f"  Phone From List: {appt.get('phone_from_list', 'N/A')}")
 
-        # Create company
+        # Create company - ALWAYS check HubSpot first
         company_id = None
         hubspot_data = None
+        source_type = 'appointment'  # Default fallback
 
-        if source_type == 'hubspot':
-            print(f"\n  Looking up in HubSpot...")
-            hubspot_data = find_hubspot_company(company_name)
-            if hubspot_data:
-                print(f"  Found: {hubspot_data.get('Company name')}")
-                print(f"    Domain: {hubspot_data.get('Company Domain Name', 'N/A')}")
-                print(f"    Industry: {hubspot_data.get('Industry', 'N/A')}")
-                print(f"    City: {hubspot_data.get('City', 'N/A')}")
-                company_id, hubspot_data, error = create_company_from_hubspot(hubspot_data)
-                if company_id:
-                    print(f"  COMPANY CREATED (HubSpot): {company_id}")
-                    results['companies'].append({
-                        'name': company_name, 'id': company_id, 'source': 'hubspot'
-                    })
-                else:
-                    print(f"  ERROR: {error}")
+        print(f"\n  Looking up in HubSpot...")
+        hubspot_data = find_hubspot_company(company_name)
+        if hubspot_data:
+            source_type = 'hubspot'
+            print(f"  FOUND in HubSpot: {hubspot_data.get('Company name')}")
+            print(f"    Domain: {hubspot_data.get('Company Domain Name', 'N/A')}")
+            print(f"    Phone: {hubspot_data.get('Company Phone Number', 'N/A')}")
+            print(f"    Email: {hubspot_data.get('Company Email', 'N/A')}")
+            print(f"    Industry: {hubspot_data.get('Industry', 'N/A')}")
+            print(f"    Business Type: {hubspot_data.get('Business type', 'N/A')}")
+            print(f"    City: {hubspot_data.get('City', 'N/A')}")
+            print(f"    State: {hubspot_data.get('State/Region', 'N/A')}")
+            print(f"    Address: {hubspot_data.get('Street Address 1', 'N/A')}")
+            print(f"    Rating: {hubspot_data.get('GBP rating', 'N/A')}")
+            company_id, hubspot_data, error = create_company_from_hubspot(hubspot_data)
+            if company_id:
+                print(f"  COMPANY CREATED (HubSpot): {company_id}")
+                results['companies'].append({
+                    'name': company_name, 'id': company_id, 'source': 'hubspot'
+                })
             else:
-                print(f"  WARNING: Not found in HubSpot, using appointment data")
-                source_type = 'appointment'
-
-        if source_type == 'appointment':
-            print(f"\n  Creating from appointment data...")
+                print(f"  ERROR creating from HubSpot: {error}")
+        else:
+            print(f"  NOT found in HubSpot, using appointment data...")
             company_id, _, error = create_company_from_appointment(appt)
             if company_id:
                 print(f"  COMPANY CREATED (appointment): {company_id}")
