@@ -1,0 +1,91 @@
+{
+  "import_batch": "test_2025-12-13",
+  "contacts": {
+    "appointments": 62,
+    "master": 114,
+    "total": 176
+  },
+  "companies": 142,
+  "errors": [
+    {
+      "email": "brisbanecitylandscapes@gmail.com",
+      "error": "Unable to update contact, SMS is already associated with another Contact"
+    },
+    {
+      "email": "johnmckinley@gmail.com",
+      "error": "Unable to update contact, SMS is already associated with another Contact"
+    },
+    {
+      "email": "bchalmers616@gmail.com",
+      "error": "Unable to update contact, SMS is already associated with another Contact"
+    },
+    {
+      "email": "hawimorke5@gmail.com",
+      "error": "Unable to update contact, SMS is already associated with another Contact"
+    },
+    {
+      "email": "ruscoijames@gmail.com",
+      "error": "Unable to update contact, SMS is already associated with another Contact"
+    },
+    {
+      "email": "cam.j.gibson@gmail.com",
+      "error": "Unable to update contact, SMS is already associated with another Contact"
+    },
+    {
+      "email": "vvfxteam@gmail.com",
+      "error": "Unable to update contact, SMS is already associated with another Contact"
+    },
+    {
+      "email": "snappyremovals.gb@gmail.com",
+      "error": "Unable to update contact, SMS is already associated with another Contact"
+    },
+    {
+      "email": "marlin.david@gmail.com",
+      "error": "Unable to update contact, SMS is already associated with another Contact"
+    },
+    {
+      "email": "hpmaintenance25@gmail.com",
+      "error": "Unable to update contact, SMS is already associated with another Contact"
+    },
+    {
+      "email": "evoslandscapingem@gmail.com",
+      "error": "Unable to update contact, SMS is already associated with another Contact"
+    },
+    {
+      "email": "1959peterharding@gmail.com",
+      "error": "Unable to update contact, SMS is already associated with another Contact"
+    },
+    {
+      "email": "fm.melbourne@gmail.com",
+      "error": "Unable to update contact, SMS is already associated with another Contact"
+    },
+    {
+      "email": "endurancetreadmills@gmail.com",
+      "error": "Unable to update contact, SMS is already associated with another Contact"
+    },
+    {
+      "email": "happyuniverse360@gmail.com",
+      "error": "Unable to update contact, SMS is already associated with another Contact"
+    },
+    {
+      "email": "dlindoorplanthire@outlook.com.au",
+      "error": "Unable to update contact, SMS is already associated with another Contact"
+    },
+    {
+      "email": "suptulung.pvt.ltd@gmail.com",
+      "error": "Unable to update contact, SMS is already associated with another Contact"
+    },
+    {
+      "email": "sarah_aassar@hotmail.com",
+      "error": "Unable to update contact, SMS is already associated with another Contact"
+    },
+    {
+      "email": "fpgpl2010@17mail.com ??",
+      "error": "Invalid email address"
+    },
+    {
+      "email": "21stcenturypainting.vic@gmail.com",
+      "error": "Unable to update contact, SMS is already associated with another Contact"
+    }
+  ]
+}
