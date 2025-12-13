@@ -1,7 +1,7 @@
 # Comprehensive Brevo Import Plan
 
 **Created:** 2025-12-13
-**Updated:** 2025-12-13 (v4 with mandatory data rule + call linking)
+**Updated:** 2025-12-13 (v4.1 with ALL HubSpot fields + call linking)
 **Status:** READY FOR APPROVAL
 **Approach:** Layer-by-layer import (contacts first, then enrich with appointments/calls)
 
@@ -202,7 +202,7 @@ After running a test import of 200 records, the following corrections were ident
 
 | Metric | Current | After Import | Limit | Headroom |
 |--------|---------|--------------|-------|----------|
-| Contact Attributes | 23 | 72 | 200 | 128 |
+| Contact Attributes | 23 | 86 | 200 | 114 |
 | Company Attributes | 15 (built-in) | 15 | Unknown | OK |
 | Contacts | 0 | ~35,000 | Unlimited | OK |
 | Companies | 0 | ~38 | Unlimited | OK |
@@ -328,7 +328,7 @@ After running a test import of 200 records, the following corrections were ident
 **Duration:** 5 minutes
 **Risk:** Low
 
-### New Attributes to Create (49 total)
+### New Attributes to Create (63 total)
 
 ```
 CONTACT ATTRIBUTES BY CATEGORY:
@@ -403,15 +403,31 @@ JSON Metadata (4 new):
   - HUBSPOT_COMPANY_META (text) - All company tracking fields
   - SOCIAL_LINKS_JSON (text) - Backup of all social links
   - LOCATION_JSON (text) - Full address as JSON
+
+HubSpot Complete Import (14 new - v4.1):
+  - TIMEZONE (text) - Company timezone (e.g., Australia/Brisbane)
+  - HUBSPOT_CREATE_DATE (text) - When record was created in HubSpot
+  - HUBSPOT_MODIFIED_DATE (text) - Last modification date in HubSpot
+  - LINKEDIN_BIO (text) - LinkedIn company bio/description
+  - IS_PUBLIC_COMPANY (boolean) - Whether company is publicly traded
+  - LATEST_TRAFFIC_SOURCE (text) - HubSpot marketing attribution
+  - LATEST_TRAFFIC_SOURCE_1 (text) - Traffic source detail 1
+  - LATEST_TRAFFIC_SOURCE_2 (text) - Traffic source detail 2
+  - ORIGINAL_SOURCE_1 (text) - Original source detail 1
+  - ORIGINAL_SOURCE_2 (text) - Original source detail 2
+  - ORIGINAL_SOURCE_TYPE (text) - Original source type
+  - HUBSPOT_RECORD_SOURCE (text) - How record entered HubSpot
+  - HUBSPOT_UPDATED_BY (text) - User who last updated in HubSpot
+  - HUBSPOT_RAW_JSON (text) - Complete raw JSON from HubSpot export
 ```
 
 ### Script Required
-`create_brevo_attributes.py` - Creates all 49 attributes via API
+`create_brevo_attributes.py` - Creates all 63 attributes via API
 
 ### Verification
-- [ ] All 49 attributes created
+- [ ] All 63 attributes created
 - [ ] Correct types assigned (text, number, date, boolean)
-- [ ] Total attributes = 72
+- [ ] Total attributes = 86
 
 ---
 

@@ -477,6 +477,72 @@ def create_contact(appt_data, company_id, company_name, source_type, hubspot_dat
             meta = {'legacy_id': legacy_id, 'contact_ids': contact_ids}
             attributes['HUBSPOT_COMPANY_META'] = json.dumps(meta)
 
+        # === ALL REMAINING HUBSPOT FIELDS (v4.1 - import EVERYTHING) ===
+
+        # Time Zone
+        timezone = hubspot_data.get('Time Zone', '').strip()
+        if timezone:
+            attributes['TIMEZONE'] = timezone
+
+        # HubSpot dates
+        create_date = hubspot_data.get('Create Date-Time', '').strip()
+        if create_date:
+            attributes['HUBSPOT_CREATE_DATE'] = create_date
+
+        modified_date = hubspot_data.get('Biz - Last Modified Date', '').strip()
+        if modified_date:
+            attributes['HUBSPOT_MODIFIED_DATE'] = modified_date
+
+        # LinkedIn Bio (separate from LinkedIn Company Page)
+        linkedin_bio = hubspot_data.get('LinkedIn Bio', '').strip()
+        if linkedin_bio:
+            attributes['LINKEDIN_BIO'] = linkedin_bio[:500]  # Limit length
+
+        # Is Public company
+        is_public = hubspot_data.get('Is Public', '').strip()
+        if is_public:
+            attributes['IS_PUBLIC_COMPANY'] = is_public.lower() == 'true'
+
+        # Traffic source / attribution fields
+        latest_traffic = hubspot_data.get('Biz - Latest Traffic Source', '').strip()
+        if latest_traffic:
+            attributes['LATEST_TRAFFIC_SOURCE'] = latest_traffic
+
+        latest_traffic_1 = hubspot_data.get('Biz - Latest Traffic Source Data 1', '').strip()
+        if latest_traffic_1:
+            attributes['LATEST_TRAFFIC_SOURCE_1'] = latest_traffic_1
+
+        latest_traffic_2 = hubspot_data.get('Biz - Latest Traffic Source Data 2', '').strip()
+        if latest_traffic_2:
+            attributes['LATEST_TRAFFIC_SOURCE_2'] = latest_traffic_2
+
+        # Original source fields
+        orig_source_1 = hubspot_data.get('Biz - Original Source Data 1', '').strip()
+        if orig_source_1:
+            attributes['ORIGINAL_SOURCE_1'] = orig_source_1
+
+        orig_source_2 = hubspot_data.get('Biz - Original Source Data 2', '').strip()
+        if orig_source_2:
+            attributes['ORIGINAL_SOURCE_2'] = orig_source_2
+
+        orig_source_type = hubspot_data.get('Biz - Original Source Type', '').strip()
+        if orig_source_type:
+            attributes['ORIGINAL_SOURCE_TYPE'] = orig_source_type
+
+        # HubSpot internal tracking
+        record_source = hubspot_data.get('Biz - Record source', '').strip()
+        if record_source:
+            attributes['HUBSPOT_RECORD_SOURCE'] = record_source
+
+        updated_by = hubspot_data.get('Biz - Updated by user ID', '').strip()
+        if updated_by:
+            attributes['HUBSPOT_UPDATED_BY'] = updated_by
+
+        # Raw JSON blob (store everything)
+        raw_json = hubspot_data.get('HubSpot_LongText_JSON', '').strip()
+        if raw_json:
+            attributes['HUBSPOT_RAW_JSON'] = raw_json[:2000]  # Brevo text limit
+
     # === APPOINTMENT EXTRA FIELDS ===
     website = appt_data.get('website_from_list', '').strip()
     if website:

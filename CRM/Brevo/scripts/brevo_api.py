@@ -129,6 +129,32 @@ class BrevoClient:
             params["listIds"] = str(list_id)
         return self._request("GET", "contacts", params=params)
 
+    # ========== CONTACT ATTRIBUTES ==========
+
+    def create_attribute(self, attribute_name: str, attribute_type: str = "text"):
+        """
+        Create a contact attribute.
+
+        Args:
+            attribute_name: Name of the attribute (e.g., "TIMEZONE")
+            attribute_type: Type of attribute - "text", "date", "float", "boolean"
+
+        Returns:
+            {"success": True/False, "data": {...}, "error": "..."}
+        """
+        # Brevo API requires category (normal or transactional) and type
+        return self._request("POST", f"contacts/attributes/normal/{attribute_name}", {
+            "type": attribute_type
+        })
+
+    def get_attributes(self):
+        """Get all contact attributes."""
+        return self._request("GET", "contacts/attributes")
+
+    def delete_attribute(self, attribute_name: str):
+        """Delete a contact attribute."""
+        return self._request("DELETE", f"contacts/attributes/normal/{attribute_name}")
+
     # ========== LISTS ==========
 
     def create_list(self, name: str, folder_id: int = 1):
