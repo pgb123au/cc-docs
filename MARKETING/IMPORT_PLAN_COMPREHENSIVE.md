@@ -1,8 +1,42 @@
 # Comprehensive Brevo Import Plan
 
 **Created:** 2025-12-13
+**Updated:** 2025-12-13 (v2 with corrections)
 **Status:** READY FOR APPROVAL
 **Approach:** Layer-by-layer import (contacts first, then enrich with appointments/calls)
+
+---
+
+## CORRECTIONS FROM TEST IMPORT (v2)
+
+After running a test import of 200 records, the following corrections were identified:
+
+### 1. Company Name Source (CRITICAL)
+**❌ WRONG:** Creating companies from appointment data (which often has URLs/domains as company names)
+**✅ CORRECT:** Companies MUST come from HubSpot Companies file (363K records). Never use domain names as company names.
+
+**Process:**
+1. First, create companies from HubSpot Companies file ONLY
+2. Match appointment contacts to existing companies by:
+   - Email domain matching
+   - Company name fuzzy matching
+3. Flag any appointments that don't match a HubSpot company
+
+### 2. Name Cleaning
+**❌ WRONG:** Strip "?" from names before import
+**✅ CORRECT:** Keep "?" in names - it indicates uncertainty in the source data (e.g., "Ken?", "Mal Stanes ?")
+
+### 3. SMS Conflict Handling
+**Problem:** Brevo only allows one phone per SMS field globally
+**Solution:** If SMS field fails, store phone in PHONE_2 or NOTES field instead
+
+### 4. Company Matching for Appointments
+**❌ WRONG:** Use COMPANY field from appointments directly
+**✅ CORRECT:**
+1. Look up company in HubSpot Companies file
+2. If found → create company from HubSpot data
+3. If NOT found → flag as COMPANY_MATCH_STATUS = "Not Found"
+4. Never create a company from just an appointment row
 
 ---
 

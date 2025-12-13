@@ -1,0 +1,78 @@
+{
+  "companies_created": 2,
+  "companies_not_found": 4,
+  "contacts_created": 10,
+  "contacts_failed": 0,
+  "details": [
+    {
+      "appointment_company": "Capital Wealth Management",
+      "email": "info@capitalwealthfinance.com.au",
+      "hubspot_match": "partial_name",
+      "company_id": null,
+      "contact_id": 35681
+    },
+    {
+      "appointment_company": "JTW building group",
+      "email": "Joe@jtwbuildinggroup.com.au",
+      "hubspot_match": "Not Found",
+      "company_id": null,
+      "contact_id": 35682
+    },
+    {
+      "appointment_company": "Finweb",
+      "email": "J.Bipin@gmail.com",
+      "hubspot_match": "exact_name",
+      "company_id": "693cfdab58677e43aa29ba94",
+      "contact_id": 35683
+    },
+    {
+      "appointment_company": "Brisbane City Landscapes",
+      "email": "BrisbaneCityLandscapes@gmail.com",
+      "hubspot_match": "Not Found",
+      "company_id": null,
+      "contact_id": 35684
+    },
+    {
+      "appointment_company": "Pinnacle Accounting Advisory",
+      "email": "mina@pinnacleaccountingadvisory.com.au",
+      "hubspot_match": "email_domain",
+      "company_id": null,
+      "contact_id": 35685
+    },
+    {
+      "appointment_company": "CLG Electrics",
+      "email": "chris@clgelectrics.com.au",
+      "hubspot_match": "email_domain",
+      "company_id": "693cfdb458677e43aa29ba96",
+      "contact_id": 35686
+    },
+    {
+      "appointment_company": "Western AC",
+      "email": "jatarelec@bigpond.com",
+      "hubspot_match": "partial_name",
+      "company_id": null,
+      "contact_id": 35687
+    },
+    {
+      "appointment_company": "environmentally friendly cremations",
+      "email": "john@bensons.com.au",
+      "hubspot_match": "Not Found",
+      "company_id": null,
+      "contact_id": 35688
+    },
+    {
+      "appointment_company": "Pradeep Chewari",
+      "email": "info@pradeeptiwari.com.au",
+      "hubspot_match": "Not Found",
+      "company_id": null,
+      "contact_id": 35689
+    },
+    {
+      "appointment_company": "Aaron Climate Control",
+      "email": "info@aaronclimatgecontrol.com.au",
+      "hubspot_match": "partial_name",
+      "company_id": null,
+      "contact_id": 35690
+    }
+  ]
+}
