@@ -1,7 +1,7 @@
 # Comprehensive Brevo Import Plan
 
 **Created:** 2025-12-13
-**Updated:** 2025-12-13 (v3 with mandatory data rule)
+**Updated:** 2025-12-13 (v4 with mandatory data rule + call linking)
 **Status:** READY FOR APPROVAL
 **Approach:** Layer-by-layer import (contacts first, then enrich with appointments/calls)
 
@@ -37,6 +37,78 @@ The ONLY exception: Do not overwrite existing good data with worse/empty data.
 3. Appointments Enriched
 4. Call Logs
 5. Master Contacts
+
+---
+
+## ⚠️ MANDATORY CALL LINKING RULE (v4)
+
+**ALL RETELL AND ZADARMA CALLS MUST BE LINKED TO BREVO CONTACTS/COMPANIES**
+
+### Call Data Sources:
+1. **Retell AI Calls** - `call_log_sheet_export.json`, `call_log_sheet2_export.json` (22,000 calls)
+2. **Zadarma Calls** - Future integration (PBX/VoIP calls)
+
+### Linking Strategy:
+
+**For each call, link to Brevo record by:**
+1. **Phone number match** (last 9 digits) to contact's SMS, PHONE_2, or PHONE_3
+2. **Company phone match** to company's phone_number attribute
+3. If no match found, create a new contact with the phone number
+
+### How Calls Are Stored:
+
+**Option A: RETELL_LOG Attribute (Current Implementation)**
+- Stores call history as text field on contact
+- Format: `DD/MM/YYYY HH:MM DIRECTION (duration) - Recording: URL`
+- Pros: Simple, searchable, visible in contact profile
+- Cons: Limited structure, can't query individual calls
+
+**Option B: Brevo Activities/Events API (Future Enhancement)**
+- Use Brevo's activity tracking to log each call as an event
+- Each call = separate activity linked to contact
+- Pros: Full call analytics, timeline view, filtering
+- Cons: More complex, requires activity API setup
+
+**Current Decision:** Use Option A (RETELL_LOG) for initial import, with Option B available for future real-time integration.
+
+### Required Call Data Fields:
+
+| Field | Source | Brevo Storage |
+|-------|--------|---------------|
+| Call date/time | start_time | RETELL_LOG (text) |
+| Direction | direction | RETELL_LOG (INBOUND/OUTBOUND) |
+| Duration | human_duration | RETELL_LOG |
+| Recording URL | recording_url | RETELL_LOG |
+| Call status | status | RETELL_LOG |
+| Total call count | (calculated) | CALL_COUNT (number) |
+| Was ever called | (calculated) | WAS_CALLED (boolean) |
+
+### Zadarma Integration (Future):
+
+When Zadarma integration is added:
+1. Match calls to contacts by phone number (same as Retell)
+2. Append to RETELL_LOG with source tag: `[ZADARMA]` prefix
+3. Update CALL_COUNT to include both sources
+4. Consider separate ZADARMA_LOG attribute if call volume is high
+
+### Example - Contact Must Have All Call Data:
+```
+Contact: Sara Lehmann (sara@reignitehealth.com.au)
+  - RETELL_LOG:
+    09/01/2025 11:48 OUTBOUND (3m 45s) - Recording: https://...
+    09/03/2025 14:22 INBOUND (1m 12s) - Recording: https://...
+  - CALL_COUNT: 2
+  - WAS_CALLED: true
+```
+
+### Example - Company Must Have All Call Data:
+```
+Company: Reignite Health
+  Linked calls (via contacts):
+    - Sara Lehmann: 2 calls
+    - (other contacts): N calls
+  Total company calls: (sum of all linked contact calls)
+```
 
 ### Example - Company Must Have:
 ```

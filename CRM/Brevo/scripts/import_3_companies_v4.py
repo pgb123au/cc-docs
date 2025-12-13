@@ -433,8 +433,10 @@ def create_contact(appt_data, company_id, company_name, source_type, hubspot_dat
         if youtube:
             attributes['YOUTUBE'] = youtube
 
-        # Reviews
+        # Reviews (check both columns - HubSpot has "Total Google reviews" and "Total Google reviews 2")
         reviews = hubspot_data.get('Total Google reviews', '').strip()
+        if not reviews:
+            reviews = hubspot_data.get('Total Google reviews 2', '').strip()
         if reviews and reviews.isdigit():
             attributes['GOOGLE_REVIEWS_COUNT'] = int(reviews)
         rating = hubspot_data.get('GBP rating', '').strip()
@@ -511,7 +513,16 @@ def create_contact(appt_data, company_id, company_name, source_type, hubspot_dat
     result = client.add_contact(email, attributes, list_ids=[24, 28])
 
     if result.get('success'):
-        contact_id = result['data'].get('id')
+        # Get contact ID - might be in response or need to look up if contact was updated
+        contact_id = None
+        if result.get('data'):
+            contact_id = result['data'].get('id')
+
+        # If no ID returned (update case), look up the contact
+        if not contact_id:
+            lookup = client.get_contact(email)
+            if lookup.get('success') and lookup.get('data'):
+                contact_id = lookup['data'].get('id')
 
         # Link to company
         if company_id and contact_id:
@@ -532,7 +543,13 @@ def create_contact(appt_data, company_id, company_name, source_type, hubspot_dat
                 attributes['PHONE_2'] = phone
             result = client.add_contact(email, attributes, list_ids=[24, 28])
             if result.get('success'):
-                contact_id = result['data'].get('id')
+                contact_id = None
+                if result.get('data'):
+                    contact_id = result['data'].get('id')
+                if not contact_id:
+                    lookup = client.get_contact(email)
+                    if lookup.get('success') and lookup.get('data'):
+                        contact_id = lookup['data'].get('id')
                 if company_id and contact_id:
                     client._request('PATCH', f'companies/link-unlink/{company_id}', {
                         "linkContactIds": [contact_id]
