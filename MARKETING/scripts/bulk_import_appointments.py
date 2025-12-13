@@ -30,8 +30,68 @@ def get_company_domain(email):
         return None
     return domain
 
+def clean_phone(phone):
+    """Normalize phone number for matching"""
+    if not phone:
+        return ""
+    return re.sub(r'[^\d]', '', str(phone))[-9:]  # Last 9 digits
+
+# Load name enrichment data from large HubSpot files
+print("Loading name enrichment data...")
+name_by_email = {}
+name_by_phone = {}
+
+# Load from Master Contacts (smaller, faster)
+try:
+    with open('C:/Users/peter/Downloads/CC/CRM/Master_Contacts_With_Flags.csv', 'r', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            email = row.get('email', '').strip().lower()
+            phone = clean_phone(row.get('phone', ''))
+            first = row.get('first_name', '').strip()
+            last = row.get('last_name', '').strip()
+            if email and first:
+                name_by_email[email] = (first, last)
+            if phone and len(phone) >= 8 and first:
+                name_by_phone[phone] = (first, last)
+    print(f"  Loaded {len(name_by_email)} names by email, {len(name_by_phone)} by phone from Master")
+except Exception as e:
+    print(f"  Warning: Could not load Master Contacts: {e}")
+
+# Load from HubSpot Contacts (larger, more complete)
+try:
+    with open('C:/Users/peter/Documents/HS/All_Contacts_2025_07_07_Cleaned.csv', 'r', encoding='utf-8', errors='replace') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            email = row.get('Email', '').strip().lower()
+            phone = clean_phone(row.get('Phone Number 1', '') or row.get('Mobile Phone Number', ''))
+            first = row.get('First Name', '').strip()
+            last = row.get('Last Name', '').strip()
+            if email and first and email not in name_by_email:
+                name_by_email[email] = (first, last)
+            if phone and len(phone) >= 8 and first and phone not in name_by_phone:
+                name_by_phone[phone] = (first, last)
+    print(f"  Total: {len(name_by_email)} names by email, {len(name_by_phone)} by phone")
+except Exception as e:
+    print(f"  Warning: Could not load HubSpot Contacts: {e}")
+
+def enrich_name(email, phone):
+    """Try to find name from enrichment data by email or phone."""
+    email_lower = email.strip().lower() if email else ''
+    phone_clean = clean_phone(phone) if phone else ''
+
+    # Try email first
+    if email_lower in name_by_email:
+        return name_by_email[email_lower]
+
+    # Try phone
+    if phone_clean and phone_clean in name_by_phone:
+        return name_by_phone[phone_clean]
+
+    return (None, None)
+
 # Load call logs
-print("Loading call logs...")
+print("\nLoading call logs...")
 with open('C:/Users/peter/Downloads/CC/CRM/call_log_sheet_export.json', 'r', encoding='utf-8') as f:
     call_logs_1 = json.load(f)
 print(f"  Sheet 1: {len(call_logs_1)} calls (Aug-Oct 2025)")
@@ -43,28 +103,21 @@ print(f"  Sheet 2: {len(call_logs_2)} calls (Jun-Jul 2025)")
 all_calls = call_logs_1 + call_logs_2
 print(f"  Total: {len(all_calls)} calls")
 
-def clean_phone(phone):
-    """Normalize phone number for matching"""
-    if not phone:
-        return ""
-    return re.sub(r'[^\d]', '', str(phone))[-9:]  # Last 9 digits
-
-def find_calls_for_contact(company_name, phone_numbers, timestamp_hint, email=None):
+def find_calls_for_contact(phone_numbers, timestamp_hint):
     """
-    Search call logs using multiple methods (from IMPORT_PROCEDURE.md)
+    Search call logs using ONLY phone and timestamp matching.
+    NEVER search transcripts - causes false positives!
     Returns list of matching calls
     """
     matches = []
     seen_call_ids = set()
 
-    # Normalize inputs
-    company_lower = company_name.lower() if company_name else ""
+    # Normalize phone numbers
     clean_phones = [clean_phone(p) for p in phone_numbers if p]
 
     # Extract date from timestamp hint (format: MM/DD/YYYY or DD/MM/YYYY)
     timestamp_date = ""
     if timestamp_hint:
-        # Try to extract date portion
         date_match = re.search(r'(\d{1,2}/\d{1,2}/\d{4})', str(timestamp_hint))
         if date_match:
             timestamp_date = date_match.group(1)
@@ -77,7 +130,7 @@ def find_calls_for_contact(company_name, phone_numbers, timestamp_hint, email=No
         matched = False
         match_method = None
 
-        # Method 1: Phone number match
+        # Method 1: Phone number match (PRIMARY)
         to_num = clean_phone(record.get('to_number', ''))
         from_num = clean_phone(record.get('from_number', ''))
         for phone in clean_phones:
@@ -87,29 +140,14 @@ def find_calls_for_contact(company_name, phone_numbers, timestamp_hint, email=No
                     match_method = 'phone'
                     break
 
-        # Method 2: Company name in transcript (fuzzy - first 4 chars)
-        if not matched and company_lower and len(company_lower) >= 4:
-            transcript = str(record.get('plain_transcript', '')).lower()
-            # Check first 4 chars or full name
-            if company_lower[:4] in transcript or company_lower in transcript:
-                matched = True
-                match_method = 'transcript'
-
-        # Method 3: Timestamp match
+        # Method 2: Timestamp match (SECONDARY)
         if not matched and timestamp_date:
             start_time = str(record.get('start_time', ''))
             if timestamp_date in start_time:
                 matched = True
                 match_method = 'timestamp'
 
-        # Method 4: Email domain in transcript (for edge cases)
-        if not matched and email and '@' in email:
-            domain = email.split('@')[1].split('.')[0].lower()
-            if len(domain) >= 4:
-                transcript = str(record.get('plain_transcript', '')).lower()
-                if domain in transcript:
-                    matched = True
-                    match_method = 'email_domain'
+        # NO transcript search - causes false positives!
 
         if matched and call_id:
             seen_call_ids.add(call_id)
@@ -120,7 +158,6 @@ def find_calls_for_contact(company_name, phone_numbers, timestamp_hint, email=No
                 'from_number': record.get('from_number', ''),
                 'recording_url': record.get('recording_url', ''),
                 'duration': record.get('human_duration', ''),
-                'transcript_preview': str(record.get('plain_transcript', ''))[:100],
                 'match_method': match_method
             })
 
@@ -215,20 +252,32 @@ for i, appt in enumerate(appointments):
     followup = appt.get('followup', '')
     retell_log_hint = appt.get('retell_log', '')
 
-    # Parse name
+    # Parse name - with enrichment fallback
     first_name = ''
     last_name = ''
-    if name:
+    name_source = 'appointment'
+
+    if name and name != '.' and name != '∙':
         parts = name.split()
         first_name = parts[0] if parts else ''
         last_name = ' '.join(parts[1:]) if len(parts) > 1 else ''
 
+    # If no name, try to enrich from large files
+    if not first_name:
+        enriched_first, enriched_last = enrich_name(email, phone)
+        if enriched_first:
+            first_name = enriched_first
+            last_name = enriched_last or ''
+            name_source = 'enriched'
+
     print(f"\n[{i+1}/{len(appointments)}] {email}")
+    if name_source == 'enriched':
+        print(f"  Name: {first_name} {last_name} (enriched from large files)")
     print(f"  Company: {company or 'Unknown'}")
 
-    # Search for calls
+    # Search for calls (phone + timestamp ONLY, no transcript)
     phone_numbers = [phone] if phone else []
-    calls = find_calls_for_contact(company, phone_numbers, retell_log_hint, email)
+    calls = find_calls_for_contact(phone_numbers, retell_log_hint)
     recording_count = len([c for c in calls if c.get('recording_url')])
     recording_counts[email] = recording_count
 

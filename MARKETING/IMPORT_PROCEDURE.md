@@ -9,33 +9,45 @@
 ## PRE-REQUISITES
 
 Before running import:
-1. Brevo account is empty (run `delete_all_brevo_data.py` if needed)
-2. All data files are up to date
-3. Custom attributes exist in Brevo (created automatically on first import)
+1. All data files are up to date
+2. Custom attributes exist in Brevo (created automatically on first import)
+3. Scripts have been verified (see SCRIPTS CHECKLIST at end)
 
 ---
 
 ## DATA SOURCES - FULL PATHS
 
-### Primary Sources (MUST process all)
+### Original Source Files (HubSpot Exports)
 
-| Source | Full Path | Records | What to Extract |
-|--------|-----------|---------|-----------------|
-| **Appointments** | `C:\Users\peter\Downloads\CC\CRM\Appointments_Enriched.csv` | 87 | Name, email, company, dates, status, quality |
-| **Call Logs 1** | `C:\Users\peter\Downloads\CC\CRM\call_log_sheet_export.json` | 15,156 | Recording URLs, phone numbers, timestamps |
-| **Call Logs 2** | `C:\Users\peter\Downloads\CC\CRM\call_log_sheet2_export.json` | 6,844 | Recording URLs, phone numbers, timestamps |
-| **Master Contacts** | `C:\Users\peter\Downloads\CC\CRM\Master_Contacts_With_Flags.csv` | 54,086 | Email, phone, company, DNC flags |
-| **DNC List** | `C:\Users\peter\Downloads\CC\CRM\DO_NOT_CALL_Master.csv` | 852 | Blocklist emails |
+These are the MASTER data sources - the original HubSpot CRM exports:
 
-### Secondary Sources (for enrichment)
+| Source | Full Path | Records | Original From |
+|--------|-----------|---------|---------------|
+| **HubSpot Companies** | `C:\Users\peter\Documents\HS\All_Companies_2025-07-07_Cleaned_For_HubSpot.csv` | 363,517 | HubSpot CRM Export |
+| **HubSpot Contacts** | `C:\Users\peter\Documents\HS\All_Contacts_2025_07_07_Cleaned.csv` | 207,278 | HubSpot CRM Export |
 
-| Source | Full Path | What to Extract |
-|--------|-----------|-----------------|
-| **HubSpot Companies** | `C:\Users\peter\Downloads\CC\CRM\All_Companies_2025-07-07_Cleaned_For_HubSpot.csv` | Phone, social, verified names |
-| **HubSpot Contacts** | `C:\Users\peter\Downloads\CC\CRM\All_Contacts_2025_07_07_Cleaned.csv` | Additional contact details |
-| **Client Folders** | `C:\Users\peter\Downloads\CC\CLIENTS\[company-name]\` | Audit reports, emails |
+**Key Fields in HubSpot Companies:**
+- Company name, Domain, Email, Phone (up to 3), Address
+- Google profile, reviews, rating
+- Business type, Industry, Description
+- Associated Contact IDs
 
-### Appointment Sub-files
+**Key Fields in HubSpot Contacts:**
+- First Name, Last Name, Email, Phone
+- Company Name, Website
+- Job Title, City, State
+
+### Primary Working Files (CRM Folder)
+
+| Source | Full Path | Records | Derived From |
+|--------|-----------|---------|--------------|
+| **Appointments** | `C:\Users\peter\Downloads\CC\CRM\Appointments_Enriched.csv` | 87 | Manual data collection |
+| **Call Logs 1** | `C:\Users\peter\Downloads\CC\CRM\call_log_sheet_export.json` | 15,156 | Retell API export |
+| **Call Logs 2** | `C:\Users\peter\Downloads\CC\CRM\call_log_sheet2_export.json` | 6,844 | Retell API export |
+| **Master Contacts** | `C:\Users\peter\Downloads\CC\CRM\Master_Contacts_With_Flags.csv` | 54,086 | HubSpot + Campaign data |
+| **Fresh Leads** | `C:\Users\peter\Downloads\CC\CRM\Fresh_Leads_Never_Called.csv` | ~30,000 | Master minus called |
+
+### Appointment Sub-files (by Status)
 
 | File | Full Path | Purpose |
 |------|-----------|---------|
@@ -43,6 +55,15 @@ Before running import:
 | Followup | `C:\Users\peter\Downloads\CC\CRM\Appointments_followup.csv` | Follow-up needed |
 | Booked | `C:\Users\peter\Downloads\CC\CRM\Appointments_booked.csv` | Upcoming appointments |
 | No Show | `C:\Users\peter\Downloads\CC\CRM\Appointments_no_show.csv` | Missed appointments |
+| Bad Prospect | `C:\Users\peter\Downloads\CC\CRM\Appointments_bad_prospect.csv` | Not suitable |
+
+### IMPORTANT: DNC List Clarification
+
+**The file `DO_NOT_CALL_Master.csv` is MISNAMED.** It contains 852 contacts that were CALLED, not contacts that requested Do-Not-Call.
+
+**Actual DNC:** Only 1 person ever requested not to be called. This should be handled manually.
+
+**The `is_dnc` flag in Master_Contacts_With_Flags.csv is also incorrect** - it's set for "already called" contacts, not actual DNC requests.
 
 ---
 
@@ -51,12 +72,12 @@ Before running import:
 **Must follow this exact order:**
 
 1. **Create Brevo Lists** (if not exist)
-2. **Import Appointment Contacts** (highest priority - best data)
-3. **Import Bulk Contacts** (from Master CSV)
-4. **Apply DNC Blocklist**
-5. **Create Companies** (from appointment data only)
+2. **Import Appointment Contacts** (highest priority - best data) - TEST FIRST
+3. **Verify Appointment Import** (100% quality before bulk)
+4. **Import Bulk Contacts** (in batches of 100)
+5. **Create Companies** (from multiple sources)
 6. **Link Contacts to Companies**
-7. **Verify Import**
+7. **Final Verification**
 
 ---
 
@@ -67,8 +88,8 @@ Before running import:
 | List ID | Name | Purpose |
 |---------|------|---------|
 | 24 | All Telemarketer Contacts | Everyone imported |
-| 25 | Safe to Contact | NOT on DNC |
-| 27 | DO NOT CALL | DNC - blocklisted |
+| 25 | Safe to Contact | Available for campaigns |
+| 27 | DO NOT CALL | Manual additions only (verified DNC requests) |
 | 28 | Had Appointments | Has appointment data |
 | 29 | Previously Called | Called but no appointment |
 
@@ -115,6 +136,7 @@ for name, expected_id in lists:
 **Phone Number:**
 - Primary: `to_number` from call logs (the ACTUAL called number)
 - Fallback: `phone` from appointments CSV
+- Third option: Match via phone in Master Contacts
 - Format: +61XXXXXXXXX
 
 **Date Fields:**
@@ -123,24 +145,42 @@ for name, expected_id in lists:
 
 ### 2.2 Name Enrichment (when name is empty)
 
-**Search order:**
-1. `C:\Users\peter\Downloads\CC\CRM\All_Contacts_2025_07_07_Cleaned.csv` - exact email match
-2. `C:\Users\peter\Downloads\CC\CRM\Master_Contacts_With_Flags.csv` - email match
-3. `C:\Users\peter\Downloads\CC\CRM\All_Companies_2025-07-07_Cleaned_For_HubSpot.csv` - domain match
+**Search order for names:**
 
-**If not found:** Flag for manual review in NOTES field.
+1. **By Email Match:**
+   - `C:\Users\peter\Documents\HS\All_Contacts_2025_07_07_Cleaned.csv` - exact email match (First Name, Last Name columns)
+   - `C:\Users\peter\Downloads\CC\CRM\Master_Contacts_With_Flags.csv` - email match (first_name, last_name columns)
+
+2. **By Phone Match:**
+   - Same files as above, match by last 9 digits of phone number
+   - This is important because sometimes email is known but name is in a different record matched by phone
+
+3. **By Domain Match (for company name):**
+   - `C:\Users\peter\Documents\HS\All_Companies_2025-07-07_Cleaned_For_HubSpot.csv` - domain match (Company name column)
+
+4. **Search Large Datasets:**
+   - Before flagging for manual review, search ALL columns of the 363K companies and 207K contacts files
+   - These contain rich data that may have names/details not in smaller files
+
+**If not found after all steps:** Flag for manual review in NOTES field.
 
 ### 2.3 Call Recording Search
 
 **ONLY use these methods (in order):**
 1. **Phone number match** - Match last 9 digits of `to_number` or `from_number`
-2. **Timestamp match** - Use `retell_log` date hint
+2. **Timestamp match** - Use `retell_log` date hint from appointments CSV
 
-**NEVER search transcripts** - causes massive false positives!
+**NEVER search transcripts** - causes massive false positives! (e.g., "etel" matches "completely")
 
-**Call Log Files:**
+**Call Log Files (from Retell export):**
 - `C:\Users\peter\Downloads\CC\CRM\call_log_sheet_export.json` (Aug-Oct 2025)
 - `C:\Users\peter\Downloads\CC\CRM\call_log_sheet2_export.json` (Jun-Jul 2025)
+
+**IMPORTANT:** These exports may have gaps. For complete data, query Retell API directly:
+```bash
+cd /c/Users/peter/Downloads/CC/retell/scripts
+python get_calls.py --limit 100 --phone 0412345678
+```
 
 ### 2.4 Import Command
 ```bash
@@ -148,97 +188,116 @@ cd /c/Users/peter/Downloads/CC/MARKETING/scripts
 python bulk_import_appointments.py
 ```
 
+### 2.5 Verify Appointment Import
+
+**Before proceeding to bulk import, verify 100% quality:**
+
+```bash
+cd /c/Users/peter/Downloads/CC/MARKETING/scripts
+python -c "
+from brevo_api import BrevoClient
+client = BrevoClient()
+
+result = client._request('GET', 'contacts/lists/28/contacts', params={'limit': 100})
+contacts = result['data'].get('contacts', [])
+
+print('=== APPOINTMENT CONTACTS QUALITY CHECK ===')
+missing_name = 0
+missing_company = 0
+has_recording = 0
+
+for c in contacts:
+    attrs = c.get('attributes', {})
+    email = c.get('email')
+    name = f\"{attrs.get('FIRSTNAME', '')} {attrs.get('LASTNAME', '')}\".strip()
+    company = attrs.get('COMPANY', '')
+    has_retell = bool(attrs.get('RETELL_LOG'))
+
+    if not name:
+        missing_name += 1
+        print(f'MISSING NAME: {email}')
+    if not company:
+        missing_company += 1
+        print(f'MISSING COMPANY: {email}')
+    if has_retell:
+        has_recording += 1
+
+print(f'')
+print(f'Total: {len(contacts)}')
+print(f'With Name: {len(contacts) - missing_name}')
+print(f'With Company: {len(contacts) - missing_company}')
+print(f'With Recordings: {has_recording}')
+"
+```
+
+**Target:** 100% of appointment contacts should have names and companies.
+
 ---
 
-## PHASE 3: Import Bulk Contacts
+## PHASE 3: Import Bulk Contacts (Batched)
 
 ### 3.1 Source File
 `C:\Users\peter\Downloads\CC\CRM\Master_Contacts_With_Flags.csv`
 
 ### 3.2 Fields to Import
 - email (required)
-- name → FIRSTNAME, LASTNAME
+- first_name, last_name → FIRSTNAME, LASTNAME
 - company → COMPANY
-- phone → SMS (if valid)
-- source → SOURCE
-- is_dnc → determines list assignment
+- phone → SMS (if valid, not already in use)
+- source_list → SOURCE
 - was_called → determines list assignment
 
-### 3.3 List Assignment Logic
+### 3.3 List Assignment Logic (CORRECTED)
+
+**Note:** The `is_dnc` flag is incorrect in the source data. Do NOT use it for DNC assignment.
+
 ```python
-if is_dnc:
-    lists = [24, 27]  # All + DNC
-elif was_called:
+if was_called:
     lists = [24, 25, 29]  # All + Safe + Previously Called
 else:
     lists = [24, 25]  # All + Safe (Fresh leads)
+
+# DNC is MANUAL ONLY - add known DNC contacts individually
 ```
 
-### 3.4 Import Command
+### 3.4 Batch Import Command
+
+Import in batches of 100 to monitor quality:
+
 ```bash
 cd /c/Users/peter/Downloads/CC/MARKETING/scripts
-python bulk_import_contacts.py
+python bulk_import_contacts.py --batch-size 100 --offset 0
 ```
+
+After each batch, verify quality before continuing.
 
 ---
 
-## PHASE 4: Apply DNC Blocklist
+## PHASE 4: Create Companies
 
-### 4.1 Source File
-`C:\Users\peter\Downloads\CC\CRM\DO_NOT_CALL_Master.csv`
+### 4.1 Data Sources for Companies (Multiple)
 
-### 4.2 Process
-1. Read all emails from DNC list
-2. For each email:
-   - Set `emailBlacklisted: true`
-   - Add to list 27 (DO NOT CALL)
-   - Remove from list 25 (Safe to Contact)
+**Create companies from ALL these sources:**
 
-### 4.3 Command
-```bash
-cd /c/Users/peter/Downloads/CC/MARKETING/scripts
-python -c "
-from brevo_api import BrevoClient
-import csv
+1. **Appointment Data** (highest quality - verified real names)
+   - `C:\Users\peter\Downloads\CC\CRM\Appointments_Enriched.csv`
+   - Use `company` field directly
 
-client = BrevoClient()
+2. **HubSpot Companies Export** (verified business data)
+   - `C:\Users\peter\Documents\HS\All_Companies_2025-07-07_Cleaned_For_HubSpot.csv`
+   - Use `Company name` field
+   - Rich data: phone, address, Google reviews, industry
 
-dnc_file = 'C:/Users/peter/Downloads/CC/CRM/DO_NOT_CALL_Master.csv'
-blocked = 0
-errors = 0
-
-with open(dnc_file, 'r', encoding='utf-8') as f:
-    reader = csv.DictReader(f)
-    for row in reader:
-        email = row.get('email', '').strip().lower()
-        if email and '@' in email:
-            result = client.blocklist_contact(email=email)
-            if result.get('success'):
-                blocked += 1
-            else:
-                errors += 1
-
-print(f'Blocklisted: {blocked}')
-print(f'Errors: {errors}')
-"
-```
-
----
-
-## PHASE 5: Create Companies
-
-### 5.1 Rules
-
-**ONLY create companies from:**
-- Appointment data (verified real names)
-- HubSpot exports (verified business names)
+3. **HubSpot Contacts Export** (if company name present)
+   - `C:\Users\peter\Documents\HS\All_Contacts_2025_07_07_Cleaned.csv`
+   - Use `Company Name` field
 
 **NEVER create companies from:**
 - Personal email domains (gmail.com, hotmail.com, etc.)
-- URL-like strings
-- Domain-only names without context
+- URL-like strings without proper company names
+- Domain-only names without additional context (too unreliable)
 
-### 5.2 Personal Domains Blacklist
+### 4.2 Personal Domains Blacklist
 ```python
 PERSONAL_DOMAINS = [
     'gmail.com', 'hotmail.com', 'yahoo.com', 'outlook.com',
@@ -248,7 +307,7 @@ PERSONAL_DOMAINS = [
 ]
 ```
 
-### 5.3 Company Name Cleaning
+### 4.3 Company Name Cleaning
 ```python
 def clean_company_name(name):
     if not name:
@@ -258,17 +317,21 @@ def clean_company_name(name):
     if name.startswith('http') or name.startswith('www.'):
         return None
 
-    # Clean domain-style names
+    # Reject if it's clearly just a domain
+    if name.count('.') >= 2 and ' ' not in name:
+        return None
+
+    # Clean domain-style names (but only if they look like real names)
     if '.com' in name or '.au' in name:
         name = name.split('/')[0]
         name = name.replace('.com.au', '').replace('.net.au', '')
         name = name.replace('.com', '').replace('.au', '')
         name = name.replace('-', ' ').replace('_', ' ').title()
 
-    return name.strip() if name else None
+    return name.strip() if name and len(name) > 2 else None
 ```
 
-### 5.4 Company Creation Command
+### 4.4 Company Creation Command
 ```bash
 cd /c/Users/peter/Downloads/CC/MARKETING/scripts
 python create_companies_from_appointments.py
@@ -276,7 +339,7 @@ python create_companies_from_appointments.py
 
 ---
 
-## PHASE 6: Link Contacts to Companies
+## PHASE 5: Link Contacts to Companies
 
 After companies are created, link related contacts:
 
@@ -297,9 +360,9 @@ def link_contacts_to_company(client, company_id, emails):
 
 ---
 
-## PHASE 7: Verification
+## PHASE 6: Final Verification
 
-### 7.1 Check Counts
+### 6.1 Check Counts
 ```bash
 cd /c/Users/peter/Downloads/CC/MARKETING/scripts
 python -c "
@@ -323,35 +386,14 @@ print(f'Companies: {len(result.get(\"data\", {}).get(\"items\", []))}')
 "
 ```
 
-### 7.2 Data Quality Check
-```bash
-python -c "
-from brevo_api import BrevoClient
-client = BrevoClient()
-
-# Sample appointment contacts
-result = client._request('GET', 'contacts/lists/28/contacts', params={'limit': 20})
-contacts = result['data'].get('contacts', [])
-
-print('=== APPOINTMENT CONTACTS QUALITY ===')
-for c in contacts[:5]:
-    attrs = c.get('attributes', {})
-    email = c.get('email')
-    name = f\"{attrs.get('FIRSTNAME', '')} {attrs.get('LASTNAME', '')}\".strip()
-    company = attrs.get('COMPANY', '')
-    has_retell = 'Yes' if attrs.get('RETELL_LOG') else 'No'
-    print(f'{email}: Name={name or \"MISSING\"}, Company={company or \"MISSING\"}, Recording={has_retell}')
-"
-```
-
-### 7.3 Expected Results
+### 6.2 Expected Results
 
 | Metric | Expected |
 |--------|----------|
 | Total contacts | ~35,000 |
 | Appointment contacts (list 28) | ~87 |
-| DNC contacts (list 27) | ~658 |
-| Companies | ~40-50 (from appointments only) |
+| DNC contacts (list 27) | ~1 (manual only) |
+| Companies | ~50-100 (from appointments + HubSpot) |
 | Contacts with names | 100% of appointments, ~10% of bulk |
 | Contacts with recordings | 70%+ of appointments |
 
@@ -363,7 +405,23 @@ for c in contacts[:5]:
 |--------|-----------|---------|
 | `brevo_api.py` | `C:\Users\peter\Downloads\CC\MARKETING\scripts\brevo_api.py` | API wrapper |
 | `bulk_import_appointments.py` | `C:\Users\peter\Downloads\CC\MARKETING\scripts\bulk_import_appointments.py` | Import appointments |
-| `delete_all_brevo_data.py` | `C:\Users\peter\Downloads\CC\MARKETING\scripts\delete_all_brevo_data.py` | Wipe all data |
+| `bulk_import_contacts.py` | `C:\Users\peter\Downloads\CC\MARKETING\scripts\bulk_import_contacts.py` | Import bulk contacts |
+| `create_companies_from_appointments.py` | `C:\Users\peter\Downloads\CC\MARKETING\scripts\create_companies_from_appointments.py` | Create companies |
+| `delete_all_brevo_data.py` | `C:\Users\peter\Downloads\CC\MARKETING\scripts\delete_all_brevo_data.py` | Wipe all data (emergency only) |
+
+---
+
+## SCRIPTS CHECKLIST
+
+**Before running any import, verify these scripts are correct:**
+
+- [ ] `bulk_import_appointments.py` - Does NOT use transcript search
+- [ ] `bulk_import_appointments.py` - Uses phone matching for name enrichment
+- [ ] `bulk_import_appointments.py` - Searches large HubSpot files for missing data
+- [ ] `bulk_import_contacts.py` - Does NOT use is_dnc flag for DNC list
+- [ ] `bulk_import_contacts.py` - Supports batch-size parameter
+- [ ] `create_companies_from_appointments.py` - Uses all data sources (not just appointments)
+- [ ] `create_companies_from_appointments.py` - Properly rejects URL-like names
 
 ---
 
@@ -372,17 +430,19 @@ for c in contacts[:5]:
 ### Data Quality Issues (from previous import)
 
 1. **93% of bulk contacts had no name** - This is expected (raw email lists)
-2. **DNC blocklisting failed** - 0/658 were blocklisted
+2. **DNC flag was incorrect** - is_dnc flag meant "already called", not real DNC
 3. **48/87 companies had URL-like names** - From using domain as name
 4. **Transcript search caused false positives** - "etel" matched "completely"
+5. **Name enrichment was incomplete** - Didn't search large HubSpot files
 
 ### Rules to Prevent Issues
 
 1. **Names:** Only expect names on appointment contacts; bulk is email-only
-2. **Companies:** Only create from appointment data with real business names
-3. **Domains:** Never use personal email domains (gmail, hotmail, etc.)
-4. **Call search:** Phone + timestamp ONLY, never transcript
-5. **DNC:** Must explicitly set `emailBlacklisted: true` on each contact
+2. **DNC:** MANUAL ONLY - don't trust is_dnc flag in source data
+3. **Companies:** Use multiple sources, but require real business names
+4. **Domains:** Never use personal email domains (gmail, hotmail, etc.)
+5. **Call search:** Phone + timestamp ONLY, never transcript
+6. **Enrichment:** Search ALL large datasets before flagging for manual review
 
 ---
 
@@ -390,7 +450,7 @@ for c in contacts[:5]:
 
 ### Contact shows email as name in Brevo UI
 - **Cause:** FIRSTNAME and LASTNAME are empty
-- **Fix:** Enrich from secondary sources or flag for manual lookup
+- **Fix:** Search large HubSpot files by email AND phone for name
 
 ### SMS field conflict error
 - **Cause:** Phone number already assigned to another contact
@@ -398,11 +458,11 @@ for c in contacts[:5]:
 
 ### Company has gmail.com domain
 - **Cause:** Contact uses personal email
-- **Fix:** Leave domain blank, or don't create company for personal emails
+- **Fix:** Don't create company for personal emails
 
 ### Recordings not found
 - **Cause:** Phone number mismatch or call not in export date range
-- **Fix:** Search by timestamp if available, or accept no recording
+- **Fix:** Query Retell API directly for the specific phone number
 
 ---
 
@@ -418,17 +478,21 @@ python brevo_api.py
 # Get contact details
 python -c "from brevo_api import BrevoClient; print(BrevoClient().get_contact('email@example.com'))"
 
-# Delete all data (requires confirmation)
+# Delete all data (emergency only - requires confirmation)
 python delete_all_brevo_data.py
 
 # Search call logs by phone
 python -c "
 import json
 phone = '412345678'  # Last 9 digits
-for f in ['../CRM/call_log_sheet_export.json', '../CRM/call_log_sheet2_export.json']:
-    data = json.load(open(f.replace('../', 'C:/Users/peter/Downloads/CC/')))
+for f in ['C:/Users/peter/Downloads/CC/CRM/call_log_sheet_export.json', 'C:/Users/peter/Downloads/CC/CRM/call_log_sheet2_export.json']:
+    data = json.load(open(f))
     for r in data:
         if phone in r.get('to_number', '') or phone in r.get('from_number', ''):
             print(r.get('start_time'), r.get('recording_url', 'No recording'))
 "
+
+# Query Retell API directly for calls
+cd /c/Users/peter/Downloads/CC/retell/scripts
+python get_calls.py --limit 10 --phone 0412345678
 ```
