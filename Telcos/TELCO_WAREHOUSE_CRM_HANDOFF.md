@@ -550,6 +550,66 @@ WHERE phone_normalized = '61412111000';
 
 ---
 
+## Appointment Contacts - Retell Data
+
+**34 calls** for appointment contacts have been enriched with full Retell data (phone numbers, transcripts, call_analysis).
+
+### Query: Get All Appointment Contact Calls with Transcripts
+
+```sql
+-- Appointment phone numbers with their Retell call data
+SELECT
+    c.id,
+    c.external_call_id,
+    c.from_number,
+    c.to_number,
+    c.started_at,
+    c.duration_seconds,
+    c.transcript,
+    c.raw_data->>'disconnection_reason' as disconnection_reason,
+    c.raw_data->'call_analysis'->>'call_summary' as call_summary,
+    c.raw_data->'call_analysis'->>'user_sentiment' as sentiment,
+    c.raw_data->'call_analysis'->>'call_successful' as successful,
+    c.raw_data->'call_analysis'->>'in_voicemail' as voicemail
+FROM telco.calls c
+WHERE c.to_number IN (
+    '+61402140955',  -- CLG Electrics
+    '+61402213582',  -- Finweb, Brisbane City Landscapes, etc.
+    '+61404610402',  -- Cool Solutions
+    '+61418127174',  -- No Show - Ian Kingston
+    '+61421189252',  -- AJS Australia Disability
+    '+61425757530',  -- Western AC
+    '+61431413530',  -- Pinnacle Accounting
+    '+61431587938'   -- Kiwi Golden Care
+)
+AND c.provider_id = 3  -- Retell only
+AND c.transcript IS NOT NULL
+ORDER BY c.to_number, c.started_at DESC;
+```
+
+### Appointment Phone Number Mapping
+
+| Phone | Company |
+|-------|---------|
+| +61402140955 | CLG Electrics |
+| +61402213582 | Finweb, Brisbane City Landscapes, Paradise Distributors |
+| +61404610402 | Cool Solutions |
+| +61418127174 | No Show - Ian Kingston |
+| +61421189252 | AJS Australia Disability |
+| +61425757530 | Western AC |
+| +61431413530 | Pinnacle Accounting |
+| +61431587938 | Kiwi Golden Care |
+
+### Data Source
+
+These calls come from the **Telco DB Sync** Retell workspace (Yes AI outbound campaign, May 2025+).
+
+**Retell API Key for this workspace:** `key_b8d6bd5512827f71f1f1202e06a4`
+
+See `Telcos/RETELL_API_KEYS.md` for full API key reference.
+
+---
+
 ## Data Freshness
 
 - **Last sync:** 2025-12-14
