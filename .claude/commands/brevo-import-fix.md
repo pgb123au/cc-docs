@@ -25,7 +25,7 @@ ls -la /c/Users/peter/Downloads/CC/CRM/Brevo/scripts/import_3_companies_v*.py | 
 ls -la /c/Users/peter/Downloads/CC/CRM/Brevo/scripts/brevo_audit*.py | tail -1
 ```
 
-**Current latest:** `import_3_companies_v7.py`, `brevo_audit_v4.py`
+**Current latest:** `import_3_companies_v8.py`, `brevo_audit_v4.py`
 
 ---
 
@@ -101,7 +101,7 @@ cd /c/Users/peter/Downloads/CC/CRM/Brevo/scripts && python delete_brevo_silent.p
 Run the **LATEST** version of the import script:
 
 ```bash
-cd /c/Users/peter/Downloads/CC/CRM/Brevo/scripts && python import_3_companies_v7.py
+cd /c/Users/peter/Downloads/CC/CRM/Brevo/scripts && python import_3_companies_v8.py
 ```
 
 ### Step 6: Verify Data
@@ -204,7 +204,7 @@ These source fields exist but have NO Brevo attribute:
 |------|---------|
 | `CRM/Brevo/scripts/brevo_api.py` | Brevo API client |
 | `CRM/Brevo/scripts/brevo_audit_v4.py` | Comprehensive audit (latest) |
-| `CRM/Brevo/scripts/import_3_companies_v7.py` | Import script (latest) |
+| `CRM/Brevo/scripts/import_3_companies_v8.py` | Import script (latest) |
 | `CRM/Brevo/scripts/delete_brevo_silent.py` | Data cleanup (silent mode) |
 | `CRM/Brevo/BREVO_FIELD_MAPPING_REPORT.md` | Field mapping report |
 | `CRM/Brevo/IMPORT_PLAN_COMPREHENSIVE.md` | Full import plan |
@@ -220,6 +220,7 @@ These source fields exist but have NO Brevo attribute:
 | v5 | Excel phone extraction, improved call logs |
 | v6 | Telco Warehouse PostgreSQL (telco.calls) |
 | v7 | Uses telco.contacts table with normalize_phone() |
+| v8 | Retell transcripts from telco.calls (RETELL_CALL_ID, RETELL_TRANSCRIPT, TELCO_SENTIMENT) |
 
 ---
 
