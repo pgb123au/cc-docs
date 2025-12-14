@@ -1,291 +1,186 @@
-# Brevo CRM Import - Status Report
+# Brevo CRM Import - Project Status
 
-**Last Updated:** 2025-12-13 09:35 AEDT
-**Session:** Marketing Automation Setup (Call Data Linked)
-
----
-
-## CURRENT STATE SUMMARY
-
-### Brevo Account
-- **Account Name:** Yes AI
-- **Plan:** Free (300 emails/day)
-- **Verified Sender:** yesrightau@gmail.com (NOT hello@yesai.au)
-- **Total Contacts:** 35,493
-- **Companies Created:** 68 (17 with real names from appointments)
-
-### What's COMPLETE ✅
-
-| Task | Details |
-|------|---------|
-| Brevo API integration | `brevo_api.py` working with all endpoints |
-| Custom attributes created | COMPANY, WEBSITE, SOURCE, APPOINTMENT_DATE, APPOINTMENT_STATUS, DEAL_STAGE |
-| Lists created | 6 lists (IDs 24-29) |
-| Contacts imported | 35,493 contacts in Brevo |
-| Companies API working | Can create companies and link contacts |
-| Test email sent | To Peter@Ball.com.au from yesrightau@gmail.com |
-| Mobile Message SMS integrated | `mobilemessage.py` ready (not tested with real SMS) |
-| Reignite Health COMPLETE | Full data: contact, company, lists, all attributes |
-
-### What's PARTIAL ⚠️
-
-| Task | Done | Remaining |
-|------|------|-----------|
-| COMPANY attribute on contacts | ~1,000 updated | ~32,000 remaining |
-| Contacts assigned to lists | Contacts have listIds but API shows 0 subscribers | May need re-sync |
-| DNC blocklisted | 658 should be blocked | Verify emailBlacklisted=true |
-| Companies with real names | 17 from appointments | 51 have domain names only |
-| Appointment data on contacts | 1 (Reignite Health) | 86 remaining |
-
-### What's NOT DONE ❌
-
-| Task | Notes |
-|------|-------|
-| Full COMPANY attribute update | Run `update_contact_attributes.py` (~30 min) |
-| All appointments imported | Run updated `import_appointments.py` |
-| Verify list subscriber counts | Brevo API shows 0 but contacts have listIds |
-| Clean up domain-as-company-name | 51 companies like "briarscottage.com.au" |
-| Link Google Sheet call data | User has Retell call sheet, needs auth |
+**Last Updated:** 2025-12-14
+**Current Import Version:** v8 (import_3_companies_v8.py)
+**Status:** ALL DATA PERFECT - 5 test companies imported successfully
 
 ---
 
-## BREVO LISTS
+## Current State
 
-| ID | Name | Purpose |
-|----|------|---------|
-| 24 | All Telemarketer Contacts | Everyone |
-| 25 | Safe to Contact | Non-DNC contacts |
-| 26 | Fresh Leads - Never Called | Never contacted |
-| 27 | DO NOT CALL | DNC - blocklisted |
-| 28 | Had Appointments | Booked appointments |
-| 29 | Previously Called | Called but no appointment |
+### What's Working
+- 5 test companies imported to Brevo with full data
+- HubSpot company/contact enrichment working
+- Telco Warehouse integration working (PostgreSQL)
+- Retell transcript extraction working (v8)
+- Audit passes with no errors
 
-**Note:** List subscriber counts show 0 in API but contacts DO have listIds assigned. This is a Brevo display/cache issue.
+### Test Companies Imported
+| Company | Contact | Source | Calls | Retell Transcripts |
+|---------|---------|--------|-------|-------------------|
+| Reignite Health | Sara Lehmann | HubSpot | 1 Zadarma | 0 |
+| Paradise Distributors | Bob Chalmers | HubSpot | 1 Zadarma | 0 |
+| JTW Building Group | Joe Van Stripe | Appointment | 1 Zadarma | 0 |
+| Lumiere Home Renovations | Chantelle | HubSpot | 1 Zadarma | 0 |
+| CLG Electrics | Chris | Appointment | 1 Zadarma | **1 Retell** |
 
----
-
-## BREVO CUSTOM ATTRIBUTES
-
-All created and working:
-- `FIRSTNAME` (built-in)
-- `LASTNAME` (built-in)
-- `SMS` (built-in)
-- `COMPANY` - Company name
-- `WEBSITE` - Company website
-- `SOURCE` - Data source (e.g., "massive_list_sa.csv")
-- `APPOINTMENT_DATE` - Date of appointment
-- `APPOINTMENT_TIME` - Time of appointment (NEW)
-- `APPOINTMENT_STATUS` - Status (e.g., "Seen - Client")
-- `DEAL_STAGE` - Won/Lost/Negotiation/etc.
-- `QUALITY` - Lead quality rating (NEW)
-- `FOLLOWUP_STATUS` - Follow-up status (NEW)
-- `RETELL_LOG` - Retell call timestamp (NEW)
-- `NOTES` - General notes (NEW)
+### Key Discovery
+The 5 test companies were called via **Zadarma** (not Retell). The `retell_log` field in appointments is misleadingly named - it logs ALL calls from any provider. Only Chris (CLG Electrics) has a Retell call in the database.
 
 ---
 
-## FILE LOCATIONS
+## Scripts & Versions
 
-### Scripts (C:\Users\peter\Downloads\CC\MARKETING\scripts\)
+### Import Scripts (use latest)
+| Script | Version | Purpose |
+|--------|---------|---------|
+| `import_3_companies_v8.py` | **LATEST** | Full import with Retell transcripts |
+| `import_3_companies_v7.py` | Previous | Uses telco.contacts table |
+| `import_3_companies_v6.py` | Older | First telco.calls integration |
 
-| File | Purpose | Status |
-|------|---------|--------|
-| `brevo_api.py` | Brevo REST API wrapper | ✅ Complete |
-| `mobilemessage.py` | Mobile Message SMS API | ✅ Complete |
-| `bulk_import_brevo.py` | Bulk import contacts | ✅ Complete |
-| `update_contact_attributes.py` | Update COMPANY/SOURCE on existing contacts | ✅ Complete |
-| `assign_contacts_to_lists.py` | Assign contacts to lists | ✅ Complete |
-| `create_companies.py` | Create companies and link contacts | ✅ Complete |
-| `import_appointments.py` | Import appointments with full data | ✅ Complete |
-| `import_contacts.py` | Original single-contact importer | ✅ Legacy |
-| `campaigns.py` | Email campaign creation | ✅ Complete |
-
-### Data Files (C:\Users\peter\Downloads\CC\CRM\)
-
-| File | Contents | Records |
-|------|----------|---------|
-| `Master_Contacts_With_Flags.csv` | All contacts with DNC/called flags | 54,086 |
-| `DO_NOT_CALL_Master.csv` | DNC phone numbers with emails | 852 |
-| `Safe_To_Contact.csv` | Non-DNC contacts | 21,693 |
-| `Fresh_Leads_Never_Called.csv` | Never contacted | 24,335 |
-| `Appointments_Enriched.csv` | All appointments with match data | 87 |
-| `Appointments_won.csv` | Won clients | 6 |
-| `Appointments_followup.csv` | Follow-up needed | 15 |
-| `Appointments_booked.csv` | Booked appointments | Various |
-| `consolidate_telemarketer_data.py` | Script that created above files | ✅ |
-| `enrich_appointments.py` | Script that enriched appointments | ✅ |
-| `call_log_linker.py` | Links Retell/Zadarma recordings | ✅ |
-
-### Source Data (C:\Users\peter\retell-dialer\)
-
-| File | Purpose |
-|------|---------|
-| `called_log.txt` | Phone numbers called |
-| `called_numbers.json` | Called numbers with timestamps |
-| `do_not_call.txt` | DNC list (852 numbers) |
-| `massive_list.csv` | Main contact list |
-| `massive_list_vic.csv` | Victoria contacts |
-| `massive_list_sa.csv` | South Australia contacts |
+### Other Scripts
+| Script | Purpose |
+|--------|---------|
+| `brevo_audit_v4.py` | Comprehensive data audit |
+| `delete_brevo_silent.py` | Delete all Brevo data (silent mode) |
+| `brevo_api.py` | Brevo API client |
 
 ---
 
-## API CREDENTIALS
+## Data Sources
 
-| Service | Location | Notes |
-|---------|----------|-------|
-| Brevo API | `C:\Users\peter\Downloads\CC\Brevo_API_Key.txt` | Used by brevo_api.py |
-| Retell API (Reignite) | `C:\Users\peter\Downloads\Retell_API_Key.txt` | Main workspace |
-| Retell API (Telemarketer) | `key_48d1b17aad7e13d3ea841faaee47` | Different workspace |
-| Mobile Message | Hardcoded in mobilemessage.py | Username: 03KnC9 |
+### Files
+| Source | Path | Records |
+|--------|------|---------|
+| HubSpot Companies | `C:\Users\peter\Documents\HS\All_Companies_2025-07-07_Cleaned_For_HubSpot.csv` | 363K |
+| HubSpot Contacts | `C:\Users\peter\Documents\HS\All_Contacts_2025_07_07_Cleaned.csv` | 207K |
+| Appointments | `C:\Users\peter\Downloads\CC\CRM\Appointments_Enriched.csv` | 87 |
+| Excel (Phone Call data) | OneDrive - `AI Appointments Set 2025-copy2025-12-12.xlsx` | 39 phones |
+
+### Telco Warehouse (PostgreSQL)
+```
+Host:     96.47.238.189
+Port:     5432
+Database: telco_warehouse
+User:     telco_sync
+Password: TelcoSync2024!
+Schema:   telco
+```
+
+**Key Tables:**
+- `telco.contacts` - Pre-aggregated stats per phone number
+- `telco.calls` - Raw call data with transcripts (use for Retell data)
+- `telco.providers` - Provider lookup (retell=3, zadarma=1, telnyx=2)
+
+**Important:** Always use `telco.normalize_phone()` for lookups!
 
 ---
 
-## COMMANDS TO CONTINUE
+## V8 Import Features
 
-### Update all contacts with COMPANY attribute (~30 min)
+### Retell Fields Added
+| Brevo Attribute | Source |
+|-----------------|--------|
+| RETELL_CALL_ID | telco.calls.external_call_id |
+| RETELL_TRANSCRIPT | telco.calls.transcript |
+| RETELL_CALL_SUMMARY | telco.calls.raw_data->'call_analysis'->>'call_summary' |
+| TELCO_SENTIMENT | telco.calls.raw_data->'call_analysis'->>'user_sentiment' |
+| RETELL_CALL_DURATION | telco.calls.duration_seconds |
+| RETELL_CALL_DIRECTION | telco.calls.direction |
+| RETELL_CALL_TIME | telco.calls.started_at |
+| RETELL_SUCCESSFUL | telco.calls.raw_data->'call_analysis'->>'call_successful' |
+| RETELL_VOICEMAIL | telco.calls.raw_data->'call_analysis'->>'in_voicemail' |
+| RETELL_DISCONNECT_REASON | telco.calls.raw_data->>'disconnection_reason' |
+
+### Aggregated Stats (from telco.contacts)
+| Brevo Attribute | Source |
+|-----------------|--------|
+| TELCO_TOTAL_CALLS | telco.contacts.total_calls |
+| RETELL_CALL_COUNT | telco.contacts.retell_calls |
+| ZADARMA_CALL_COUNT | telco.contacts.zadarma_calls |
+| TELCO_PROVIDER | Comma-separated list of providers |
+| TELCO_IS_DNC | telco.contacts.is_dnc |
+| TELCO_DNC_REASON | telco.contacts.dnc_reason |
+| TELCO_CONTACT_STATUS | telco.contacts.contact_status |
+| TELCO_LEAD_SCORE | telco.contacts.lead_score |
+
+---
+
+## Quick Commands
+
+### Run Full Import Process
 ```bash
-cd /c/Users/peter/Downloads/CC/MARKETING/scripts
-python update_contact_attributes.py
+# 1. Delete existing data
+cd /c/Users/peter/Downloads/CC/CRM/Brevo/scripts && python delete_brevo_silent.py
+
+# 2. Run import
+python import_3_companies_v8.py
+
+# 3. Verify
+python brevo_audit_v4.py
 ```
 
-### Import all appointments with full data
-```bash
-cd /c/Users/peter/Downloads/CC/MARKETING/scripts
-python import_appointments.py
+### Use Slash Command
+```
+/brevo-import-fix
 ```
 
-### Create remaining companies from CSV
-```bash
-cd /c/Users/peter/Downloads/CC/MARKETING/scripts
-python create_companies.py --limit 500
-```
-
-### Verify Brevo state
-```bash
-cd /c/Users/peter/Downloads/CC/MARKETING/scripts
-python -c "
-from brevo_api import BrevoClient
-client = BrevoClient()
-print('Contacts:', client.get_contacts(limit=1)['data']['count'])
-companies = client._request('GET', 'companies', params={'limit': 1})
-print('Companies:', companies)
-"
+### Query Retell Calls Directly
+```sql
+SELECT
+    c.external_call_id,
+    c.to_number,
+    c.started_at,
+    c.duration_seconds,
+    LEFT(c.transcript, 200) as transcript_preview,
+    c.raw_data->'call_analysis'->>'call_summary' as summary,
+    c.raw_data->'call_analysis'->>'user_sentiment' as sentiment
+FROM telco.calls c
+WHERE c.provider_id = 3
+  AND c.transcript IS NOT NULL
+ORDER BY c.started_at DESC
+LIMIT 10;
 ```
 
 ---
 
-## EXAMPLE: Complete Contact Record
+## Next Steps (When Continuing)
 
-**Reignite Health (COMPLETE - 2 Contacts):**
-
-### Contact 1: Sara Lehmann (Telemarketer Lead)
-```
-Email: sara@reignitehealth.com.au
-ID: 778
-FIRSTNAME: Sara
-LASTNAME: Lehmann
-COMPANY: Reignite Health
-APPOINTMENT_DATE: 2025-09-17
-APPOINTMENT_TIME: 10:00am
-APPOINTMENT_STATUS: Seen - Client
-DEAL_STAGE: Won
-QUALITY: Good
-FOLLOWUP_STATUS: Client
-RETELL_LOG: 09/01/2025 11:48 - Recording: https://dxc03zgurdly9.cloudfront.net/2ddc176248fead0e1f0ad06936d899ad266e93bfe45bf036e9c5f3e7ebd56a94/recording.wav
-SOURCE: Telemarketer Campaign
-NOTES: Won client. Telemarketer appointment converted. Original call to Liam Potter's voicemail.
-Lists: [24, 25, 28]
-```
-
-### Contact 2: Liam Potter (Founder)
-```
-Email: liam@reignitehealth.com.au
-ID: 35494
-FIRSTNAME: Liam
-LASTNAME: Potter
-COMPANY: Reignite Health
-SMS: 61437160997  (from HubSpot)
-DEAL_STAGE: Closed Won
-SOURCE: Website Audit Client
-RETELL_LOG: 09/01/2025 11:48 - Recording: https://dxc03zgurdly9.cloudfront.net/2ddc176248fead0e1f0ad06936d899ad266e93bfe45bf036e9c5f3e7ebd56a94/recording.wav
-NOTES: Founder/Owner. Original telemarketer call went to his voicemail. Received digital audit report Dec 2025.
-Lists: [24, 25, 28]
-```
-
-### Contact 3: HubSpot Lead (Alt Domain)
-```
-Email: hello@reignitehealth.co
-ID: 35495
-COMPANY: Reignite Health
-SOURCE: HubSpot Scraped Lead - Aged care (AU).xlsx
-WEBSITE: reignitehealth.co
-NOTES: From HubSpot. Alt domain .co (main is .com.au)
-Lists: [24, 25]
-```
-
-### Company Record
-```
-Name: Reignite Health
-ID: 693c813d58677e43aa29b493
-Domain: reignitehealth.com.au
-Linked Contacts: [778, 35494, 35495] (Sara + Liam + hello@)
-Phone: +61437160997 (on Liam's contact)
-Facebook: facebook.com/reignitehealth
-```
-
-### Additional Data Sources Found
-- `CLIENTS/reignite-health/` - Full website audit, email draft, logo
-- `CRM/ALLIED_HEALTH_VIC_OUTREACH.md` - Marketing templates using as case study
-- `CRM/All_Companies_2025-07-07_Cleaned_For_HubSpot.csv` - Phone +61437160997, Facebook page
-- `CRM/All_Contacts_2025_07_07_Cleaned.csv` - HubSpot contact hello@reignitehealth.co
-- Audit report addressed to Liam Potter (founder, physiotherapist)
-- Company: 11-50 employees, serves 10 aged care villages, 877 patients
-- Alt domain: reignitehealth.co (scraped from Aged care AU list)
+1. **Expand to more contacts** - Currently only 5 test companies, ready for full import
+2. **Add more Brevo fields** - See `brevo-import-fix.md` for fields NOT yet populated
+3. **DNC handling** - `telco.contacts.is_dnc` and `dnc_reason` are captured but not enforced
 
 ---
 
-## KNOWN ISSUES
+## Related Documentation
 
-1. **List subscriber counts show 0** - Contacts have listIds but Brevo API returns totalSubscribers=0. Likely cache/display issue.
-
-2. **Some companies have gmail.com as domain** - When contact uses personal email (e.g., bchalmers616@gmail.com for Paradise Distributors).
-
-3. **Domain names as company names** - 51 companies from telemarketer list have domain (briarscottage.com.au) not real name.
-
-4. **hello@yesai.au not verified** - Must send from yesrightau@gmail.com or verify hello@yesai.au in Brevo.
-
----
-
-## NEXT SESSION TODO
-
-1. [ ] Run `update_contact_attributes.py` for all 32,000+ contacts
-2. [ ] Run `import_appointments.py` for all 87 appointments
-3. [ ] Verify list counts update in Brevo
-4. [ ] Check DNC contacts are properly blocklisted
-5. [ ] Test email campaign to small list
-6. [ ] Optionally: Clean up company names (domain -> real name)
-7. [x] ~~Import Google Sheet call data~~ DONE - 22,000 calls exported to `CRM/call_log_sheet_export.json` and `CRM/call_log_sheet2_export.json`
+| Doc | Purpose |
+|-----|---------|
+| `.claude/commands/brevo-import-fix.md` | Slash command with full process |
+| `CRM/Brevo/BREVO_FIELD_MAPPING_REPORT.md` | All field mappings |
+| `CRM/Brevo/IMPORT_PLAN_COMPREHENSIVE.md` | Full import strategy |
+| `Telcos/TELCO_WAREHOUSE_CRM_HANDOFF.md` | Telco database reference |
+| `CRM/APPOINTMENTS_MOBILE_NUMBERS.md` | All mobile numbers from appointments |
 
 ---
 
-## CALL DATA INTEGRATION
+## Troubleshooting
 
-### Google Sheets Exported
-
-| File | Records | Date Range |
-|------|---------|------------|
-| `call_log_sheet_export.json` | 15,156 | Aug-Oct 2025 |
-| `call_log_sheet2_export.json` | 6,844 | Jun-Jul 2025 |
-
-**Total:** 22,000 call records with transcripts and recording URLs.
-
-### Reignite Health Call Found
-
-```
-Call ID: call_0233f8b1ac5b37c6d76362afc9f
-Timestamp: 01/09/2025, 11:48:55
-Recording: https://dxc03zgurdly9.cloudfront.net/2ddc176248fead0e1f0ad06936d899ad266e93bfe45bf036e9c5f3e7ebd56a94/recording.wav
-Transcript: "Hi there. You've reached Liam Potter from Reignite Health. Sorry that I've missed your phone call..."
+### Telco DB Connection Flaky
+The connection sometimes fails with "password authentication failed" - just retry. Add delay between attempts:
+```python
+for attempt in range(5):
+    try:
+        conn = psycopg2.connect(**TELCO_DB)
+        break
+    except:
+        time.sleep(3)
 ```
 
-Recording URL added to both Sara Lehmann and Liam Potter's RETELL_LOG in Brevo.
+### No Retell Calls Found
+Check the phone number format - Retell uses `+61...` format. Always use `telco.normalize_phone()`:
+```sql
+SELECT * FROM telco.calls
+WHERE telco.normalize_phone(to_number) = telco.normalize_phone('+61402140955')
+  AND provider_id = 3;
+```
